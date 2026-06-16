@@ -224,10 +224,7 @@ function HomePage() {
           </p>
         </div>
         <Button asChild variant="note" className="min-h-12">
-          <Link to="/collections">
-            <Layers2 aria-hidden="true" />
-            <span>Get Volume 1</span>
-          </Link>
+          <Link to="/collections">Get Volume 1</Link>
         </Button>
       </section>
     </AppLayout>
