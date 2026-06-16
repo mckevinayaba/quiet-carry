@@ -1,4 +1,4 @@
-import { Heart, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { BookOpenText, Heart, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -67,7 +67,6 @@ function NotePage() {
   };
 
   const handleSend = async () => {
-    let copied = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({ title: note.title, text: note.sendableText });
@@ -77,13 +76,11 @@ function NotePage() {
         typeof navigator.clipboard.writeText === "function"
       ) {
         await navigator.clipboard.writeText(note.sendableText);
-        copied = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
           await navigator.clipboard.writeText(note.sendableText);
-          copied = true;
         }
       } catch {
         /* noop */
@@ -92,11 +89,7 @@ function NotePage() {
 
     logSentNote(note);
     trackEvent("note_sent", { noteId: note.id });
-    setMessage(
-      copied
-        ? "Copied. Send it to someone who may need words today."
-        : "Sent quietly. Pass it to someone who may need words today.",
-    );
+    setMessage("Copied. Send it to someone who may need words today.");
     registerGuestAction();
   };
 
@@ -137,6 +130,21 @@ function NotePage() {
                 Write from This
               </Link>
             </ActionButton>
+            <ActionButton
+              asChild
+              hint="Three more notes for what you carry"
+              icon={BookOpenText}
+            >
+              <a href="#similar-notes">Read Similar Notes</a>
+            </ActionButton>
+            <ActionButton
+              asChild
+              hint="See the full Volume 1 collection"
+              icon={Layers2}
+              onClick={() => trackEvent("collection_clicked", { from: "note", noteId: note.id })}
+            >
+              <Link to="/collections">Unlock Full Collection</Link>
+            </ActionButton>
           </>
         }
       />
@@ -169,7 +177,7 @@ function NotePage() {
         </section>
       ) : null}
 
-      <section className="space-y-3">
+      <section id="similar-notes" className="space-y-3 scroll-mt-6">
         <h2 className="font-display text-2xl leading-none">Other notes you may need</h2>
         <div className="grid gap-3">
           {similar.map((entry) => (

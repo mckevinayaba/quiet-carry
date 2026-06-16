@@ -1,9 +1,19 @@
-import { Heart, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { Heart, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
+import { ActionButton } from "@/components/action-button";
 import { AppLayout } from "@/components/app-layout";
+import { ReceiptBlock } from "@/components/receipt-block";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import { featuredNote } from "@/lib/note-data";
+import {
+  incrementGuestActionCount,
+  keepNote,
+  logSentNote,
+  shouldShowAccountPrompt,
+} from "@/lib/note-storage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,6 +34,55 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const [message, setMessage] = useState<string | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [dismissedPrompt, setDismissedPrompt] = useState(false);
+
+  useEffect(() => {
+    trackEvent("note_opened", { noteId: featuredNote.id, category: featuredNote.categorySlug, source: "home" });
+  }, []);
+
+  const registerGuestAction = () => {
+    const count = incrementGuestActionCount();
+    if (shouldShowAccountPrompt(count) && !showPrompt && !dismissedPrompt) {
+      setShowPrompt(true);
+      trackEvent("account_prompt_shown", { actionCount: count });
+    }
+  };
+
+  const handleKeep = () => {
+    keepNote(featuredNote);
+    trackEvent("note_kept", { noteId: featuredNote.id, source: "home" });
+    setMessage("Kept. You can come back to this when you need it.");
+    registerGuestAction();
+  };
+
+  const handleSend = async () => {
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share({ title: featuredNote.title, text: featuredNote.sendableText });
+      } else if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
+        await navigator.clipboard.writeText(featuredNote.sendableText);
+      }
+    } catch {
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard) {
+          await navigator.clipboard.writeText(featuredNote.sendableText);
+        }
+      } catch {
+        /* noop */
+      }
+    }
+    logSentNote(featuredNote);
+    trackEvent("note_sent", { noteId: featuredNote.id, source: "home" });
+    setMessage("Copied. Send it to someone who may need words today.");
+    registerGuestAction();
+  };
+
   return (
     <AppLayout className="space-y-8 pb-8">
       <section className="space-y-5 py-3">
@@ -57,6 +116,13 @@ function HomePage() {
           <h2 className="font-display text-3xl leading-none">Today’s Note</h2>
           <Heart className="heart-mark" aria-hidden="true" />
         </div>
+
+        {message ? (
+          <div className="paper-panel text-base leading-7 text-foreground" role="status">
+            {message}
+          </div>
+        ) : null}
+
         <article className="space-y-4">
           <div className="note-surface">
             <div className="space-y-4">
@@ -64,15 +130,82 @@ function HomePage() {
               <div className="note-copy">{featuredNote.mainText}</div>
             </div>
           </div>
+
+          <ReceiptBlock
+            from={featuredNote.receiptFrom}
+            to={featuredNote.receiptTo}
+            date={featuredNote.receiptDate}
+            total={featuredNote.receiptTotal}
+          />
+
           <div className="grid gap-3">
-            <Button asChild variant="note" className="min-h-14 justify-start text-left text-base">
-              <Link to="/note/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
-                <LockKeyhole aria-hidden="true" />
-                <span>Open this note</span>
+            <Button
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
+              onClick={handleKeep}
+            >
+              <LockKeyhole aria-hidden="true" />
+              <span className="flex flex-col items-start gap-0.5">
+                <span>Keep this Note</span>
+                <span className="text-xs text-muted-foreground">Save it privately for later</span>
+              </span>
+            </Button>
+            <Button
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
+              onClick={handleSend}
+            >
+              <Mail aria-hidden="true" />
+              <span className="flex flex-col items-start gap-0.5">
+                <span>Send this Quietly</span>
+                <span className="text-xs text-muted-foreground">Share softly, without noise</span>
+              </span>
+            </Button>
+            <Button
+              asChild
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
+              onClick={() => trackEvent("reflection_started", { noteId: featuredNote.id, source: "home" })}
+            >
+              <Link to="/write/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
+                <NotebookPen aria-hidden="true" />
+                <span className="flex flex-col items-start gap-0.5">
+                  <span>Write from This</span>
+                  <span className="text-xs text-muted-foreground">Begin a private reflection</span>
+                </span>
               </Link>
             </Button>
           </div>
         </article>
+
+
+        {showPrompt ? (
+          <section className="paper-panel space-y-3">
+            <div className="flex items-center gap-3">
+              <Heart className="heart-mark" aria-hidden="true" />
+              <h3 className="font-display text-2xl leading-none">Keep them safe across devices</h3>
+            </div>
+            <p className="text-base leading-7 text-muted-foreground">
+              Your notes are being kept on this device. Create a private account if you want them
+              safe across devices.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Button
+                variant="paper"
+                className="min-h-12"
+                onClick={() => {
+                  setShowPrompt(false);
+                  setDismissedPrompt(true);
+                }}
+              >
+                Not now
+              </Button>
+              <Button asChild variant="note" className="min-h-12">
+                <Link to="/account">Create private account</Link>
+              </Button>
+            </div>
+          </section>
+        ) : null}
       </section>
 
       <section className="space-y-3">
@@ -112,7 +245,7 @@ function HomePage() {
           </p>
         </div>
         <Button asChild variant="note" className="min-h-12">
-          <Link to="/collections">Unlock Volume 1</Link>
+          <Link to="/collections">Get Volume 1</Link>
         </Button>
       </section>
     </AppLayout>

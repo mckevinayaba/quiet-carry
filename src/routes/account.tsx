@@ -47,9 +47,17 @@ function AccountPage() {
             reflections to stay safe across devices, create a private account.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button variant="note">Create Private Account</Button>
-            <Button variant="paper">Sign In</Button>
+            <Button variant="note" disabled aria-disabled="true">
+              Create Private Account (coming soon)
+            </Button>
+            <Button variant="paper" disabled aria-disabled="true">
+              Sign In (coming soon)
+            </Button>
           </div>
+          <p className="text-xs leading-5 text-muted-foreground">
+            Accounts are not open yet. Your notes and reflections are saved privately on this
+            device until then.
+          </p>
           <div className="space-y-1 text-sm text-muted-foreground">
             <p>No public profile.</p>
             <p>No followers.</p>
