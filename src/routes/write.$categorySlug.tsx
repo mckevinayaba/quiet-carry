@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
 import { ReflectionEditor } from "@/components/reflection-editor";
@@ -32,17 +32,25 @@ function WritePage() {
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    trackEvent("reflection_started", { noteId: note.id });
+  }, [note.id]);
+
   return (
     <AppLayout className="space-y-5 pb-8">
       <section className="space-y-3 py-2">
         <div className="stitched-label">Write from this note</div>
-        <h1 className="font-display text-5xl leading-none">Write from this note</h1>
+        <h1 className="font-display text-4xl leading-[1.05] sm:text-5xl">Write from this note</h1>
         <p className="text-base leading-7 text-muted-foreground">
           No one will see this unless you choose to share it.
         </p>
       </section>
 
-      {message ? <div className="paper-panel text-base text-foreground">{message}</div> : null}
+      {message ? (
+        <div className="paper-panel text-base leading-7 text-foreground" role="status">
+          {message}
+        </div>
+      ) : null}
 
       <ReflectionEditor
         categorySlug={note.categorySlug}
@@ -57,7 +65,7 @@ function WritePage() {
           saveReflection(note, value.trim());
           trackEvent("reflection_saved", { noteId: note.id });
           setMessage(
-            "Saved privately. Your reflection is saved on this device. Create a private account if you want to keep it safe across devices.",
+            "Saved privately. Saved on this device. Create a private account if you want to keep your reflections safe across devices.",
           );
         }}
         prompt={note.journalPrompt}

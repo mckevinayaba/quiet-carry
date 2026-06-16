@@ -35,13 +35,17 @@ export function CollectionCard({ collection, onClick }: CollectionCardProps) {
         </ul>
       ) : null}
 
+      {collection.price ? (
+        <p className="font-label text-lg text-foreground">{collection.price}</p>
+      ) : null}
+
       {collection.comingSoon ? (
         <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
           <Clock3 className="size-4" aria-hidden="true" />
           Coming soon
         </div>
       ) : (
-        <Button asChild variant="note" onClick={onClick}>
+        <Button asChild variant="note" className="min-h-12" onClick={onClick}>
           <a href={collection.ctaHref} rel="noreferrer" target="_blank">
             {collection.ctaLabel}
             <ArrowUpRight aria-hidden="true" />

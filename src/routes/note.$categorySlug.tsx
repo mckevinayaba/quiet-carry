@@ -1,4 +1,4 @@
-import { Heart, LockKeyhole, Mail, NotebookPen, Palette, Sparkles, Unlock } from "lucide-react";
+import { Heart, LockKeyhole, Mail, NotebookPen } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
 import {
-  getGuestActionCount,
   incrementGuestActionCount,
   keepNote,
   logSentNote,
@@ -26,7 +25,10 @@ export const Route = createFileRoute("/note/$categorySlug")({
   head: ({ loaderData }) => ({
     meta: [
       { title: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
-      { name: "description", content: loaderData?.category.subtitle ?? "A private note for what you carry quietly." },
+      {
+        name: "description",
+        content: loaderData?.category.subtitle ?? "A private note for what you carry quietly.",
+      },
       { property: "og:title", content: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
       {
         property: "og:description",
@@ -41,15 +43,17 @@ function NotePage() {
   const { category, note } = Route.useLoaderData();
   const [message, setMessage] = useState<string | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [dismissedPrompt, setDismissedPrompt] = useState(false);
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
     trackEvent("note_opened", { noteId: note.id, category: category.slug });
+    setMessage(null);
   }, [category.slug, note.id]);
 
   const registerGuestAction = () => {
     const count = incrementGuestActionCount();
-    if (shouldShowAccountPrompt(count) && !showPrompt) {
+    if (shouldShowAccountPrompt(count) && !showPrompt && !dismissedPrompt) {
       setShowPrompt(true);
       trackEvent("account_prompt_shown", { actionCount: count });
     }
@@ -57,79 +61,124 @@ function NotePage() {
 
   const handleKeep = () => {
     keepNote(note);
-    registerGuestAction();
     trackEvent("note_kept", { noteId: note.id });
     setMessage("Kept. You can come back to this when you need it.");
+    registerGuestAction();
   };
 
   const handleSend = async () => {
+    let copied = false;
     try {
-      if (typeof navigator !== "undefined" && navigator.share) {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({ title: note.title, text: note.sendableText });
-      } else if (typeof navigator !== "undefined"?.valueOf()) {
+      } else if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
         await navigator.clipboard.writeText(note.sendableText);
+        copied = true;
       }
     } catch {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(note.sendableText);
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard) {
+          await navigator.clipboard.writeText(note.sendableText);
+          copied = true;
+        }
+      } catch {
+        /* noop */
       }
     }
 
     logSentNote(note);
-    registerGuestAction();
     trackEvent("note_sent", { noteId: note.id });
-    setMessage("Sent quietly. If sharing is not available, the note text was copied.");
+    setMessage(
+      copied
+        ? "Copied. Send it to someone who may need words today."
+        : "Sent quietly. Pass it to someone who may need words today.",
+    );
+    registerGuestAction();
   };
 
   return (
-    <AppLayout className="space-y-5 pb-8">
+    <AppLayout className="space-y-6 pb-8">
       <section className="space-y-3 py-2">
         <div className="stitched-label">{category.title}</div>
-        <h1 className="font-display text-5xl leading-none text-foreground">The Note You Needed Today</h1>
+        <h1 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl">
+          {note.title}
+        </h1>
         <p className="text-base leading-7 text-muted-foreground">{category.subtitle}</p>
       </section>
 
-      {message ? <div className="paper-panel text-base text-foreground">{message}</div> : null}
+      {message ? (
+        <div className="paper-panel text-base leading-7 text-foreground" role="status">
+          {message}
+        </div>
+      ) : null}
 
       <NoteCard
         categoryLabel={category.title}
         note={note}
         actions={
           <>
-            <ActionButton hint="Keep it privately on this device" icon={LockKeyhole} onClick={handleKeep}>
+            <ActionButton hint="Save it privately for later" icon={LockKeyhole} onClick={handleKeep}>
               Keep this Note
             </ActionButton>
-            <ActionButton hint="Share or copy softly" icon={Mail} onClick={handleSend}>
+            <ActionButton hint="Share softly, without noise" icon={Mail} onClick={handleSend}>
               Send this Quietly
             </ActionButton>
-            <ActionButton asChild hint="Write privately from what this opened" icon={NotebookPen}>
+            <ActionButton
+              asChild
+              hint="Begin a private reflection"
+              icon={NotebookPen}
+              onClick={() => trackEvent("reflection_started", { noteId: note.id })}
+            >
               <Link to="/write/$categorySlug" params={{ categorySlug: category.slug }}>
                 Write from This
               </Link>
-            </ActionButton>
-            <ActionButton hint="Open a nearby note" icon={Sparkles}>
-              Read Similar Notes
-            </ActionButton>
-            <ActionButton hint="Save this note image later" icon={Palette}>
-              Save as Wallpaper
-            </ActionButton>
-            <ActionButton asChild hint="Explore the deeper collection" icon={Unlock}>
-              <Link to="/collections">Unlock Full Collection</Link>
             </ActionButton>
           </>
         }
       />
 
+      {showPrompt ? (
+        <section className="paper-panel space-y-3">
+          <div className="flex items-center gap-3">
+            <Heart className="heart-mark" aria-hidden="true" />
+            <h2 className="font-display text-2xl leading-none">Keep them safe across devices</h2>
+          </div>
+          <p className="text-base leading-7 text-muted-foreground">
+            Your notes are being kept on this device. Create a private account if you want them safe
+            across devices.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              variant="paper"
+              className="min-h-12"
+              onClick={() => {
+                setShowPrompt(false);
+                setDismissedPrompt(true);
+              }}
+            >
+              Not now
+            </Button>
+            <Button asChild variant="note" className="min-h-12">
+              <Link to="/account">Create private account</Link>
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
       <section className="space-y-3">
-        <h2 className="font-display text-4xl leading-none">Read Similar Notes</h2>
+        <h2 className="font-display text-2xl leading-none">Other notes you may need</h2>
         <div className="grid gap-3">
           {similar.map((entry) => (
             <article key={entry.id} className="paper-panel space-y-3">
               <p className="eyebrow-copy">{entry.title}</p>
-              <p className="font-note text-[1.8rem] leading-none text-foreground">
+              <p className="font-note text-2xl leading-tight text-foreground">
                 {entry.mainText.split("\n").slice(0, 3).join(" ")}
               </p>
-              <Button asChild variant="paper">
+              <Button asChild variant="paper" className="min-h-12">
                 <Link to="/note/$categorySlug" params={{ categorySlug: entry.categorySlug }}>
                   Open note
                 </Link>
@@ -138,22 +187,6 @@ function NotePage() {
           ))}
         </div>
       </section>
-
-      {showPrompt || getGuestActionCount() >= 3 ? (
-        <section className="paper-panel space-y-3">
-          <div className="flex items-center gap-3">
-            <Heart className="heart-mark" aria-hidden="true" />
-            <h2 className="font-display text-3xl leading-none">Keep this private, safely</h2>
-          </div>
-          <p className="text-base leading-7 text-muted-foreground">
-            Create a private account so your notes and shelves do not get lost. No public profile.
-            No comments. No followers.
-          </p>
-          <Button asChild variant="note">
-            <Link to="/account">Create a private account</Link>
-          </Button>
-        </section>
-      ) : null}
     </AppLayout>
   );
 }
