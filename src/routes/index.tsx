@@ -30,9 +30,9 @@ import {
 } from "@/lib/note-storage";
 import { isValidEmail, saveWaitlistEntry } from "@/lib/waitlist";
 
-import heroEditorial from "@/assets/hero-editorial.jpg";
+import heroCollage from "@/assets/hero-note-collage.jpg";
 import manifestoWindow from "@/assets/manifesto-window.jpg";
-import volumeStilllife from "@/assets/volume-stilllife.jpg";
+import volumeCollage from "@/assets/volume-one-collage.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -138,38 +138,22 @@ function Hero() {
 function HeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-[34rem]">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-border shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)]">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-[28px] border border-border shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)] rotate-[-1.2deg]">
         <img
-          src={heroEditorial}
-          alt="Hands holding a small folded note beside an envelope, a cup of tea, dried flowers, and a phone displaying a quiet note"
+          src={heroCollage}
+          alt="A handmade collage: an opened vintage envelope, a handwritten note that reads ‘the truth was too heavy’, a typewritten FROM TO DATE TOTAL receipt, pressed flowers, a navy stitched fabric ribbon and a small hand-drawn heart"
           width={1536}
-          height={1280}
+          height={2048}
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
       </div>
 
-      {/* Floating phone mockup */}
+      {/* Floating phone mockup — the calmer in-app reading view */}
       <div
         aria-hidden
-        className="absolute -bottom-6 -left-2 hidden w-[18rem] rotate-[-4deg] sm:block lg:-left-10 lg:-bottom-10 lg:w-[20rem]"
+        className="absolute -bottom-6 -left-2 hidden w-[17rem] rotate-[-4deg] sm:block lg:-left-12 lg:-bottom-10 lg:w-[19rem]"
       >
         <PhoneMockup />
-      </div>
-
-      {/* Floating receipt-style tag */}
-      <div
-        aria-hidden
-        className="paper-panel absolute -right-3 top-6 hidden w-[14rem] rotate-[3deg] sm:block lg:-right-8 lg:top-10"
-      >
-        <div className="eyebrow-copy">Today’s Note</div>
-        <p className="mt-1 font-display text-xl leading-tight text-foreground">
-          The truth was too heavy.
-        </p>
-        <div className="receipt-row mt-3" />
-        <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          For the days when “I’m fine” is not the truth.
-        </p>
       </div>
     </div>
   );
@@ -305,7 +289,7 @@ function CategoriesPreview() {
             key={c.slug}
             to="/note/$categorySlug"
             params={{ categorySlug: c.slug }}
-            className="group paper-panel space-y-2 p-5 transition-transform duration-200 hover:-translate-y-0.5"
+            className="group stitched-edge space-y-2 p-5 transition-transform duration-200 hover:-translate-y-0.5"
           >
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-balance font-display text-2xl leading-[1.1] text-foreground">
@@ -546,10 +530,10 @@ function VolumeOne() {
             <span className="font-label text-base text-foreground">R149 launch price</span>
           </div>
         </div>
-        <div className="relative overflow-hidden rounded-[24px] border border-border">
+        <div className="relative overflow-hidden rounded-[24px] border border-border shadow-[0_30px_60px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)] rotate-[1deg]">
           <img
-            src={volumeStilllife}
-            alt="A stack of softly aged paper notes tied with twine, beside a sealed kraft envelope and a fountain pen"
+            src={volumeCollage}
+            alt="A stack of handwritten notes tied with twine and a navy stitched fabric tag with a pressed flower, beside a kraft envelope sealed with a red MAD wax stamp"
             width={1536}
             height={1024}
             loading="lazy"
