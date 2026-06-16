@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      feedback: {
+        Row: {
+          created_at: string
+          event_context: Json | null
+          id: string
+          message: string
+          page_path: string | null
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_context?: Json | null
+          id?: string
+          message: string
+          page_path?: string | null
+          source?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_context?: Json | null
+          id?: string
+          message?: string
+          page_path?: string | null
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      waitlist: {
+        Row: {
+          context: string | null
+          created_at: string
+          email: string
+          id: string
+          page_path: string | null
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          page_path?: string | null
+          source: string
+          user_agent?: string | null
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          page_path?: string | null
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
