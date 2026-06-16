@@ -574,13 +574,17 @@ function Waitlist() {
   const [submitted, setSubmitted] = useState(false);
   const ref = useRef<HTMLFormElement>(null);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidEmail(email)) {
       setError("Please enter an email address that looks right.");
       return;
     }
-    saveWaitlistEntry(email, "account");
+    const res = await saveWaitlistEntry(email, "landing");
+    if (!res.ok) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
     trackEvent("waitlist_submitted", { source: "landing" });
     setSubmitted(true);
   };
