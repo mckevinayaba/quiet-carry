@@ -1,14 +1,16 @@
-import { ArrowUpRight, Clock3 } from "lucide-react";
+import { ArrowRight, Clock3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { CollectionEntry } from "@/lib/note-data";
 
 interface CollectionCardProps {
   collection: CollectionEntry;
-  onClick?: () => void;
+  onWaitlistClick?: () => void;
 }
 
-export function CollectionCard({ collection, onClick }: CollectionCardProps) {
+export function CollectionCard({ collection, onWaitlistClick }: CollectionCardProps) {
+  const hasWaitlistCta = collection.comingSoon && collection.ctaLabel;
+
   return (
     <article className="paper-panel space-y-4">
       <div className="space-y-3">
@@ -26,32 +28,31 @@ export function CollectionCard({ collection, onClick }: CollectionCardProps) {
         <ul className="grid gap-2 text-sm text-foreground">
           {collection.contents.map((item) => (
             <li key={item} className="flex items-center gap-2">
-              <span className="heart-mark" aria-hidden="true">
-                ♥
-              </span>
+              <span className="heart-mark" aria-hidden="true">♥</span>
               {item}
             </li>
           ))}
         </ul>
       ) : null}
 
-      {collection.price ? (
-        <p className="font-label text-lg text-foreground">{collection.price}</p>
-      ) : null}
+      <div className="flex flex-wrap items-center gap-3">
+        {collection.comingSoon ? (
+          <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
+            <Clock3 className="size-4" aria-hidden="true" />
+            Coming soon
+          </span>
+        ) : null}
+        {collection.price ? (
+          <p className="font-label text-lg text-foreground">{collection.price}</p>
+        ) : null}
+      </div>
 
-      {collection.comingSoon ? (
-        <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
-          <Clock3 className="size-4" aria-hidden="true" />
-          Coming soon
-        </div>
-      ) : (
-        <Button asChild variant="note" className="min-h-12" onClick={onClick}>
-          <a href={collection.ctaHref} rel="noreferrer" target="_blank">
-            {collection.ctaLabel}
-            <ArrowUpRight aria-hidden="true" />
-          </a>
+      {hasWaitlistCta ? (
+        <Button variant="note" className="min-h-12" onClick={onWaitlistClick}>
+          {collection.ctaLabel}
+          <ArrowRight aria-hidden="true" />
         </Button>
-      )}
+      ) : null}
     </article>
   );
 }

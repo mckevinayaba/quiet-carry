@@ -11,25 +11,45 @@ export const Route = createFileRoute("/shelf")({
   head: () => ({
     meta: [
       { title: "My Private Shelf" },
-      {
-        name: "description",
-        content: "Your kept notes, private reflections, and quietly sent notes.",
-      },
+      { name: "description", content: "Your kept notes, private reflections, and quietly sent notes." },
       { property: "og:title", content: "My Private Shelf" },
-      {
-        property: "og:description",
-        content: "Your kept notes, private reflections, and quietly sent notes.",
-      },
+      { property: "og:description", content: "Your kept notes, private reflections, and quietly sent notes." },
     ],
   }),
   component: ShelfPage,
 });
 
-function EmptyShelf() {
+function EmptyKept() {
   return (
     <div className="paper-panel space-y-4 text-left">
       <p className="text-base leading-7 text-muted-foreground">
         Nothing here yet. When a note finds you, keep it here.
+      </p>
+      <Button asChild variant="note">
+        <Link to="/feelings">Find a note</Link>
+      </Button>
+    </div>
+  );
+}
+
+function EmptyReflections() {
+  return (
+    <div className="paper-panel space-y-4 text-left">
+      <p className="text-base leading-7 text-muted-foreground">
+        You have not written from a note yet. When a note touches something true, you can write from it privately.
+      </p>
+      <Button asChild variant="note">
+        <Link to="/feelings">Choose a feeling</Link>
+      </Button>
+    </div>
+  );
+}
+
+function EmptySent() {
+  return (
+    <div className="paper-panel space-y-4 text-left">
+      <p className="text-base leading-7 text-muted-foreground">
+        Nothing sent yet. When a note feels like it belongs to someone you care about, send it quietly.
       </p>
       <Button asChild variant="note">
         <Link to="/feelings">Find a note</Link>
@@ -60,6 +80,11 @@ function ShelfPage() {
         </p>
       </section>
 
+      <div className="paper-panel space-y-1 text-sm leading-6 text-muted-foreground">
+        <p className="text-foreground">Your notes and reflections are private on this device.</p>
+        <p>No public profile. No comments. No followers.</p>
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
         {[
           ["kept", "Notes I kept"],
@@ -77,10 +102,9 @@ function ShelfPage() {
         ))}
       </div>
 
-      {activeTab === "kept" && (kept.length ? kept.map((item) => <ShelfItem key={item.noteId} item={item} />) : <EmptyShelf />)}
+      {activeTab === "kept" && (kept.length ? kept.map((item) => <ShelfItem key={item.noteId} item={item} />) : <EmptyKept />)}
 
-      {activeTab === "sent" &&
-        (sent.length ? sent.map((item) => <ShelfItem key={item.savedAt} item={item} />) : <EmptyShelf />)}
+      {activeTab === "sent" && (sent.length ? sent.map((item) => <ShelfItem key={item.savedAt} item={item} />) : <EmptySent />)}
 
       {activeTab === "reflections" &&
         (reflections.length ? (
@@ -97,7 +121,7 @@ function ShelfPage() {
             ))}
           </div>
         ) : (
-          <EmptyShelf />
+          <EmptyReflections />
         ))}
     </AppLayout>
   );

@@ -235,8 +235,8 @@ export const collections: CollectionEntry[] = [
       "5 private letters",
     ],
     price: "R149 launch price",
-    ctaLabel: "Get Volume 1",
-    ctaHref: "https://selar.com",
+    ctaLabel: "Join the Volume 1 waitlist",
+    comingSoon: true,
   },
   {
     id: "words-that-stayed",

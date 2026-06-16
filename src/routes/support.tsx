@@ -38,11 +38,13 @@ function SupportPage() {
           If you feel in immediate danger, feel like harming yourself, or cannot stay safe, please
           contact emergency services, a crisis line, or someone you trust now.
         </p>
-        <Button asChild variant="note">
-          <a href="https://findahelpline.com" rel="noreferrer" target="_blank">
-            Find support near me
-          </a>
+        <Button variant="note" disabled aria-disabled="true">
+          Find support near me (coming soon)
         </Button>
+        <p className="text-xs leading-5 text-muted-foreground">
+          A vetted list of crisis lines is being prepared. Until then, please reach out to local
+          emergency services or someone you trust.
+        </p>
       </section>
     </AppLayout>
   );

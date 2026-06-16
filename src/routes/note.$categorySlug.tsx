@@ -1,4 +1,4 @@
-import { BookOpenText, Heart, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
 import {
-  incrementGuestActionCount,
   keepNote,
   logSentNote,
-  shouldShowAccountPrompt,
+  registerMeaningfulGuestAction,
 } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/note/$categorySlug")({
@@ -42,8 +41,6 @@ export const Route = createFileRoute("/note/$categorySlug")({
 function NotePage() {
   const { category, note } = Route.useLoaderData();
   const [message, setMessage] = useState<string | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [dismissedPrompt, setDismissedPrompt] = useState(false);
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
@@ -51,19 +48,11 @@ function NotePage() {
     setMessage(null);
   }, [category.slug, note.id]);
 
-  const registerGuestAction = () => {
-    const count = incrementGuestActionCount();
-    if (shouldShowAccountPrompt(count) && !showPrompt && !dismissedPrompt) {
-      setShowPrompt(true);
-      trackEvent("account_prompt_shown", { actionCount: count });
-    }
-  };
-
   const handleKeep = () => {
     keepNote(note);
     trackEvent("note_kept", { noteId: note.id });
     setMessage("Kept. You can come back to this when you need it.");
-    registerGuestAction();
+    registerMeaningfulGuestAction();
   };
 
   const handleSend = async () => {
@@ -90,7 +79,7 @@ function NotePage() {
     logSentNote(note);
     trackEvent("note_sent", { noteId: note.id });
     setMessage("Copied. Send it to someone who may need words today.");
-    registerGuestAction();
+    registerMeaningfulGuestAction();
   };
 
   return (
@@ -148,34 +137,6 @@ function NotePage() {
           </>
         }
       />
-
-      {showPrompt ? (
-        <section className="paper-panel space-y-3">
-          <div className="flex items-center gap-3">
-            <Heart className="heart-mark" aria-hidden="true" />
-            <h2 className="font-display text-2xl leading-none">Keep them safe across devices</h2>
-          </div>
-          <p className="text-base leading-7 text-muted-foreground">
-            Your notes are being kept on this device. Create a private account if you want them safe
-            across devices.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Button
-              variant="paper"
-              className="min-h-12"
-              onClick={() => {
-                setShowPrompt(false);
-                setDismissedPrompt(true);
-              }}
-            >
-              Not now
-            </Button>
-            <Button asChild variant="note" className="min-h-12">
-              <Link to="/account">Create private account</Link>
-            </Button>
-          </div>
-        </section>
-      ) : null}
 
       <section id="similar-notes" className="space-y-3 scroll-mt-6">
         <h2 className="font-display text-2xl leading-none">Other notes you may need</h2>
