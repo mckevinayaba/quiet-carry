@@ -139,24 +139,45 @@ function HomePage() {
           />
 
           <div className="grid gap-3">
-            <ActionButton hint="Save it privately for later" icon={LockKeyhole} onClick={handleKeep}>
-              Keep this Note
-            </ActionButton>
-            <ActionButton hint="Share softly, without noise" icon={Mail} onClick={handleSend}>
-              Send this Quietly
-            </ActionButton>
-            <ActionButton
+            <Button
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
+              onClick={handleKeep}
+            >
+              <LockKeyhole aria-hidden="true" />
+              <span className="flex flex-col items-start gap-0.5">
+                <span>Keep this Note</span>
+                <span className="text-xs text-muted-foreground">Save it privately for later</span>
+              </span>
+            </Button>
+            <Button
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
+              onClick={handleSend}
+            >
+              <Mail aria-hidden="true" />
+              <span className="flex flex-col items-start gap-0.5">
+                <span>Send this Quietly</span>
+                <span className="text-xs text-muted-foreground">Share softly, without noise</span>
+              </span>
+            </Button>
+            <Button
               asChild
-              hint="Begin a private reflection"
-              icon={NotebookPen}
+              variant="paper"
+              className="min-h-14 w-full items-start justify-start px-4 py-3 text-left"
               onClick={() => trackEvent("reflection_started", { noteId: featuredNote.id, source: "home" })}
             >
               <Link to="/write/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
-                Write from This
+                <NotebookPen aria-hidden="true" />
+                <span className="flex flex-col items-start gap-0.5">
+                  <span>Write from This</span>
+                  <span className="text-xs text-muted-foreground">Begin a private reflection</span>
+                </span>
               </Link>
-            </ActionButton>
+            </Button>
           </div>
         </article>
+
 
         {showPrompt ? (
           <section className="paper-panel space-y-3">
