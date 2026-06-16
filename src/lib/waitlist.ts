@@ -1,71 +1,62 @@
-// Lightweight local-only storage for waitlist signups and feedback.
-// Designed to be swapped for a real backend (Supabase / Resend / Mailchimp)
-// without changing the calling code: replace the bodies of saveWaitlistEntry
-// and saveFeedbackEntry with a network call.
+// Waitlist + feedback persistence.
+// Writes to Lovable Cloud (Postgres via Supabase). RLS allows INSERT for
+// anon + authenticated; reads are admin-only from the dashboard.
 
-export type WaitlistSource = "volume" | "account";
+import { supabase } from "@/integrations/supabase/client";
 
-export interface WaitlistEntry {
-  email: string;
-  source: WaitlistSource;
-  savedAt: string;
+export type WaitlistSource = "volume" | "account" | "landing";
+
+export interface SaveResult {
+  ok: boolean;
+  error?: string;
 }
 
-export interface FeedbackEntry {
-  text: string;
-  savedAt: string;
+function browserContext() {
+  if (typeof window === "undefined") return { user_agent: null, page_path: null };
+  return {
+    user_agent: navigator.userAgent ?? null,
+    page_path: window.location.pathname ?? null,
+  };
 }
 
-const KEYS = {
-  waitlist: "tnynyt-waitlist",
-  feedback: "tnynyt-feedback",
-} as const;
-
-function getStorage() {
-  if (typeof window === "undefined") return null;
-  return window.localStorage;
-}
-
-function readJSON<T>(key: string, fallback: T): T {
-  const storage = getStorage();
-  if (!storage) return fallback;
-  const raw = storage.getItem(key);
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJSON<T>(key: string, value: T) {
-  const storage = getStorage();
-  if (!storage) return;
-  storage.setItem(key, JSON.stringify(value));
-}
-
-export function saveWaitlistEntry(email: string, source: WaitlistSource) {
+export async function saveWaitlistEntry(
+  email: string,
+  source: WaitlistSource,
+): Promise<SaveResult> {
   const trimmed = email.trim();
-  if (!trimmed) return null;
-  const current = readJSON<WaitlistEntry[]>(KEYS.waitlist, []);
-  const entry: WaitlistEntry = {
+  if (!trimmed) return { ok: false, error: "empty" };
+
+  const { error } = await supabase.from("waitlist").insert({
     email: trimmed,
     source,
-    savedAt: new Date().toISOString(),
-  };
-  writeJSON(KEYS.waitlist, [entry, ...current.filter((e) => e.email !== trimmed || e.source !== source)]);
-  // Future backend hook: POST to /api/public/waitlist here.
-  return entry;
+    ...browserContext(),
+  });
+
+  // Postgres unique violation (already on the list for this source) — treat as success.
+  if (error && error.code === "23505") return { ok: true };
+
+  if (error) {
+    console.error("[waitlist] insert failed", error);
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
 }
 
-export function saveFeedbackEntry(text: string) {
+export async function saveFeedbackEntry(text: string): Promise<SaveResult> {
   const trimmed = text.trim();
-  if (!trimmed) return null;
-  const current = readJSON<FeedbackEntry[]>(KEYS.feedback, []);
-  const entry: FeedbackEntry = { text: trimmed, savedAt: new Date().toISOString() };
-  writeJSON(KEYS.feedback, [entry, ...current]);
-  // Future backend hook: POST to /api/public/feedback here.
-  return entry;
+  if (!trimmed) return { ok: false, error: "empty" };
+
+  const { error } = await supabase.from("feedback").insert({
+    message: trimmed,
+    source: "app",
+    ...browserContext(),
+  });
+
+  if (error) {
+    console.error("[feedback] insert failed", error);
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
 }
 
 export function isValidEmail(email: string) {
