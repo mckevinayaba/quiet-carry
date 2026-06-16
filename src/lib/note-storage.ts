@@ -123,3 +123,22 @@ export function incrementGuestActionCount() {
 export function shouldShowAccountPrompt(actionCount = getGuestActionCount()) {
   return actionCount >= 3;
 }
+
+type PromptListener = (count: number) => void;
+const promptListeners = new Set<PromptListener>();
+
+export function onMeaningfulGuestAction(listener: PromptListener) {
+  promptListeners.add(listener);
+  return () => promptListeners.delete(listener);
+}
+
+/**
+ * Record a meaningful guest action (Keep / Send / Save Reflection).
+ * Notifies any listeners so a global account prompt can render immediately,
+ * regardless of which page the action happened on.
+ */
+export function registerMeaningfulGuestAction() {
+  const count = incrementGuestActionCount();
+  promptListeners.forEach((listener) => listener(count));
+  return count;
+}
