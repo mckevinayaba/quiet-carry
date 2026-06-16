@@ -67,7 +67,6 @@ function NotePage() {
   };
 
   const handleSend = async () => {
-    let copied = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({ title: note.title, text: note.sendableText });
@@ -77,13 +76,11 @@ function NotePage() {
         typeof navigator.clipboard.writeText === "function"
       ) {
         await navigator.clipboard.writeText(note.sendableText);
-        copied = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
           await navigator.clipboard.writeText(note.sendableText);
-          copied = true;
         }
       } catch {
         /* noop */
