@@ -84,6 +84,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "The Note You Needed Today" },
+      { name: "description", content: "The Note You Needed Today offers private emotional language for personal reflection." },
+      { property: "og:description", content: "The Note You Needed Today offers private emotional language for personal reflection." },
+      { name: "twitter:description", content: "The Note You Needed Today offers private emotional language for personal reflection." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/73cc5279-72d3-43bf-be83-9679a52eff4a/id-preview-4ccdad64--42b096e9-c48d-46ed-a2cd-c1468652d462.lovable.app-1781647574924.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/73cc5279-72d3-43bf-be83-9679a52eff4a/id-preview-4ccdad64--42b096e9-c48d-46ed-a2cd-c1468652d462.lovable.app-1781647574924.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
