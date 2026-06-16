@@ -112,7 +112,6 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
         {submitted ? (
           <div className="paper-panel space-y-2 text-base leading-7 text-foreground" role="status">
             <p>You are on the list. We will send the note when it is ready.</p>
-            <p className="text-sm text-muted-foreground">Saved privately on this device for now.</p>
           </div>
         ) : (
           <form
