@@ -15,12 +15,12 @@ export const Route = createFileRoute("/write/$categorySlug")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Write from ${loaderData.note.title}` },
+      { title: `Write from ${loaderData?.note.title ?? "this note"}` },
       {
         name: "description",
         content: "Write privately from the note that found you.",
       },
-      { property: "og:title", content: `Write from ${loaderData.note.title}` },
+      { property: "og:title", content: `Write from ${loaderData?.note.title ?? "this note"}` },
       { property: "og:description", content: "Write privately from the note that found you." },
     ],
   }),

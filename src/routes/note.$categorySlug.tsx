@@ -25,10 +25,13 @@ export const Route = createFileRoute("/note/$categorySlug")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData.note.title} | The Note You Needed Today` },
-      { name: "description", content: loaderData.category.subtitle },
-      { property: "og:title", content: `${loaderData.note.title} | The Note You Needed Today` },
-      { property: "og:description", content: loaderData.category.subtitle },
+      { title: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
+      { name: "description", content: loaderData?.category.subtitle ?? "A private note for what you carry quietly." },
+      { property: "og:title", content: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
+      {
+        property: "og:description",
+        content: loaderData?.category.subtitle ?? "A private note for what you carry quietly.",
+      },
     ],
   }),
   component: NotePage,

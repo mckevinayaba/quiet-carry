@@ -9,38 +9,188 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShelfRouteImport } from './routes/shelf'
+import { Route as FeelingsRouteImport } from './routes/feelings'
+import { Route as CollectionsRouteImport } from './routes/collections'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
+import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShelfRoute = ShelfRouteImport.update({
+  id: '/shelf',
+  path: '/shelf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeelingsRoute = FeelingsRouteImport.update({
+  id: '/feelings',
+  path: '/feelings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsRoute = CollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WriteCategorySlugRoute = WriteCategorySlugRouteImport.update({
+  id: '/write/$categorySlug',
+  path: '/write/$categorySlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoteCategorySlugRoute = NoteCategorySlugRouteImport.update({
+  id: '/note/$categorySlug',
+  path: '/note/$categorySlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/collections': typeof CollectionsRoute
+  '/feelings': typeof FeelingsRoute
+  '/shelf': typeof ShelfRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/collections': typeof CollectionsRoute
+  '/feelings': typeof FeelingsRoute
+  '/shelf': typeof ShelfRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/collections': typeof CollectionsRoute
+  '/feelings': typeof FeelingsRoute
+  '/shelf': typeof ShelfRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/collections'
+    | '/feelings'
+    | '/shelf'
+    | '/sitemap.xml'
+    | '/support'
+    | '/note/$categorySlug'
+    | '/write/$categorySlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account'
+    | '/collections'
+    | '/feelings'
+    | '/shelf'
+    | '/sitemap.xml'
+    | '/support'
+    | '/note/$categorySlug'
+    | '/write/$categorySlug'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/collections'
+    | '/feelings'
+    | '/shelf'
+    | '/sitemap.xml'
+    | '/support'
+    | '/note/$categorySlug'
+    | '/write/$categorySlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  CollectionsRoute: typeof CollectionsRoute
+  FeelingsRoute: typeof FeelingsRoute
+  ShelfRoute: typeof ShelfRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SupportRoute: typeof SupportRoute
+  NoteCategorySlugRoute: typeof NoteCategorySlugRoute
+  WriteCategorySlugRoute: typeof WriteCategorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shelf': {
+      id: '/shelf'
+      path: '/shelf'
+      fullPath: '/shelf'
+      preLoaderRoute: typeof ShelfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feelings': {
+      id: '/feelings'
+      path: '/feelings'
+      fullPath: '/feelings'
+      preLoaderRoute: typeof FeelingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections': {
+      id: '/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +198,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/write/$categorySlug': {
+      id: '/write/$categorySlug'
+      path: '/write/$categorySlug'
+      fullPath: '/write/$categorySlug'
+      preLoaderRoute: typeof WriteCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/note/$categorySlug': {
+      id: '/note/$categorySlug'
+      path: '/note/$categorySlug'
+      fullPath: '/note/$categorySlug'
+      preLoaderRoute: typeof NoteCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  CollectionsRoute: CollectionsRoute,
+  FeelingsRoute: FeelingsRoute,
+  ShelfRoute: ShelfRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SupportRoute: SupportRoute,
+  NoteCategorySlugRoute: NoteCategorySlugRoute,
+  WriteCategorySlugRoute: WriteCategorySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
