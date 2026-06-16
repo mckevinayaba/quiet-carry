@@ -129,7 +129,9 @@ const promptListeners = new Set<PromptListener>();
 
 export function onMeaningfulGuestAction(listener: PromptListener) {
   promptListeners.add(listener);
-  return () => promptListeners.delete(listener);
+  return () => {
+    promptListeners.delete(listener);
+  };
 }
 
 /**
