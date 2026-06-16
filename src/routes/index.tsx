@@ -1,18 +1,17 @@
-import { Heart, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { Heart, Layers2, LockKeyhole, Mail, MessageSquareHeart, NotebookPen } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { ActionButton } from "@/components/action-button";
 import { AppLayout } from "@/components/app-layout";
 import { ReceiptBlock } from "@/components/receipt-block";
 import { Button } from "@/components/ui/button";
+import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
 import { featuredNote } from "@/lib/note-data";
 import {
-  incrementGuestActionCount,
   keepNote,
   logSentNote,
-  shouldShowAccountPrompt,
+  registerMeaningfulGuestAction,
 } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/")({
@@ -34,27 +33,26 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  return (
+    <AppLayout className="space-y-8 pb-8">
+      <HomeInner />
+    </AppLayout>
+  );
+}
+
+function HomeInner() {
+  const { openWaitlist, openFeedback } = useAppModals();
   const [message, setMessage] = useState<string | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [dismissedPrompt, setDismissedPrompt] = useState(false);
 
   useEffect(() => {
     trackEvent("note_opened", { noteId: featuredNote.id, category: featuredNote.categorySlug, source: "home" });
   }, []);
 
-  const registerGuestAction = () => {
-    const count = incrementGuestActionCount();
-    if (shouldShowAccountPrompt(count) && !showPrompt && !dismissedPrompt) {
-      setShowPrompt(true);
-      trackEvent("account_prompt_shown", { actionCount: count });
-    }
-  };
-
   const handleKeep = () => {
     keepNote(featuredNote);
     trackEvent("note_kept", { noteId: featuredNote.id, source: "home" });
     setMessage("Kept. You can come back to this when you need it.");
-    registerGuestAction();
+    registerMeaningfulGuestAction();
   };
 
   const handleSend = async () => {
@@ -80,11 +78,11 @@ function HomePage() {
     logSentNote(featuredNote);
     trackEvent("note_sent", { noteId: featuredNote.id, source: "home" });
     setMessage("Copied. Send it to someone who may need words today.");
-    registerGuestAction();
+    registerMeaningfulGuestAction();
   };
 
   return (
-    <AppLayout className="space-y-8 pb-8">
+    <>
       <section className="space-y-5 py-3">
         <div className="stitched-label">Private first emotional language</div>
         <div className="space-y-4">
@@ -177,35 +175,6 @@ function HomePage() {
             </Button>
           </div>
         </article>
-
-
-        {showPrompt ? (
-          <section className="paper-panel space-y-3">
-            <div className="flex items-center gap-3">
-              <Heart className="heart-mark" aria-hidden="true" />
-              <h3 className="font-display text-2xl leading-none">Keep them safe across devices</h3>
-            </div>
-            <p className="text-base leading-7 text-muted-foreground">
-              Your notes are being kept on this device. Create a private account if you want them
-              safe across devices.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button
-                variant="paper"
-                className="min-h-12"
-                onClick={() => {
-                  setShowPrompt(false);
-                  setDismissedPrompt(true);
-                }}
-              >
-                Not now
-              </Button>
-              <Button asChild variant="note" className="min-h-12">
-                <Link to="/account">Create private account</Link>
-              </Button>
-            </div>
-          </section>
-        ) : null}
       </section>
 
       <section className="space-y-3">
@@ -236,18 +205,37 @@ function HomePage() {
       </section>
 
       <section className="paper-panel space-y-4">
-        <div className="stitched-label">Volume 1</div>
+        <div className="flex items-center gap-2">
+          <div className="stitched-label">Volume 1</div>
+          <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[0.65rem] uppercase tracking-[0.15em] text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
         <div className="space-y-2">
           <h2 className="font-display text-3xl leading-none">The Things We Do Not Say Out Loud</h2>
           <p className="text-base leading-7 text-muted-foreground">
             A digital collection of notes, wallpapers, captions, prompts, and private letters for
             heavy days.
           </p>
+          <p className="font-label text-lg text-foreground">R149 launch price</p>
         </div>
-        <Button asChild variant="note" className="min-h-12">
-          <Link to="/collections">Get Volume 1</Link>
+        <Button variant="note" className="min-h-12" onClick={() => openWaitlist("volume")}>
+          Join the Volume 1 waitlist
         </Button>
       </section>
-    </AppLayout>
+
+      <section className="paper-panel flex items-start gap-3">
+        <MessageSquareHeart className="mt-1 size-5 text-muted-foreground" aria-hidden="true" />
+        <div className="flex-1 space-y-2">
+          <h2 className="font-display text-2xl leading-none">Share feedback</h2>
+          <p className="text-sm leading-6 text-muted-foreground">
+            Tell us what felt right, what felt confusing, or what note you needed but could not find.
+          </p>
+          <Button variant="paper" className="min-h-11" onClick={openFeedback}>
+            Share feedback
+          </Button>
+        </div>
+      </section>
+    </>
   );
 }

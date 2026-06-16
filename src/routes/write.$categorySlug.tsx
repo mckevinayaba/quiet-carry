@@ -5,7 +5,7 @@ import { AppLayout } from "@/components/app-layout";
 import { ReflectionEditor } from "@/components/reflection-editor";
 import { trackEvent } from "@/lib/analytics";
 import { getNoteByCategorySlug } from "@/lib/note-data";
-import { saveReflection } from "@/lib/note-storage";
+import { registerMeaningfulGuestAction, saveReflection } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/write/$categorySlug")({
   loader: ({ params }) => {
@@ -16,10 +16,7 @@ export const Route = createFileRoute("/write/$categorySlug")({
   head: ({ loaderData }) => ({
     meta: [
       { title: `Write from ${loaderData?.note.title ?? "this note"}` },
-      {
-        name: "description",
-        content: "Write privately from the note that found you.",
-      },
+      { name: "description", content: "Write privately from the note that found you." },
       { property: "og:title", content: `Write from ${loaderData?.note.title ?? "this note"}` },
       { property: "og:description", content: "Write privately from the note that found you." },
     ],
@@ -46,6 +43,11 @@ function WritePage() {
         </p>
       </section>
 
+      <div className="paper-panel space-y-1 text-sm leading-6 text-muted-foreground">
+        <p className="text-foreground">Your notes and reflections are private on this device.</p>
+        <p>No public profile. No comments. No followers.</p>
+      </div>
+
       {message ? (
         <div className="paper-panel text-base leading-7 text-foreground" role="status">
           {message}
@@ -65,8 +67,9 @@ function WritePage() {
           saveReflection(note, value.trim());
           trackEvent("reflection_saved", { noteId: note.id });
           setMessage(
-            "Saved privately. Saved on this device. Create a private account if you want to keep your reflections safe across devices.",
+            "Saved privately on this device. A private account is coming soon so you can keep your reflections safe across devices.",
           );
+          registerMeaningfulGuestAction();
         }}
         prompt={note.journalPrompt}
         value={value}
