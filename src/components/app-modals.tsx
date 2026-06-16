@@ -167,11 +167,13 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
 function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
       setText("");
       setSubmitted(false);
+      setError(null);
     }
   }, [open]);
 
@@ -194,10 +196,14 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
         ) : (
           <form
             className="space-y-3"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               if (!text.trim()) return;
-              saveFeedbackEntry(text);
+              const res = await saveFeedbackEntry(text);
+              if (!res.ok) {
+                setError("Something went wrong. Please try again.");
+                return;
+              }
               trackEvent("feedback_submitted");
               setSubmitted(true);
             }}
@@ -208,8 +214,12 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
               className="min-h-40"
               placeholder="Write your feedback here"
               value={text}
-              onChange={(event) => setText(event.target.value)}
+              onChange={(event) => {
+                setText(event.target.value);
+                if (error) setError(null);
+              }}
             />
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <DialogFooter>
               <Button type="button" variant="paper" onClick={onClose}>
                 Not now
