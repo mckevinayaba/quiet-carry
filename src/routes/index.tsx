@@ -604,7 +604,6 @@ function Waitlist() {
         {submitted ? (
           <div className="paper-panel mx-auto max-w-md text-base leading-7 text-foreground" role="status">
             <p>You are on the list. We will write to you when it is ready.</p>
-            <p className="mt-1 text-sm text-muted-foreground">Saved privately on this device for now.</p>
           </div>
         ) : (
           <form
