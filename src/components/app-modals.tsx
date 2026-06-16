@@ -117,13 +117,17 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
         ) : (
           <form
             className="space-y-3"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
               if (!isValidEmail(email)) {
                 setError("Please enter an email address that looks right.");
                 return;
               }
-              saveWaitlistEntry(email, source ?? "volume");
+              const res = await saveWaitlistEntry(email, source ?? "volume");
+              if (!res.ok) {
+                setError("Something went wrong. Please try again.");
+                return;
+              }
               trackEvent("waitlist_submitted", { source });
               setSubmitted(true);
             }}
