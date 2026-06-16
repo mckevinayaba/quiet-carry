@@ -224,6 +224,23 @@
   border-bottom: 1px dashed color-mix(in oklab, var(--foreground) 25%, transparent);
 }
 
+@utility stitched-edge {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--paper-gradient);
+  box-shadow: var(--shadow-soft);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 14px;
+    border: 1px dashed color-mix(in oklab, var(--foreground) 28%, transparent);
+    pointer-events: none;
+  }
+}
+
 @utility bottom-nav {
   position: fixed;
   right: 0;
