@@ -381,9 +381,7 @@ function WhatsAppStatusCanvas({ note }: { note: NoteEntry }) {
 
         {/* Footer */}
         <div style={{ padding: "0.55rem 1rem 0.7rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkFaint }}>
-            {PRODUCT_DOMAIN}
-          </span>
+          <CtaDomain />
           <MadMark />
         </div>
       </div>
@@ -429,13 +427,8 @@ function InstagramStoryCanvas({ note }: { note: NoteEntry }) {
 
         {/* CTA footer */}
         <div style={{ padding: "0.6rem 1rem 0.8rem", borderTop: `1px dashed ${B.accentBorder}` }}>
-          <p style={{ fontFamily: F.label, fontSize: "0.44rem", letterSpacing: "0.09em", color: B.inkMuted, marginBottom: "0.3rem", lineHeight: 1.5 }}>
-            Find words for what you carry quietly.
-          </p>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkFaint }}>
-              {PRODUCT_DOMAIN}
-            </span>
+            <CtaDomain />
             <MadMark />
           </div>
         </div>
@@ -475,9 +468,7 @@ function InstagramSquareCanvas({ note }: { note: NoteEntry }) {
 
         {/* Footer strip */}
         <div style={{ padding: "0.55rem 1.1rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkFaint }}>
-            {PRODUCT_DOMAIN}
-          </span>
+          <CtaDomain />
           <MadMark />
         </div>
       </div>
@@ -535,9 +526,7 @@ function LinkedInPortraitCanvas({ note }: { note: NoteEntry }) {
 
         {/* Footer */}
         <div style={{ marginTop: "0.7rem", paddingTop: "0.5rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkFaint }}>
-            {PRODUCT_DOMAIN}
-          </span>
+          <CtaDomain />
           <MadMark />
         </div>
       </div>
@@ -588,9 +577,7 @@ function PinterestPinCanvas({ note }: { note: NoteEntry }) {
 
         {/* Footer */}
         <div style={{ padding: "0.55rem 1rem 0.7rem", borderTop: `1px dashed ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkFaint }}>
-            {PRODUCT_DOMAIN}
-          </span>
+          <CtaDomain />
           <MadMark />
         </div>
       </div>
@@ -599,6 +586,19 @@ function PinterestPinCanvas({ note }: { note: NoteEntry }) {
 }
 
 // ─── Shared decorative atoms ──────────────────────────────────────────────────
+
+function CtaDomain() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      <span style={{ fontFamily: F.label, fontSize: "0.38rem", letterSpacing: "0.1em", textTransform: "uppercase", color: B.inkFaint, lineHeight: 1 }}>
+        Read the full note at
+      </span>
+      <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.12em", color: B.inkMuted, lineHeight: 1 }}>
+        {PRODUCT_DOMAIN}
+      </span>
+    </div>
+  );
+}
 
 function HeartSVG({ style }: { style?: CSSProperties }) {
   return (
