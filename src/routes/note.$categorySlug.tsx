@@ -1,8 +1,9 @@
-import { ArrowLeft, BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { ArrowLeft, BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen, Share2 } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
 import { ActionButton } from "@/components/action-button";
+import { ShareNoteModal } from "@/components/share-note-modal";
 import { AppLayout } from "@/components/app-layout";
 import { NoteCard } from "@/components/note-card";
 import { NoteNotFound, RouteErrorBoundary } from "@/components/route-error";
@@ -52,6 +53,7 @@ function NotePage() {
   const { category, note } = Route.useLoaderData();
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const [isKept, setIsKept] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
@@ -165,6 +167,20 @@ function NotePage() {
               </Link>
             </ActionButton>
             <ActionButton
+              hint="Share as image or private message"
+              icon={Share2}
+              onClick={() => {
+                setShareOpen(true);
+                trackEvent("share_modal_opened", {
+                  noteId: note.id,
+                  categorySlug: category.slug,
+                  source: "note_page",
+                });
+              }}
+            >
+              Share this Note
+            </ActionButton>
+            <ActionButton
               asChild
               hint="Three more notes for what you carry"
               icon={BookOpenText}
@@ -181,6 +197,12 @@ function NotePage() {
             </ActionButton>
           </>
         }
+      />
+
+      <ShareNoteModal
+        note={note}
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
       />
 
       <section id="similar-notes" className="space-y-3 scroll-mt-6">

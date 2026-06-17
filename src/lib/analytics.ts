@@ -40,7 +40,13 @@ export type AnalyticsEventName =
   | "volume_waitlist_clicked"
   | "account_waitlist_clicked"
   | "feedback_opened"
-  | "feedback_submitted";
+  | "feedback_submitted"
+  | "share_modal_opened"
+  | "share_preset_selected"
+  | "share_text_copied"
+  | "share_native_opened"
+  | "share_caption_copied"
+  | "share_download_clicked";
 
 // ---------------------------------------------------------------------------
 // Payload sanitisation
@@ -61,6 +67,7 @@ const SAFE_PAYLOAD_KEYS = new Set([
   "route",
   "actionCount",
   "from",
+  "preset",
 ]);
 
 function sanitizePayload(
