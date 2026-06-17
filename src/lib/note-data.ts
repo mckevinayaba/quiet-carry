@@ -80,6 +80,11 @@ export const categories: EmotionalCategory[] = [
     title: "People who wanted your fall",
     subtitle: "For the ones who judged your climb without knowing what you survived.",
   },
+  {
+    slug: "people-who-watched-you-bleed",
+    title: "The People Who Watched You Bleed",
+    subtitle: "For the people who knew what you survived, saw what you carried, and still waited for the world to clap before they supported you.",
+  },
 ];
 
 export const notes: NoteEntry[] = [
@@ -217,6 +222,19 @@ export const notes: NoteEntry[] = [
     journalPrompt: "What part of your journey do people judge because they never had to carry it?",
     sendableText:
       "People may see where you are, but they do not always see what it cost you to stand there.",
+  },
+  {
+    id: "note-people-who-watched-you-bleed",
+    categorySlug: "people-who-watched-you-bleed",
+    title: "Do It Anyway",
+    mainText: `I hope you heal from\nthe people who knew your story\nbut still waited for strangers to clap\nbefore they supported you.\n\nThey knew what you survived.\n\nThey knew what you carried.\n\nThey knew the pit you crawled out of.\n\nAnd still, they waited.\n\nThey waited until money validated you.\n\nThey waited until the world\nstarted calling you successful.\n\nThey waited until it became safe\nto say they always believed in you.\n\nDo it anyway.\n\nStop expecting recognition\nfrom people who watched you bleed\nand still chose silence.\n\nBecome your own witness.\n\nYour own proof.\n\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\n\nIt was given to you.`,
+    receiptFrom: "Every silent room where you expected support and received distance.",
+    receiptTo: "The day you stop needing witnesses before you believe yourself.",
+    receiptDate: "The moment you choose the dream without waiting for applause.",
+    receiptTotal: "Your proof was never their permission. Keep going.",
+    journalPrompt: "Where have you been waiting for recognition from people who already saw enough to support you?",
+    sendableText:
+      "Do it anyway.\n\nStop expecting recognition from people who watched you bleed and still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.",
   },
 ];
 
