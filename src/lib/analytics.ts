@@ -6,7 +6,7 @@
 //                  call is silently dropped. The app never crashes over analytics.
 //
 // To enable Plausible, set in your deployment environment:
-//   VITE_PLAUSIBLE_DOMAIN=thenoteyouneededtoday.com
+//   VITE_PLAUSIBLE_DOMAIN=thenoteyouneeded.today
 //   VITE_ENABLE_PLAUSIBLE=true
 
 // ---------------------------------------------------------------------------

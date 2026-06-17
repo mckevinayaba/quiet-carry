@@ -2,8 +2,10 @@
 
 A private-first emotional language platform that helps people find words for what they carry quietly.
 
-**Live (private beta):** https://quiet-words-today.lovable.app/  
+**Live (private beta):** https://thenoteyouneeded.today/  
 **Repository:** [mckevinayaba/quiet-carry](https://github.com/mckevinayaba/quiet-carry)
+
+> **Internal deployment note:** The Lovable preview URL (`https://quiet-words-today.lovable.app/`) remains live as a staging/deployment endpoint but is not the public-facing URL.
 
 ---
 
@@ -82,7 +84,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-secret-key>
 ### Optional — Plausible analytics
 
 ```env
-VITE_PLAUSIBLE_DOMAIN=thenoteyouneededtoday.com
+VITE_PLAUSIBLE_DOMAIN=thenoteyouneeded.today
 VITE_ENABLE_PLAUSIBLE=true
 ```
 

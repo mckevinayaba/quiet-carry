@@ -10,19 +10,19 @@
 
 | Variable | Required | Example | Purpose |
 |---|---|---|---|
-| `VITE_PLAUSIBLE_DOMAIN` | Yes (to enable) | `thenoteyouneededtoday.com` | The domain registered in your Plausible account |
+| `VITE_PLAUSIBLE_DOMAIN` | Yes (to enable) | `thenoteyouneeded.today` | The domain registered in your Plausible account |
 | `VITE_ENABLE_PLAUSIBLE` | Yes (to enable) | `true` | Explicit opt-in flag |
 
 Both must be set for analytics to activate. If either is missing or empty, all tracking calls are silently dropped.
 
-Add these to your Lovable / Cloudflare Workers deployment environment. Do **not** commit them to `.env` files in version control.
+Add these to your Cloudflare Workers (or Lovable deployment) environment variables. Do **not** commit them to `.env` files in version control.
 
 ---
 
 ## How to enable
 
 1. Create a site in your [Plausible dashboard](https://plausible.io/sites).
-2. Set the domain to match the live URL (e.g. `thenoteyouneededtoday.com`).
+2. Set the domain to `thenoteyouneeded.today` (the canonical root — `www` redirects here). Plausible should be registered against the root domain.
 3. Add `VITE_PLAUSIBLE_DOMAIN` and `VITE_ENABLE_PLAUSIBLE=true` to your deployment environment.
 4. Deploy. The Plausible script is injected into the server-rendered HTML with `defer`.
 
