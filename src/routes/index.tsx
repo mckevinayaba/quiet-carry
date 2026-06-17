@@ -22,10 +22,12 @@ import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
 import { categories, featuredNote } from "@/lib/note-data";
 import {
+  getKeptNotes,
   keepNote,
   logSentNote,
   registerMeaningfulGuestAction,
 } from "@/lib/note-storage";
+import { buildShareText } from "@/lib/share";
 import { isValidEmail, saveWaitlistEntry } from "@/lib/waitlist";
 
 import heroCollage from "@/assets/hero-note-collage.jpg";
@@ -306,8 +308,14 @@ function CategoriesPreview() {
 
 /* -------------------------- Today’s Note -------------------------- */
 
+interface LandingActionResult {
+  text: string;
+  shelfLink?: boolean;
+}
+
 function TodaysNote() {
-  const [message, setMessage] = useState<string | null>(null);
+  const [actionResult, setActionResult] = useState<LandingActionResult | null>(null);
+  const [isKept, setIsKept] = useState(false);
 
   useEffect(() => {
     trackEvent("note_opened", {
@@ -315,33 +323,43 @@ function TodaysNote() {
       category: featuredNote.categorySlug,
       source: "landing",
     });
+    setIsKept(getKeptNotes().some((n) => n.noteId === featuredNote.id));
   }, []);
 
   const handleKeep = () => {
+    if (isKept) {
+      setActionResult({ text: "Already kept in your Shelf.", shelfLink: true });
+      return;
+    }
     keepNote(featuredNote);
     trackEvent("note_kept", { noteId: featuredNote.id, source: "landing" });
-    setMessage("Kept. You can come back to this when you need it.");
+    setIsKept(true);
+    setActionResult({
+      text: "Kept. You can come back to this when you need it.",
+      shelfLink: true,
+    });
     registerMeaningfulGuestAction();
   };
 
   const handleSend = async () => {
+    const shareText = buildShareText(featuredNote.sendableText);
     let shared = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share({ title: featuredNote.title, text: featuredNote.sendableText });
+        await navigator.share({ title: featuredNote.title, text: shareText });
         shared = true;
       } else if (
         typeof navigator !== "undefined" &&
         navigator.clipboard &&
         typeof navigator.clipboard.writeText === "function"
       ) {
-        await navigator.clipboard.writeText(featuredNote.sendableText);
+        await navigator.clipboard.writeText(shareText);
         shared = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
-          await navigator.clipboard.writeText(featuredNote.sendableText);
+          await navigator.clipboard.writeText(shareText);
           shared = true;
         }
       } catch {
@@ -350,11 +368,11 @@ function TodaysNote() {
     }
     logSentNote(featuredNote);
     trackEvent("note_sent", { noteId: featuredNote.id, source: "landing" });
-    setMessage(
-      shared
+    setActionResult({
+      text: shared
         ? "Copied. Send it to someone who may need words today."
         : "Copy the note manually.",
-    );
+    });
     registerMeaningfulGuestAction();
   };
 
@@ -377,9 +395,14 @@ function TodaysNote() {
       </div>
 
       <article className="space-y-4">
-        {message ? (
-          <div className="paper-panel text-base leading-7 text-foreground" role="status">
-            {message}
+        {actionResult ? (
+          <div className="paper-panel space-y-3 text-base leading-7 text-foreground" role="status">
+            <p>{actionResult.text}</p>
+            {actionResult.shelfLink ? (
+              <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+                <Link to="/shelf">View in Shelf</Link>
+              </Button>
+            ) : null}
           </div>
         ) : null}
 
@@ -408,8 +431,10 @@ function TodaysNote() {
           >
             <LockKeyhole aria-hidden />
             <span className="flex flex-col items-start gap-0.5">
-              <span>Keep this Note</span>
-              <span className="text-[0.7rem] text-muted-foreground">Save it privately</span>
+              <span>{isKept ? "Kept in Shelf" : "Keep this Note"}</span>
+              <span className="text-[0.7rem] text-muted-foreground">
+                {isKept ? "Already in your Shelf" : "Save it privately"}
+              </span>
             </span>
           </Button>
           <Button

@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
 import {
+  getKeptNotes,
   keepNote,
   logSentNote,
   registerMeaningfulGuestAction,
 } from "@/lib/note-storage";
+import { buildShareText } from "@/lib/share";
 
 export const Route = createFileRoute("/note/$categorySlug")({
   loader: ({ params }) => {
@@ -49,16 +51,23 @@ interface ActionResult {
 function NotePage() {
   const { category, note } = Route.useLoaderData();
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
+  const [isKept, setIsKept] = useState(false);
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
     trackEvent("note_opened", { noteId: note.id, category: category.slug });
     setActionResult(null);
+    setIsKept(getKeptNotes().some((n) => n.noteId === note.id));
   }, [category.slug, note.id]);
 
   const handleKeep = () => {
+    if (isKept) {
+      setActionResult({ text: "Already kept in your Shelf.", shelfLink: true });
+      return;
+    }
     keepNote(note);
     trackEvent("note_kept", { noteId: note.id });
+    setIsKept(true);
     setActionResult({
       text: "Kept. You can come back to this when you need it.",
       shelfLink: true,
@@ -67,23 +76,24 @@ function NotePage() {
   };
 
   const handleSend = async () => {
+    const shareText = buildShareText(note.sendableText);
     let shared = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share({ title: note.title, text: note.sendableText });
+        await navigator.share({ title: note.title, text: shareText });
         shared = true;
       } else if (
         typeof navigator !== "undefined" &&
         navigator.clipboard &&
         typeof navigator.clipboard.writeText === "function"
       ) {
-        await navigator.clipboard.writeText(note.sendableText);
+        await navigator.clipboard.writeText(shareText);
         shared = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
-          await navigator.clipboard.writeText(note.sendableText);
+          await navigator.clipboard.writeText(shareText);
           shared = true;
         }
       } catch {
@@ -134,8 +144,12 @@ function NotePage() {
         note={note}
         actions={
           <>
-            <ActionButton hint="Save it privately for later" icon={LockKeyhole} onClick={handleKeep}>
-              Keep this Note
+            <ActionButton
+              hint={isKept ? "Already in your Shelf" : "Save it privately for later"}
+              icon={LockKeyhole}
+              onClick={handleKeep}
+            >
+              {isKept ? "Kept in Shelf" : "Keep this Note"}
             </ActionButton>
             <ActionButton hint="Share softly, without noise" icon={Mail} onClick={handleSend}>
               Send this Quietly
