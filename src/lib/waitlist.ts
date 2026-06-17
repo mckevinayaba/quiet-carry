@@ -2,6 +2,7 @@
 // Writes to Lovable Cloud (Postgres via Supabase). RLS allows INSERT for
 // anon + authenticated; reads are admin-only from the dashboard.
 
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export type WaitlistSource = "volume" | "account" | "landing";
@@ -36,7 +37,7 @@ export async function saveWaitlistEntry(
   if (error && error.code === "23505") return { ok: true };
 
   if (error) {
-    console.error("[waitlist] insert failed", error);
+    if (import.meta.env.DEV) console.error("[waitlist] insert failed", error);
     return { ok: false, error: error.message };
   }
   return { ok: true };
@@ -45,6 +46,7 @@ export async function saveWaitlistEntry(
 export async function saveFeedbackEntry(text: string): Promise<SaveResult> {
   const trimmed = text.trim();
   if (!trimmed) return { ok: false, error: "empty" };
+  if (trimmed.length > 1000) return { ok: false, error: "too_long" };
 
   const { error } = await supabase.from("feedback").insert({
     message: trimmed,
@@ -53,12 +55,12 @@ export async function saveFeedbackEntry(text: string): Promise<SaveResult> {
   });
 
   if (error) {
-    console.error("[feedback] insert failed", error);
+    if (import.meta.env.DEV) console.error("[feedback] insert failed", error);
     return { ok: false, error: error.message };
   }
   return { ok: true };
 }
 
 export function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  return z.string().email().safeParse(email.trim()).success;
 }

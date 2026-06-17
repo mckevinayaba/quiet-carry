@@ -2,12 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
-  Facebook,
   Feather,
   Heart,
-  Instagram,
   Layers2,
-  Linkedin,
   LockKeyhole,
   Mail,
   MessageSquareHeart,
@@ -326,28 +323,36 @@ function TodaysNote() {
   };
 
   const handleSend = async () => {
+    let shared = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({ title: featuredNote.title, text: featuredNote.sendableText });
+        shared = true;
       } else if (
         typeof navigator !== "undefined" &&
         navigator.clipboard &&
         typeof navigator.clipboard.writeText === "function"
       ) {
         await navigator.clipboard.writeText(featuredNote.sendableText);
+        shared = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
           await navigator.clipboard.writeText(featuredNote.sendableText);
+          shared = true;
         }
       } catch {
-        /* noop */
+        // all sharing methods unavailable
       }
     }
     logSentNote(featuredNote);
     trackEvent("note_sent", { noteId: featuredNote.id, source: "landing" });
-    setMessage("Copied. Send it to someone who may need words today.");
+    setMessage(
+      shared
+        ? "Copied. Send it to someone who may need words today."
+        : "Copy the note manually.",
+    );
     registerMeaningfulGuestAction();
   };
 
@@ -674,35 +679,6 @@ function SiteFooter() {
           <p className="text-sm leading-6 text-muted-foreground">
             Find words for what you carry quietly. A private-first emotional language platform.
           </p>
-          <div className="flex items-center gap-2 pt-1">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-              className="icon-seal !size-9 hover:opacity-80"
-            >
-              <Instagram className="size-4" aria-hidden />
-            </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Facebook"
-              className="icon-seal !size-9 hover:opacity-80"
-            >
-              <Facebook className="size-4" aria-hidden />
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="icon-seal !size-9 hover:opacity-80"
-            >
-              <Linkedin className="size-4" aria-hidden />
-            </a>
-          </div>
         </div>
 
         <FooterCol title="Product">

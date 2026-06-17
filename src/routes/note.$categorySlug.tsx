@@ -56,29 +56,37 @@ function NotePage() {
   };
 
   const handleSend = async () => {
+    let shared = false;
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
         await navigator.share({ title: note.title, text: note.sendableText });
+        shared = true;
       } else if (
         typeof navigator !== "undefined" &&
         navigator.clipboard &&
         typeof navigator.clipboard.writeText === "function"
       ) {
         await navigator.clipboard.writeText(note.sendableText);
+        shared = true;
       }
     } catch {
       try {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
           await navigator.clipboard.writeText(note.sendableText);
+          shared = true;
         }
       } catch {
-        /* noop */
+        // all sharing methods unavailable
       }
     }
 
     logSentNote(note);
     trackEvent("note_sent", { noteId: note.id });
-    setMessage("Copied. Send it to someone who may need words today.");
+    setMessage(
+      shared
+        ? "Copied. Send it to someone who may need words today."
+        : "Copy the note manually.",
+    );
     registerMeaningfulGuestAction();
   };
 

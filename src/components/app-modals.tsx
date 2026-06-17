@@ -198,6 +198,10 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
             onSubmit={async (event) => {
               event.preventDefault();
               if (!text.trim()) return;
+              if (text.trim().length > 1000) {
+                setError("Please keep your feedback under 1000 characters.");
+                return;
+              }
               const res = await saveFeedbackEntry(text);
               if (!res.ok) {
                 setError("Something went wrong. Please try again.");
@@ -212,12 +216,16 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
               id="feedback-text"
               className="min-h-40"
               placeholder="Write your feedback here"
+              maxLength={1000}
               value={text}
               onChange={(event) => {
                 setText(event.target.value);
                 if (error) setError(null);
               }}
             />
+            <p className="text-right text-xs text-muted-foreground" aria-live="polite">
+              {text.length}/1000
+            </p>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <DialogFooter>
               <Button type="button" variant="paper" onClick={onClose}>
