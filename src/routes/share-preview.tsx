@@ -5,20 +5,23 @@ import type { ReactNode } from "react";
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
-import { notes, type NoteEntry } from "@/lib/note-data";
-import { trackEvent } from "@/lib/analytics";
 import {
   B,
   F,
-  PRESETS,
-  type PresetId,
-  formatBrandedShareText,
   InstagramSquareCanvas,
   InstagramStoryCanvas,
   LinkedInPortraitCanvas,
   PinterestPinCanvas,
   WhatsAppStatusCanvas,
 } from "@/components/share-canvases";
+import {
+  PRESETS,
+  buildRenderPlan,
+  formatBrandedShareText,
+  type PresetId,
+} from "@/lib/note-render-engine";
+import { notes, type NoteEntry } from "@/lib/note-data";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/share-preview")({
   errorComponent: RouteErrorBoundary,
@@ -31,7 +34,6 @@ export const Route = createFileRoute("/share-preview")({
   component: SharePreviewPage,
 });
 
-// Three notes shown in the selector
 const PREVIEW_NOTES: NoteEntry[] = [
   notes.find((n) => n.id === "note-im-fine-but-not-really"),
   notes.find((n) => n.id === "note-distance-is-also-healing"),
@@ -47,6 +49,7 @@ function SharePreviewPage() {
   const [shareStatus, setShareStatus] = useState<string | null>(null);
 
   const note = PREVIEW_NOTES[noteIdx];
+  const renderPlan = buildRenderPlan(note, preset);
 
   async function handleCopy() {
     await navigator.clipboard.writeText(formatBrandedShareText(note));
@@ -63,9 +66,7 @@ function SharePreviewPage() {
         trackEvent("share_native_opened", { noteId: note.id, source: "share_preview" });
         setShareStatus("Shared.");
         setTimeout(() => setShareStatus(null), 2500);
-      } catch {
-        /* user cancelled */
-      }
+      } catch { /* cancelled */ }
     } else {
       await navigator.clipboard.writeText(text);
       setShareStatus("Copied to clipboard.");
@@ -76,13 +77,11 @@ function SharePreviewPage() {
   return (
     <AppLayout className="space-y-6 pb-12">
 
-      {/* Header */}
       <section className="space-y-2">
         <div className="stitched-label">Design preview · not live</div>
         <h1 className="font-display text-4xl leading-none">Social Export Preview</h1>
         <p className="text-sm leading-6 text-muted-foreground">
-          Preview how one note becomes platform-ready social assets while keeping
-          The Note You Needed Today identity.
+          Internal preview of the Note Render Engine. Shows content mode and layout warnings.
         </p>
       </section>
 
@@ -124,16 +123,43 @@ function SharePreviewPage() {
                   : "border-border bg-card text-muted-foreground hover:border-foreground/40",
               ].join(" ")}
             >
-              <span className="text-xs font-medium">
-                {p.id}. {p.label}
-              </span>
-              {p.ratio && (
-                <span className="text-[0.6rem] opacity-60">{p.ratio}</span>
-              )}
+              <span className="text-xs font-medium">{p.id}. {p.label}</span>
+              {p.ratio && <span className="text-[0.6rem] opacity-60">{p.ratio}</span>}
             </button>
           ))}
         </div>
       </section>
+
+      {/* Engine diagnostic panel */}
+      <div
+        className="rounded-2xl border p-4 space-y-2 text-xs"
+        style={{ borderColor: B.accentBorder, background: B.cream, fontFamily: F.label, letterSpacing: "0.07em" }}
+      >
+        <p style={{ textTransform: "uppercase", letterSpacing: "0.15em", color: B.inkMuted }}>
+          Render Engine · Diagnostic
+        </p>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1" style={{ color: B.ink }}>
+          <span style={{ color: B.inkMuted }}>Preset</span>
+          <span>{renderPlan.preset.label} ({renderPlan.preset.layoutType})</span>
+          <span style={{ color: B.inkMuted }}>Content mode</span>
+          <span style={{ fontWeight: renderPlan.contentMode !== "full" ? 600 : 400, color: renderPlan.contentMode === "carousel_required" ? "oklch(0.55 0.14 30)" : renderPlan.contentMode === "excerpt" ? "oklch(0.52 0.10 55)" : B.ink }}>
+            {renderPlan.contentMode}
+          </span>
+          <span style={{ color: B.inkMuted }}>Text budget</span>
+          <span>{renderPlan.preset.maxChars} chars</span>
+          <span style={{ color: B.inkMuted }}>Rendered chars</span>
+          <span>{renderPlan.mainText.length}</span>
+          <span style={{ color: B.inkMuted }}>socialExcerpt</span>
+          <span>{note.socialExcerpt ? `yes (${note.socialExcerpt.length} chars)` : "none"}</span>
+        </div>
+        {renderPlan.layoutWarnings.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {renderPlan.layoutWarnings.map((w, i) => (
+              <p key={i} style={{ color: "oklch(0.55 0.12 40)", fontSize: "0.7rem" }}>⚠ {w}</p>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Active preset canvas */}
       <div className="flex flex-col items-center gap-3">
@@ -148,137 +174,74 @@ function SharePreviewPage() {
         )}
         {preset === "B" && (
           <PreviewShell displayLabel="Preset B · WhatsApp Status · 9:16">
-            <WhatsAppStatusCanvas note={note} />
+            <WhatsAppStatusCanvas renderPlan={renderPlan} />
           </PreviewShell>
         )}
         {preset === "C" && (
           <PreviewShell displayLabel="Preset C · Instagram Story · 9:16">
-            <InstagramStoryCanvas note={note} />
+            <InstagramStoryCanvas renderPlan={renderPlan} />
           </PreviewShell>
         )}
         {preset === "D" && (
           <PreviewShell displayLabel="Preset D · Instagram Square · 1:1">
-            <InstagramSquareCanvas note={note} />
+            <InstagramSquareCanvas renderPlan={renderPlan} />
           </PreviewShell>
         )}
         {preset === "E" && (
           <PreviewShell displayLabel="Preset E · LinkedIn Portrait · 4:5">
-            <LinkedInPortraitCanvas note={note} />
+            <LinkedInPortraitCanvas renderPlan={renderPlan} />
           </PreviewShell>
         )}
         {preset === "F" && (
           <PreviewShell displayLabel="Preset F · Pinterest Pin · 2:3">
-            <PinterestPinCanvas note={note} />
+            <PinterestPinCanvas renderPlan={renderPlan} />
           </PreviewShell>
         )}
       </div>
 
-      {/* Developer notice */}
       <div
         className="rounded-2xl border border-dashed p-4 text-center text-xs text-muted-foreground"
-        style={{
-          borderColor: "oklch(0.75 0.03 60 / 0.5)",
-          fontFamily: F.label,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-        }}
+        style={{ borderColor: "oklch(0.75 0.03 60 / 0.5)", fontFamily: F.label, letterSpacing: "0.08em", textTransform: "uppercase" }}
       >
-        Preview only · Final export and download will be added after design approval
+        Internal preview · not shown to users
       </div>
 
     </AppLayout>
   );
 }
 
-// ─── Preset A: Private Share Text ─────────────────────────────────────────────
+// ─── Preset A ────────────────────────────────────────────────────────────────
 
-function PrivateShareText({
-  note,
-  copyLabel,
-  shareStatus,
-  onCopy,
-  onShare,
-}: {
-  note: NoteEntry;
-  copyLabel: string;
-  shareStatus: string | null;
-  onCopy: () => void;
-  onShare: () => void;
+function PrivateShareText({ note, copyLabel, shareStatus, onCopy, onShare }: {
+  note: NoteEntry; copyLabel: string; shareStatus: string | null; onCopy: () => void; onShare: () => void;
 }) {
   return (
     <div className="w-full space-y-4">
-      <p
-        className="text-xs text-muted-foreground"
-        style={{ fontFamily: F.label, letterSpacing: "0.1em", textTransform: "uppercase" }}
-      >
+      <p className="text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.1em", textTransform: "uppercase" }}>
         Preset A — Private Share Text · WhatsApp · SMS · Messenger · Email
       </p>
-      <div
-        className="paper-panel"
-        style={{
-          fontFamily: F.note,
-          fontSize: "0.95rem",
-          lineHeight: 1.75,
-          color: B.ink,
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-        }}
-      >
+      <div className="paper-panel" style={{ fontFamily: F.note, fontSize: "0.95rem", lineHeight: 1.75, color: B.ink, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
         {formatBrandedShareText(note)}
       </div>
       {shareStatus && <p className="text-sm text-muted-foreground">{shareStatus}</p>}
       <div className="flex flex-col gap-2.5 sm:flex-row">
-        <Button variant="note" onClick={onCopy} className="w-full sm:flex-1">
-          {copyLabel}
-        </Button>
-        <Button variant="paper" onClick={onShare} className="w-full sm:flex-1">
-          Preview native share
-        </Button>
+        <Button variant="note" onClick={onCopy} className="w-full sm:flex-1">{copyLabel}</Button>
+        <Button variant="paper" onClick={onShare} className="w-full sm:flex-1">Preview native share</Button>
       </div>
     </div>
   );
 }
 
-// ─── Preview shell (adds label + download button below each canvas) ────────────
+// ─── Preview shell ─────────────────────────────────────────────────────────────
 
-function PreviewShell({
-  displayLabel,
-  children,
-}: {
-  displayLabel: string;
-  children: ReactNode;
-}) {
+function PreviewShell({ displayLabel, children }: { displayLabel: string; children: ReactNode }) {
   return (
     <div className="flex w-full flex-col items-center gap-2.5">
       {children}
-      <p
-        style={{
-          fontFamily: F.label,
-          fontSize: "0.52rem",
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          color: B.inkFaint,
-        }}
-      >
+      <p style={{ fontFamily: F.label, fontSize: "0.52rem", letterSpacing: "0.15em", textTransform: "uppercase", color: B.inkFaint }}>
         {displayLabel}
       </p>
-      <button
-        disabled
-        aria-disabled="true"
-        style={{
-          fontFamily: F.label,
-          fontSize: "0.56rem",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          color: B.inkFaint,
-          border: `1px dashed ${B.inkFaint}`,
-          borderRadius: "999px",
-          padding: "0.35rem 0.9rem",
-          background: "transparent",
-          cursor: "not-allowed",
-          opacity: 0.55,
-        }}
-      >
+      <button disabled aria-disabled="true" style={{ fontFamily: F.label, fontSize: "0.56rem", letterSpacing: "0.12em", textTransform: "uppercase", color: B.inkFaint, border: `1px dashed ${B.inkFaint}`, borderRadius: "999px", padding: "0.35rem 0.9rem", background: "transparent", cursor: "not-allowed", opacity: 0.55 }}>
         Download PNG — coming soon
       </button>
     </div>

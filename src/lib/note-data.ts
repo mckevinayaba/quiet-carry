@@ -15,6 +15,10 @@ export interface NoteEntry {
   receiptTotal?: string;
   journalPrompt: string;
   sendableText: string;
+  socialExcerpt?: string;
+  publicHook?: string;
+  shortCaption?: string;
+  longCaption?: string;
 }
 
 export interface CollectionEntry {
@@ -100,6 +104,7 @@ export const notes: NoteEntry[] = [
     receiptDate: "The first time someone asks and you do not flinch.",
     receiptTotal:
       "The tears you saved for the dark. they are not shame. they are just waiting for permission.",
+    socialExcerpt: `They asked,\n"How are you?"\nand this time,\nthey really meant it.\n\nBut you still smiled.\nYou still said,\n"I'm fine."\n\nBecause the truth\nwas too heavy\nto carry out loud.`,
     journalPrompt: "What truth reached your throat but never became words?",
     sendableText:
       "I found this and thought of you. You do not have to explain everything today. I just hope you find one safe place where the truth does not feel too heavy.",
@@ -139,6 +144,7 @@ export const notes: NoteEntry[] = [
     receiptTo: "A silence that finally protects you.",
     receiptDate: "The day you stop explaining your absence.",
     receiptTotal: "Your presence, returned to you.",
+    socialExcerpt: `Distance is my new answer\nto disrespect.\n\nI no longer react.\nI no longer argue.\nI no longer dive\ninto drama.\n\nI simply remove\nmy presence.`,
     journalPrompt: "Where do you need distance, not another explanation?",
     sendableText:
       "Sometimes distance is not pride. Sometimes it is the first time your peace becomes visible.",
@@ -232,6 +238,7 @@ export const notes: NoteEntry[] = [
     receiptTo: "The day you stop needing witnesses before you believe yourself.",
     receiptDate: "The moment you choose the dream without waiting for applause.",
     receiptTotal: "Your proof was never their permission. Keep going.",
+    socialExcerpt: `Do it anyway.\n\nStop expecting recognition\nfrom people who watched you bleed\nand still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.`,
     journalPrompt: "Where have you been waiting for recognition from people who already saw enough to support you?",
     sendableText:
       "Do it anyway.\n\nStop expecting recognition from people who watched you bleed and still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.",

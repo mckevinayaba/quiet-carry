@@ -9,23 +9,27 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { trackEvent } from "@/lib/analytics";
-import type { NoteEntry } from "@/lib/note-data";
 import {
   B,
-  DOWNLOADABLE_PRESETS,
+  CanvasShell,
   F,
-  PRESETS,
-  type PresetId,
-  buildCaptionText,
-  buildFilename,
-  formatBrandedShareText,
   InstagramSquareCanvas,
   InstagramStoryCanvas,
   LinkedInPortraitCanvas,
   PinterestPinCanvas,
   WhatsAppStatusCanvas,
 } from "@/components/share-canvases";
+import {
+  DOWNLOADABLE_PRESETS,
+  PRESETS,
+  buildFilename,
+  buildRenderPlan,
+  formatBrandedShareText,
+  formatSocialCaption,
+  type PresetId,
+} from "@/lib/note-render-engine";
+import { trackEvent } from "@/lib/analytics";
+import type { NoteEntry } from "@/lib/note-data";
 
 export { Share2 as ShareIcon };
 
@@ -47,6 +51,7 @@ export function ShareNoteModal({
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const renderPlan = buildRenderPlan(note, preset);
 
   function selectPreset(id: PresetId) {
     setPreset(id);
@@ -55,18 +60,14 @@ export function ShareNoteModal({
       noteId: note.id,
       categorySlug: note.categorySlug,
       preset: id,
+      contentMode: buildRenderPlan(note, id).contentMode,
       source: "modal",
     });
   }
 
   async function handleCopyText() {
     await navigator.clipboard.writeText(formatBrandedShareText(note));
-    trackEvent("share_text_copied", {
-      noteId: note.id,
-      categorySlug: note.categorySlug,
-      preset,
-      source: "modal",
-    });
+    trackEvent("share_text_copied", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy share text"), 2500);
   }
@@ -76,17 +77,10 @@ export function ShareNoteModal({
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ text });
-        trackEvent("share_native_opened", {
-          noteId: note.id,
-          categorySlug: note.categorySlug,
-          preset,
-          source: "modal",
-        });
+        trackEvent("share_native_opened", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
         setShareStatus("Shared.");
         setTimeout(() => setShareStatus(null), 2500);
-      } catch {
-        /* user cancelled */
-      }
+      } catch { /* cancelled */ }
     } else {
       await navigator.clipboard.writeText(text);
       setShareStatus("Copied to clipboard.");
@@ -95,13 +89,8 @@ export function ShareNoteModal({
   }
 
   async function handleCopyCaption() {
-    await navigator.clipboard.writeText(buildCaptionText(note));
-    trackEvent("share_caption_copied", {
-      noteId: note.id,
-      categorySlug: note.categorySlug,
-      preset,
-      source: "modal",
-    });
+    await navigator.clipboard.writeText(formatSocialCaption(note));
+    trackEvent("share_caption_copied", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
     setCaptionLabel("Copied!");
     setTimeout(() => setCaptionLabel("Copy caption"), 2500);
   }
@@ -110,59 +99,30 @@ export function ShareNoteModal({
     if (!canvasRef.current) return;
     setDownloadState("downloading");
     try {
-      // Dynamic import keeps html-to-image out of the SSR bundle
       const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(canvasRef.current, {
-        pixelRatio: 4,
-        cacheBust: true,
-      });
+      const dataUrl = await toPng(canvasRef.current, { pixelRatio: 4, cacheBust: true });
       const filename = buildFilename(note, preset);
-
-      // Try anchor-click download; fall back to manual open
       const link = document.createElement("a");
       link.download = filename;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Some mobile browsers block the anchor click — detect by checking if
-      // the data URL looks valid but the click may have been a no-op
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      if (isIOS) {
-        setDownloadState("manual");
-      } else {
-        setDownloadState("success");
-        setTimeout(() => setDownloadState("idle"), 3000);
-      }
-
-      trackEvent("share_image_downloaded", {
-        noteId: note.id,
-        categorySlug: note.categorySlug,
-        preset,
-        source: "modal",
-      });
+      setDownloadState(isIOS ? "manual" : "success");
+      if (!isIOS) setTimeout(() => setDownloadState("idle"), 3000);
+      trackEvent("share_image_downloaded", { noteId: note.id, categorySlug: note.categorySlug, preset, contentMode: renderPlan.contentMode, source: "modal" });
     } catch {
       setDownloadState("error");
       setTimeout(() => setDownloadState("idle"), 4000);
-      trackEvent("share_image_download_failed", {
-        noteId: note.id,
-        categorySlug: note.categorySlug,
-        preset,
-        source: "modal",
-      });
+      trackEvent("share_image_download_failed", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
     }
   }
 
   const isDownloadable = DOWNLOADABLE_PRESETS.includes(preset);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) onClose();
-      }}
-    >
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
       <DialogContent className="max-h-[92vh] w-full overflow-y-auto bg-card sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display text-3xl leading-none">
@@ -188,12 +148,8 @@ export function ShareNoteModal({
                   : "border-border bg-card text-muted-foreground hover:border-foreground/40",
               ].join(" ")}
             >
-              <span className="text-[0.65rem] font-medium">
-                {p.id}. {p.label}
-              </span>
-              {p.ratio && (
-                <span className="text-[0.55rem] opacity-60">{p.ratio}</span>
-              )}
+              <span className="text-[0.65rem] font-medium">{p.id}. {p.label}</span>
+              {p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>}
             </button>
           ))}
         </div>
@@ -203,41 +159,38 @@ export function ShareNoteModal({
           {preset === "A" && (
             <div
               className="paper-panel w-full"
-              style={{
-                fontFamily: F.note,
-                fontSize: "0.9rem",
-                lineHeight: 1.75,
-                color: B.ink,
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                maxHeight: "200px",
-                overflowY: "auto",
-              }}
+              style={{ fontFamily: F.note, fontSize: "0.9rem", lineHeight: 1.75, color: B.ink, whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: "200px", overflowY: "auto" }}
             >
               {formatBrandedShareText(note)}
             </div>
           )}
-          {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} note={note} />}
-          {preset === "C" && <InstagramStoryCanvas ref={canvasRef} note={note} />}
-          {preset === "D" && <InstagramSquareCanvas ref={canvasRef} note={note} />}
-          {preset === "E" && <LinkedInPortraitCanvas ref={canvasRef} note={note} />}
-          {preset === "F" && <PinterestPinCanvas ref={canvasRef} note={note} />}
+          {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} renderPlan={renderPlan} />}
+          {preset === "C" && <InstagramStoryCanvas ref={canvasRef} renderPlan={renderPlan} />}
+          {preset === "D" && <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />}
+          {preset === "E" && <LinkedInPortraitCanvas ref={canvasRef} renderPlan={renderPlan} />}
+          {preset === "F" && <PinterestPinCanvas ref={canvasRef} renderPlan={renderPlan} />}
         </div>
+
+        {/* Content mode badge (excerpt / carousel warning) */}
+        {isDownloadable && renderPlan.contentMode !== "full" && (
+          <p
+            className="text-center text-xs text-muted-foreground"
+            style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}
+          >
+            {renderPlan.contentMode === "carousel_required"
+              ? "Showing best excerpt · full note is too long for one card"
+              : "Showing excerpt · full note available on site"}
+          </p>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col gap-2">
           {preset === "A" ? (
             <>
-              {shareStatus && (
-                <p className="text-sm text-muted-foreground">{shareStatus}</p>
-              )}
+              {shareStatus && <p className="text-sm text-muted-foreground">{shareStatus}</p>}
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="note" onClick={handleCopyText}>
-                  {copyLabel}
-                </Button>
-                <Button variant="paper" onClick={handleNativeShare}>
-                  Share now
-                </Button>
+                <Button variant="note" onClick={handleCopyText}>{copyLabel}</Button>
+                <Button variant="paper" onClick={handleNativeShare}>Share now</Button>
               </div>
             </>
           ) : (
@@ -246,40 +199,29 @@ export function ShareNoteModal({
                 variant="note"
                 onClick={handleDownload}
                 disabled={downloadState === "downloading"}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <Download className="size-4" aria-hidden="true" />
-                {downloadState === "downloading"
-                  ? "Creating image…"
-                  : downloadState === "success"
-                    ? "Image downloaded"
-                    : "Download PNG"}
+                {downloadState === "downloading" ? "Creating image…"
+                  : downloadState === "success" ? "Image downloaded"
+                  : "Download PNG"}
               </Button>
 
               {downloadState === "error" && (
-                <p className="text-sm text-destructive">
-                  We could not create the image. Please try again.
-                </p>
+                <p className="text-sm text-destructive">We could not create the image. Please try again.</p>
               )}
               {downloadState === "manual" && (
-                <p className="text-sm text-muted-foreground">
-                  Your image is ready. Long press or open it to save.
-                </p>
+                <p className="text-sm text-muted-foreground">Your image is ready. Long press or open it to save.</p>
               )}
-              {downloadState === "idle" && isDownloadable && (
-                <p
-                  className="text-center text-xs text-muted-foreground"
-                  style={{ fontFamily: F.label, letterSpacing: "0.06em" }}
-                >
+              {downloadState === "idle" && (
+                <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
                   Download the image, then upload it to your Story, Status, or post.
                 </p>
               )}
             </>
           )}
 
-          <Button variant="paper" onClick={handleCopyCaption}>
-            {captionLabel}
-          </Button>
+          <Button variant="paper" onClick={handleCopyCaption}>{captionLabel}</Button>
         </div>
       </DialogContent>
     </Dialog>

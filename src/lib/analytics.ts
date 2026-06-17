@@ -70,6 +70,7 @@ const SAFE_PAYLOAD_KEYS = new Set([
   "actionCount",
   "from",
   "preset",
+  "contentMode",
 ]);
 
 function sanitizePayload(
