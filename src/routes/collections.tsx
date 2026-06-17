@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { AppLayout } from "@/components/app-layout";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { CollectionCard } from "@/components/collection-card";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
 import { collections } from "@/lib/note-data";
 
 export const Route = createFileRoute("/collections")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "Collections" },

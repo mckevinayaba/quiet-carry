@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActionButton } from "@/components/action-button";
 import { AppLayout } from "@/components/app-layout";
 import { NoteCard } from "@/components/note-card";
+import { NoteNotFound, RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/note/$categorySlug")({
     if (!category || !note) throw notFound();
     return { category, note };
   },
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: NoteNotFound,
   head: ({ loaderData }) => ({
     meta: [
       { title: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },

@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { ShelfItem } from "@/components/shelf-item";
 import { Button } from "@/components/ui/button";
 import type { SavedReflection, SavedShelfNote } from "@/lib/note-storage";
 import { getKeptNotes, getReflections, getSentNotes } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/shelf")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "My Private Shelf" },

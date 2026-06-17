@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
+import { RouteErrorBoundary, WriteNotFound } from "@/components/route-error";
 import { ReflectionEditor } from "@/components/reflection-editor";
 import { trackEvent } from "@/lib/analytics";
 import { getNoteByCategorySlug } from "@/lib/note-data";
@@ -13,6 +14,8 @@ export const Route = createFileRoute("/write/$categorySlug")({
     if (!note) throw notFound();
     return { note };
   },
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: WriteNotFound,
   head: ({ loaderData }) => ({
     meta: [
       { title: `Write from ${loaderData?.note.title ?? "this note"}` },

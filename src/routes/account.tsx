@@ -2,11 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { useAppModals } from "@/components/app-modals";
 import { getKeptNotes, getReflections } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/account")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "Your Private Account" },

@@ -2,10 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { AppLayout } from "@/components/app-layout";
 import { CategoryCard } from "@/components/category-card";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { trackEvent } from "@/lib/analytics";
 import { categories } from "@/lib/note-data";
 
 export const Route = createFileRoute("/feelings")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "What are you carrying today?" },

@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { AppLayout } from "@/components/app-layout";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/support")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "Before you go further" },

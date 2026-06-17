@@ -15,6 +15,7 @@ import {
 
 import { AppLayout } from "@/components/app-layout";
 import { ReceiptBlock } from "@/components/receipt-block";
+import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppModals } from "@/components/app-modals";
@@ -32,6 +33,7 @@ import manifestoWindow from "@/assets/manifesto-window.jpg";
 import volumeCollage from "@/assets/volume-one-collage.jpg";
 
 export const Route = createFileRoute("/")({
+  errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
       { title: "The Note You Needed Today — Find words for what you carry quietly" },
