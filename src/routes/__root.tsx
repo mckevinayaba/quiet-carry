@@ -87,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "The Note You Needed Today" },
       { name: "twitter:description", content: "Find words for what you carry quietly." },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/73cc5279-72d3-43bf-be83-9679a52eff4a/id-preview-4ccdad64--42b096e9-c48d-46ed-a2cd-c1468652d462.lovable.app-1781647574924.png" },
+      // PWA / home-screen meta
+      { name: "theme-color", content: "#f7f1e8" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "The Note" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -97,6 +103,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Special+Elite&family=Patrick+Hand&display=swap",
       },
       { rel: "canonical", href: "https://thenoteyouneeded.today/" },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -128,6 +136,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
+        // SW registration failure is non-fatal — app works without it
+      });
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

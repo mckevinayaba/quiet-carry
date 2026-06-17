@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#f7f1e8"/>
+  <!-- Heart shape using the classical implicit curve approximated as two circles + bottom triangle -->
+  <path
+    d="M256 370
+       C256 370 120 280 120 190
+       C120 148 154 118 198 118
+       C222 118 244 132 256 152
+       C268 132 290 118 314 118
+       C358 118 392 148 392 190
+       C392 280 256 370 256 370Z"
+    fill="#3d2b1a"
+  />
+</svg>

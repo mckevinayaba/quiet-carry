@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
+import { InstallModal } from "@/components/install-modal";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { useAppModals } from "@/components/app-modals";
@@ -32,6 +33,7 @@ function AccountInner() {
   const { openWaitlist, openFeedback } = useAppModals();
   const [savedCount, setSavedCount] = useState(0);
   const [reflectionCount, setReflectionCount] = useState(0);
+  const [installOpen, setInstallOpen] = useState(false);
 
   useEffect(() => {
     setSavedCount(getKeptNotes().length);
@@ -40,6 +42,8 @@ function AccountInner() {
 
   return (
     <>
+      <InstallModal open={installOpen} onClose={() => setInstallOpen(false)} />
+
       <section className="space-y-3 py-2">
         <div className="stitched-label">Private account</div>
         <h1 className="font-display text-5xl leading-none">Your Private Account</h1>
@@ -80,6 +84,17 @@ function AccountInner() {
         </p>
         <Button variant="paper" onClick={openFeedback}>
           Share feedback
+        </Button>
+      </section>
+
+      <section className="paper-panel space-y-3">
+        <div className="stitched-label">Add to your phone</div>
+        <h2 className="font-display text-2xl leading-none">Add The Note to your phone</h2>
+        <p className="text-sm leading-6 text-muted-foreground">
+          Keep a quiet place for the words you may need again.
+        </p>
+        <Button variant="paper" onClick={() => setInstallOpen(true)}>
+          How to install
         </Button>
       </section>
     </>
