@@ -124,7 +124,11 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
               }
               const res = await saveWaitlistEntry(email, source ?? "volume");
               if (!res.ok) {
-                setError("Something went wrong. Please try again.");
+                setError(
+                  res.error === "throttled"
+                    ? "You have already joined recently. Please wait a moment before trying again."
+                    : "Something went wrong. Please try again.",
+                );
                 return;
               }
               trackEvent("waitlist_submitted", { source });
@@ -204,7 +208,11 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
               }
               const res = await saveFeedbackEntry(text);
               if (!res.ok) {
-                setError("Something went wrong. Please try again.");
+                setError(
+                  res.error === "throttled"
+                    ? "You have already sent feedback recently. Please wait a moment before trying again."
+                    : "Something went wrong. Please try again.",
+                );
                 return;
               }
               trackEvent("feedback_submitted");
