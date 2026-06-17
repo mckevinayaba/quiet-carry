@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { CollectionCard } from "@/components/collection-card";
 import { useAppModals } from "@/components/app-modals";
+import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { collections } from "@/lib/note-data";
 
@@ -34,6 +36,17 @@ function CollectionsInner() {
   return (
     <>
       <section className="space-y-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 pb-1">
+          <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+            <Link to="/">
+              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              Back to Home
+            </Link>
+          </Button>
+          <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+            <Link to="/today">Read Today's Note</Link>
+          </Button>
+        </div>
         <div className="stitched-label">Collections</div>
         <h1 className="font-display text-5xl leading-none">Collections</h1>
         <p className="text-base leading-7 text-muted-foreground">

@@ -1,4 +1,4 @@
-import { BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
+import { ArrowLeft, BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -41,20 +41,28 @@ export const Route = createFileRoute("/note/$categorySlug")({
   component: NotePage,
 });
 
+interface ActionResult {
+  text: string;
+  shelfLink?: boolean;
+}
+
 function NotePage() {
   const { category, note } = Route.useLoaderData();
-  const [message, setMessage] = useState<string | null>(null);
+  const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
     trackEvent("note_opened", { noteId: note.id, category: category.slug });
-    setMessage(null);
+    setActionResult(null);
   }, [category.slug, note.id]);
 
   const handleKeep = () => {
     keepNote(note);
     trackEvent("note_kept", { noteId: note.id });
-    setMessage("Kept. You can come back to this when you need it.");
+    setActionResult({
+      text: "Kept. You can come back to this when you need it.",
+      shelfLink: true,
+    });
     registerMeaningfulGuestAction();
   };
 
@@ -85,17 +93,24 @@ function NotePage() {
 
     logSentNote(note);
     trackEvent("note_sent", { noteId: note.id });
-    setMessage(
-      shared
+    setActionResult({
+      text: shared
         ? "Copied. Send it to someone who may need words today."
         : "Copy the note manually.",
-    );
+    });
     registerMeaningfulGuestAction();
   };
 
   return (
     <AppLayout className="space-y-6 pb-8">
       <section className="space-y-3 py-2">
+        <Link
+          to="/feelings"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
+          Back to Feelings
+        </Link>
         <div className="stitched-label">{category.title}</div>
         <h1 className="font-display text-4xl leading-[1.05] text-foreground sm:text-5xl">
           {note.title}
@@ -103,9 +118,14 @@ function NotePage() {
         <p className="text-base leading-7 text-muted-foreground">{category.subtitle}</p>
       </section>
 
-      {message ? (
-        <div className="paper-panel text-base leading-7 text-foreground" role="status">
-          {message}
+      {actionResult ? (
+        <div className="paper-panel space-y-3 text-base leading-7 text-foreground" role="status">
+          <p>{actionResult.text}</p>
+          {actionResult.shelfLink ? (
+            <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+              <Link to="/shelf">View in Shelf</Link>
+            </Button>
+          ) : null}
         </div>
       ) : null}
 

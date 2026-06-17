@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
@@ -47,6 +48,12 @@ function SupportPage() {
           A vetted list of crisis lines is being prepared. Until then, please reach out to local
           emergency services or someone you trust.
         </p>
+        <Button asChild variant="paper" className="mt-2 min-h-11 self-start">
+          <Link to="/">
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Return Home
+          </Link>
+        </Button>
       </section>
     </AppLayout>
   );

@@ -87,6 +87,15 @@ function ShelfPage() {
         <p>No public profile. No comments. No followers.</p>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Button asChild variant="note" size="sm" className="min-h-9">
+          <Link to="/today">Open Today's Note</Link>
+        </Button>
+        <Button asChild variant="paper" size="sm" className="min-h-9">
+          <Link to="/feelings">Find another note</Link>
+        </Button>
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
         {[
           ["kept", "Notes I kept"],

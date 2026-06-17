@@ -1,8 +1,10 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary, WriteNotFound } from "@/components/route-error";
+import { Button } from "@/components/ui/button";
 import { ReflectionEditor } from "@/components/reflection-editor";
 import { trackEvent } from "@/lib/analytics";
 import { getNoteByCategorySlug } from "@/lib/note-data";
@@ -31,6 +33,7 @@ function WritePage() {
   const { note } = Route.useLoaderData();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     trackEvent("reflection_started", { noteId: note.id });
@@ -39,6 +42,14 @@ function WritePage() {
   return (
     <AppLayout className="space-y-5 pb-8">
       <section className="space-y-3 py-2">
+        <Link
+          to="/note/$categorySlug"
+          params={{ categorySlug: note.categorySlug }}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
+          Back to Note
+        </Link>
         <div className="stitched-label">Write from this note</div>
         <h1 className="font-display text-4xl leading-[1.05] sm:text-5xl">Write from this note</h1>
         <p className="text-base leading-7 text-muted-foreground">
@@ -52,8 +63,20 @@ function WritePage() {
       </div>
 
       {message ? (
-        <div className="paper-panel text-base leading-7 text-foreground" role="status">
-          {message}
+        <div className="paper-panel space-y-3 text-base leading-7 text-foreground" role="status">
+          <p>{message}</p>
+          {saved ? (
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+                <Link to="/shelf">View in Shelf</Link>
+              </Button>
+              <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+                <Link to="/note/$categorySlug" params={{ categorySlug: note.categorySlug }}>
+                  Back to Note
+                </Link>
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -64,6 +87,7 @@ function WritePage() {
         onClear={() => {
           setValue("");
           setMessage(null);
+          setSaved(false);
         }}
         onSave={() => {
           if (!value.trim()) return;
@@ -72,6 +96,7 @@ function WritePage() {
           setMessage(
             "Saved privately on this device. A private account is coming soon so you can keep your reflections safe across devices.",
           );
+          setSaved(true);
           registerMeaningfulGuestAction();
         }}
         prompt={note.journalPrompt}
