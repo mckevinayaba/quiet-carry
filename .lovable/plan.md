@@ -1,50 +1,44 @@
-## QA Plan: The Note You Needed Today MVP
+# Custom Domain Setup Plan
 
-I'll run an end-to-end QA pass with Playwright against the live preview, capture screenshots of each flow, then apply targeted fixes. No new features.
+## Step 1 — You: buy the domain in Lovable
 
-### Phase 1 — Automated QA pass (Playwright)
+1. **Project Settings → Project section → Domains** → **Buy new domain**
+2. Search candidates. Suggested (in priority order):
+   - `thenoteyouneededtoday.com` — matches brand name exactly, best for memorability and SEO
+   - `noteyouneededtoday.com` — shorter fallback
+   - `thenoteyouneeded.com` — shortest, still on-brand
+   - `quietwords.co` / `quietcarry.co` — short, brandable, cheaper TLD
+3. Complete purchase. Lovable auto-connects it and provisions SSL.
+4. In Domains settings, set **Root (`yourdomain.com`)** as **Primary** so `www` redirects to root.
 
-Drive a headless browser through every guest flow and capture screenshots + console output:
+No code changes needed for the domain to start serving the site — it'll work the moment SSL provisions.
 
-1. **Home** loads, both CTAs navigate, Today's Note renders.
-2. **Feelings** lists all 10 categories, each card opens the correct note.
-3. **Note page** for each of the 10 categories: title, body, receipt block (FROM/TO/DATE/TOTAL), journal prompt area, three action buttons.
-4. **Keep this Note** → confirmation message → Shelf shows it under "Notes I kept" → survives page refresh.
-5. **Send this Quietly** → clipboard fallback fires (headless has no Web Share) → confirmation message → appears under "Notes I sent quietly".
-6. **Write from This** → `/write/:slug` loads with correct prompt → save reflection → confirmation → appears under "Reflections I wrote" → survives refresh.
-7. **Account prompt** appears after 3 guest actions; "Not now" dismisses it.
-8. **Collections** lists Volume 1 with price R149, Get Volume 1 links to selar.com, all 4 "coming soon" entries visible.
-9. **Account page** shows trust copy + guest CTAs.
-10. **Bottom nav** all 5 links work, active state shows on current route.
-11. **Mobile viewport** (375×812) screenshot of each main page to verify readability, no overflow.
-12. **Console**: capture and report any errors/warnings across the run.
-13. **Analytics**: assert each of the 8 required `[analytics]` events fires via `console.info` interception.
+## Step 2 — Me: update the codebase once the domain is known
 
-### Phase 2 — Known gaps to fix (found during code review)
+Tell me the domain you bought and I will, in one pass:
 
-These are visible from the current code and will be fixed regardless of what QA surfaces:
+1. **Open Graph + Twitter metadata** (`src/routes/__root.tsx` and per-route `head()`) — replace `quiet-words-today.lovable.app` references with the new canonical URL so social shares show the right domain.
+2. **Canonical tag** — add `<link rel="canonical">` pointing to the new root.
+3. **`src/routes/sitemap[.]xml.ts`** — switch base URL to the new domain.
+4. **`public/robots.txt`** — update the `Sitemap:` line.
+5. **`README.md`** — replace the "Live (private beta)" URL.
+6. **Plausible analytics** (`VITE_PLAUSIBLE_DOMAIN` in `.env`) — set to the new apex so analytics report under the real domain. Document it in README env section.
+7. **JSON-LD / structured data** if present — point `url` to the new domain.
+8. Verify the build is clean and the published Lovable URL still works (it keeps working alongside the custom domain).
 
-- **Note page missing two buttons** the spec calls for:
-  - "Read Similar Notes" → currently similar notes render inline as cards with no header CTA. Add a clearly-labeled jump/anchor button so the section is reachable from the action stack.
-  - "Unlock Full Collection" → currently absent. Add a button linking to `/collections`.
-  - "Save as Wallpaper" — spec says "if currently included". It is not implemented, so leave it out (no dead button).
-- **Account page dead buttons**: "Create Private Account" and "Sign In" do nothing. Re-label as "Create Private Account (coming soon)" / "Sign In (coming soon)" and disable, per spec ("Do not let users enter a broken auth flow").
-- **Home page Today's Note**: spec lists Keep / Send / Write buttons on home. Currently only "Open this note" is shown. Either add the three action buttons on home or update the home section to a single "Open this note" CTA that matches the actual UI — I'll add the three actions so the spec passes.
-- **Receipt block on home**: featured note currently shows without receipt; add `<ReceiptBlock />` so home matches Note page.
-- **Send-quietly copy**: spec wants "Copied. Send it to someone who may need words today." in both the share-API and clipboard paths. Currently the share-API path uses different copy. Normalize.
+## Step 3 — Verification (after DNS goes live)
 
-### Phase 3 — Fix anything QA surfaces
+- Visit `https://yourdomain.com` — should load the site over HTTPS
+- Visit `https://www.yourdomain.com` — should 301 to root
+- Share the URL in a Slack/iMessage preview to confirm OG image + title render
+- Confirm Plausible (if enabled) starts recording under the new domain
 
-Anything Playwright reveals (runtime errors, broken nav, lost localStorage, missing analytics events, mobile overflow) gets fixed in the same pass.
+## Notes
 
-### Phase 4 — QA report
+- **No DNS work on your side** — buying through Lovable means DNS is auto-configured. SSL usually provisions within minutes.
+- **Email DNS (MX/SPF/DKIM/DMARC)** — only needed if you later send mail from `@yourdomain.com`. Managed under **⋯ → Configure → Manage DNS records** when ready.
+- **Lovable URL stays live** — `quiet-words-today.lovable.app` continues to work; the custom domain becomes the canonical/primary.
 
-Final reply to you will include:
-- What was tested
-- What was broken
-- What was fixed
-- What remains as placeholder / coming soon (account auth, "Save as Wallpaper")
-- Known limitations (Web Share API only on supporting browsers; guest data is localStorage-only and per-device)
+## Open question
 
-### Out of scope
-No new features, no auth implementation, no schema changes, no redesign.
+**What domain name do you want to buy?** Once you tell me (or buy it and share the name), I'll run Step 2 in a single build pass.
