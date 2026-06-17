@@ -46,7 +46,9 @@ export type AnalyticsEventName =
   | "share_text_copied"
   | "share_native_opened"
   | "share_caption_copied"
-  | "share_download_clicked";
+  | "share_download_clicked"
+  | "share_image_downloaded"
+  | "share_image_download_failed";
 
 // ---------------------------------------------------------------------------
 // Payload sanitisation

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Share2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { Download, Share2 } from "lucide-react";
 
 import {
   Dialog,
@@ -13,10 +13,12 @@ import { trackEvent } from "@/lib/analytics";
 import type { NoteEntry } from "@/lib/note-data";
 import {
   B,
+  DOWNLOADABLE_PRESETS,
   F,
   PRESETS,
   type PresetId,
   buildCaptionText,
+  buildFilename,
   formatBrandedShareText,
   InstagramSquareCanvas,
   InstagramStoryCanvas,
@@ -26,6 +28,8 @@ import {
 } from "@/components/share-canvases";
 
 export { Share2 as ShareIcon };
+
+type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
 
 export function ShareNoteModal({
   note,
@@ -40,9 +44,13 @@ export function ShareNoteModal({
   const [copyLabel, setCopyLabel] = useState("Copy share text");
   const [captionLabel, setCaptionLabel] = useState("Copy caption");
   const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   function selectPreset(id: PresetId) {
     setPreset(id);
+    setDownloadState("idle");
     trackEvent("share_preset_selected", {
       noteId: note.id,
       categorySlug: note.categorySlug,
@@ -97,6 +105,56 @@ export function ShareNoteModal({
     setCaptionLabel("Copied!");
     setTimeout(() => setCaptionLabel("Copy caption"), 2500);
   }
+
+  async function handleDownload() {
+    if (!canvasRef.current) return;
+    setDownloadState("downloading");
+    try {
+      // Dynamic import keeps html-to-image out of the SSR bundle
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(canvasRef.current, {
+        pixelRatio: 4,
+        cacheBust: true,
+      });
+      const filename = buildFilename(note, preset);
+
+      // Try anchor-click download; fall back to manual open
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Some mobile browsers block the anchor click — detect by checking if
+      // the data URL looks valid but the click may have been a no-op
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      if (isIOS) {
+        setDownloadState("manual");
+      } else {
+        setDownloadState("success");
+        setTimeout(() => setDownloadState("idle"), 3000);
+      }
+
+      trackEvent("share_image_downloaded", {
+        noteId: note.id,
+        categorySlug: note.categorySlug,
+        preset,
+        source: "modal",
+      });
+    } catch {
+      setDownloadState("error");
+      setTimeout(() => setDownloadState("idle"), 4000);
+      trackEvent("share_image_download_failed", {
+        noteId: note.id,
+        categorySlug: note.categorySlug,
+        preset,
+        source: "modal",
+      });
+    }
+  }
+
+  const isDownloadable = DOWNLOADABLE_PRESETS.includes(preset);
 
   return (
     <Dialog
@@ -159,11 +217,11 @@ export function ShareNoteModal({
               {formatBrandedShareText(note)}
             </div>
           )}
-          {preset === "B" && <WhatsAppStatusCanvas note={note} />}
-          {preset === "C" && <InstagramStoryCanvas note={note} />}
-          {preset === "D" && <InstagramSquareCanvas note={note} />}
-          {preset === "E" && <LinkedInPortraitCanvas note={note} />}
-          {preset === "F" && <PinterestPinCanvas note={note} />}
+          {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} note={note} />}
+          {preset === "C" && <InstagramStoryCanvas ref={canvasRef} note={note} />}
+          {preset === "D" && <InstagramSquareCanvas ref={canvasRef} note={note} />}
+          {preset === "E" && <LinkedInPortraitCanvas ref={canvasRef} note={note} />}
+          {preset === "F" && <PinterestPinCanvas ref={canvasRef} note={note} />}
         </div>
 
         {/* Actions */}
@@ -183,26 +241,40 @@ export function ShareNoteModal({
               </div>
             </>
           ) : (
-            <button
-              disabled
-              aria-disabled="true"
-              style={{
-                fontFamily: F.label,
-                fontSize: "0.56rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: B.inkFaint,
-                border: `1px dashed ${B.inkFaint}`,
-                borderRadius: "999px",
-                padding: "0.5rem 1rem",
-                background: "transparent",
-                cursor: "not-allowed",
-                opacity: 0.55,
-                textAlign: "center",
-              }}
-            >
-              Download PNG — coming soon
-            </button>
+            <>
+              <Button
+                variant="note"
+                onClick={handleDownload}
+                disabled={downloadState === "downloading"}
+                className="flex items-center gap-2"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                {downloadState === "downloading"
+                  ? "Creating image…"
+                  : downloadState === "success"
+                    ? "Image downloaded"
+                    : "Download PNG"}
+              </Button>
+
+              {downloadState === "error" && (
+                <p className="text-sm text-destructive">
+                  We could not create the image. Please try again.
+                </p>
+              )}
+              {downloadState === "manual" && (
+                <p className="text-sm text-muted-foreground">
+                  Your image is ready. Long press or open it to save.
+                </p>
+              )}
+              {downloadState === "idle" && isDownloadable && (
+                <p
+                  className="text-center text-xs text-muted-foreground"
+                  style={{ fontFamily: F.label, letterSpacing: "0.06em" }}
+                >
+                  Download the image, then upload it to your Story, Status, or post.
+                </p>
+              )}
+            </>
           )}
 
           <Button variant="paper" onClick={handleCopyCaption}>
