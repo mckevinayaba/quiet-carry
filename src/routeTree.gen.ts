@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TodayRouteImport } from './routes/today'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShelfRouteImport } from './routes/shelf'
+import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
 import { Route as FeelingsRouteImport } from './routes/feelings'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AccountRouteImport } from './routes/account'
@@ -19,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 
+const TodayRoute = TodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -32,6 +39,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ShelfRoute = ShelfRouteImport.update({
   id: '/shelf',
   path: '/shelf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoteFramePreviewRoute = NoteFramePreviewRouteImport.update({
+  id: '/note-frame-preview',
+  path: '/note-frame-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeelingsRoute = FeelingsRouteImport.update({
@@ -70,9 +82,11 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/note-frame-preview': typeof NoteFramePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/today': typeof TodayRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -81,9 +95,11 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/note-frame-preview': typeof NoteFramePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/today': typeof TodayRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -93,9 +109,11 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/note-frame-preview': typeof NoteFramePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
+  '/today': typeof TodayRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -106,9 +124,11 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/note-frame-preview'
     | '/shelf'
     | '/sitemap.xml'
     | '/support'
+    | '/today'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   fileRoutesByTo: FileRoutesByTo
@@ -117,9 +137,11 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/note-frame-preview'
     | '/shelf'
     | '/sitemap.xml'
     | '/support'
+    | '/today'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   id:
@@ -128,9 +150,11 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/note-frame-preview'
     | '/shelf'
     | '/sitemap.xml'
     | '/support'
+    | '/today'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   fileRoutesById: FileRoutesById
@@ -140,15 +164,24 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   CollectionsRoute: typeof CollectionsRoute
   FeelingsRoute: typeof FeelingsRoute
+  NoteFramePreviewRoute: typeof NoteFramePreviewRoute
   ShelfRoute: typeof ShelfRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
+  TodayRoute: typeof TodayRoute
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
@@ -168,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/shelf'
       fullPath: '/shelf'
       preLoaderRoute: typeof ShelfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/note-frame-preview': {
+      id: '/note-frame-preview'
+      path: '/note-frame-preview'
+      fullPath: '/note-frame-preview'
+      preLoaderRoute: typeof NoteFramePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feelings': {
@@ -220,9 +260,11 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   CollectionsRoute: CollectionsRoute,
   FeelingsRoute: FeelingsRoute,
+  NoteFramePreviewRoute: NoteFramePreviewRoute,
   ShelfRoute: ShelfRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
+  TodayRoute: TodayRoute,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
 }
