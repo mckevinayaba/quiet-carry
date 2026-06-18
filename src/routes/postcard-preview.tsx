@@ -30,13 +30,13 @@ function PostcardPreviewPage() {
     try {
       const { toPng } = await import("html-to-image");
       const dataUrl = await toPng(canvasRef.current, {
-        pixelRatio: 3,
+        pixelRatio: 2.5,
         cacheBust: true,
-        width: 720,
-        height: 450,
+        width: 432,
+        height: 540,
       });
       const link = document.createElement("a");
-      link.download = "the-note-you-needed-today-do-it-anyway-full-postcard.png";
+      link.download = "the-note-you-needed-today-do-it-anyway-portrait.png";
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
@@ -63,12 +63,10 @@ function PostcardPreviewPage() {
       </section>
 
       {/* Postcard preview — scale to 50% for screen, full 720×450 captured for export */}
+      {/* Portrait 4:5 — show at natural width (432px fits most screens) */}
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-        {/* Clip to the scaled visual size so layout doesn't blow out */}
-        <div style={{ width: "360px", height: "225px", overflow: "hidden", margin: "0 auto" }}>
-          <div style={{ transform: "scale(0.5)", transformOrigin: "top left", width: "720px", height: "450px" }}>
-            <PostcardCanvas ref={canvasRef} />
-          </div>
+        <div style={{ margin: "0 auto", width: "fit-content" }}>
+          <PostcardCanvas ref={canvasRef} />
         </div>
       </div>
 

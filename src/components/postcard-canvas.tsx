@@ -1,56 +1,57 @@
 /**
- * Full Note Postcard Spread — v2
+ * Full Note Portrait Postcard — 4:5
  *
- * DOM: 720×450  →  Export: 2160×1350 (pixelRatio 3).
+ * DOM: 432×540  →  Export: 1080×1350 (pixelRatio 2.5)
  *
  * Layout zones (canvas y-coordinates):
- *   0   – 56   Header strip (kraft, stitched)
- *   56  – 408  Content area (left panel | center fold | right panel)
- *   408 – 450  Envelope base (42px, subtle)
+ *   0   –  44   Header strip (kraft, stitched brand name)
+ *   44  –  78   Title area   (DO IT ANYWAY label)
+ *   78  – 404   Content area (two columns of note text, overflow hidden)
+ *   404 – 494   Receipt zone (4 rows, absolute, always visible)
+ *   494 – 540   Envelope base (46px)
  *
- * Right panel internal zones (absolute):
- *   top: 0, bottom: 116px  → note text (overflow: hidden)
- *   bottom: 0, height: 110px  → receipt (always visible)
+ * Receipt right padding reserves 68px for MAD patch (no overlap).
+ * Text columns use overflow:hidden — never push receipt off-screen.
  *
- * MAD patch: canvas absolute, bottom: 46px, right: 10px
- *   → above envelope, right of receipt, no overlap
+ * Font readability at export:
+ *   9px DOM × 2.5 = 22.5px in PNG
+ *   On Instagram mobile (612px display from 1080px PNG): ~12.7px  ✓ readable
+ *   Receipt 8.5px DOM × 2.5 = 21.25px PNG → ~12px on mobile  ✓
  */
 
 import { forwardRef } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 
 // ─── Brand tokens ──────────────────────────────────────────────────────────────
 
 const B = {
-  parchment: "#f4eddc",
+  parchment:      "#f4eddc",
   parchmentLight: "#faf5ea",
-  parchmentDark: "#e8dcc8",
-  kraft: "#c9a96e",
-  kraftLight: "#d6b87a",
-  kraftDark: "#b8935a",
-  kraftDeep: "#9e7840",
-  ink: "#2e2010",
-  inkMuted: "#6b5540",
-  inkFaint: "#a08060",
-  accent: "#8b4513",
-  accentBorder: "rgba(100, 60, 20, 0.28)",
-  receiptBg: "#fdf7ec",
-  navy: "#1a2d4a",
-  navyMid: "#243b5e",
-  navyLight: "#2f4d7a",
-  rust: "#7a3020",
-  rustMid: "#9b4530",
-  denim: "#2d4a6e",
-  denimLight: "#3d5e8a",
+  parchmentDark:  "#e8dcc8",
+  kraft:          "#c9a96e",
+  kraftLight:     "#d6b87a",
+  kraftDark:      "#b8935a",
+  kraftDeep:      "#9e7840",
+  ink:            "#2e2010",
+  inkMuted:       "#6b5540",
+  inkFaint:       "#a08060",
+  accent:         "#8b4513",
+  receiptBg:      "#fdf7ec",
+  navy:           "#1a2d4a",
+  navyMid:        "#243b5e",
+  rust:           "#7a3020",
+  rustMid:        "#9b4530",
+  denim:          "#2d4a6e",
+  denimLight:     "#3d5e8a",
 } as const;
 
 const F = {
   display: "var(--font-display)",
-  note: "var(--font-note)",
-  label: "var(--font-label)",
+  note:    "var(--font-note)",
+  label:   "var(--font-label)",
 } as const;
 
-// ─── Postcard text (spec-exact) ────────────────────────────────────────────────
+// ─── Note text ─────────────────────────────────────────────────────────────────
 
 export const POSTCARD_LEFT = `Trust me when I say this.
 
@@ -88,9 +89,9 @@ Because the dream was never given to the crowd.
 It was given to you.`;
 
 export const POSTCARD_RECEIPT = {
-  from: "Every room where your pain was visible but your effort was ignored.",
-  to: "The part of you that keeps rising without applause.",
-  date: "The day you stop waiting for familiar people to confirm your worth.",
+  from:  "Every room where your pain was visible but your effort was ignored.",
+  to:    "The part of you that keeps rising without applause.",
+  date:  "The day you stop waiting for familiar people to confirm your worth.",
   total: "The proof that survival was already your qualification.",
 };
 
@@ -104,132 +105,48 @@ function HeartSVG({ style }: { style?: CSSProperties }) {
   );
 }
 
-/** Navy woven fabric patch with double stitching */
 function NavyPatch({ w, h, style }: { w: number; h: number; style?: CSSProperties }) {
+  const xs = Array.from({ length: Math.ceil(w / 5) + 1 }, (_, i) => i * 5);
+  const ys = Array.from({ length: Math.ceil(h / 5) + 1 }, (_, i) => i * 5);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} style={style} aria-hidden="true">
+      <rect width={w} height={h} fill={B.navy} rx="2" />
+      {ys.map(y => <line key={`h${y}`} x1="0" y1={y} x2={w} y2={y} stroke={B.navyMid} strokeWidth="0.6" opacity="0.5" />)}
+      {xs.map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2={h} stroke={B.navyMid} strokeWidth="0.6" opacity="0.5" />)}
+      <rect x="2.5" y="2.5" width={w-5} height={h-5} fill="none" stroke="rgba(210,200,190,0.5)" strokeWidth="1" strokeDasharray="3.5 2.5" rx="1" />
+      <rect x="5" y="5" width={w-10} height={h-10} fill="none" stroke="rgba(210,200,190,0.22)" strokeWidth="0.6" strokeDasharray="3 4" rx="1" />
+    </svg>
+  );
+}
+
+function RustPatch({ w, h, style }: { w: number; h: number; style?: CSSProperties }) {
   const xs = Array.from({ length: Math.ceil(w / 6) + 1 }, (_, i) => i * 6);
   const ys = Array.from({ length: Math.ceil(h / 6) + 1 }, (_, i) => i * 6);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} style={style} aria-hidden="true">
-      <rect width={w} height={h} fill={B.navy} rx="2" />
-      {ys.map(y => <line key={`h${y}`} x1="0" y1={y} x2={w} y2={y} stroke={B.navyMid} strokeWidth="0.7" opacity="0.55" />)}
-      {xs.map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2={h} stroke={B.navyMid} strokeWidth="0.7" opacity="0.55" />)}
-      {/* outer stitching */}
-      <rect x="3" y="3" width={w-6} height={h-6} fill="none" stroke="rgba(210,200,190,0.55)" strokeWidth="1" strokeDasharray="4 3" rx="1" />
-      {/* inner stitching */}
-      <rect x="6" y="6" width={w-12} height={h-12} fill="none" stroke="rgba(210,200,190,0.25)" strokeWidth="0.6" strokeDasharray="3 4" rx="1" />
-    </svg>
-  );
-}
-
-/** Rust/terracotta woven fabric patch */
-function RustPatch({ w, h, style }: { w: number; h: number; style?: CSSProperties }) {
-  const xs = Array.from({ length: Math.ceil(w / 7) + 1 }, (_, i) => i * 7);
-  const ys = Array.from({ length: Math.ceil(h / 7) + 1 }, (_, i) => i * 7);
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} style={style} aria-hidden="true">
       <rect width={w} height={h} fill={B.rust} rx="2" />
-      {ys.map(y => <line key={`h${y}`} x1="0" y1={y} x2={w} y2={y} stroke={B.rustMid} strokeWidth="0.6" opacity="0.5" />)}
-      {xs.map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2={h} stroke={B.rustMid} strokeWidth="0.6" opacity="0.5" />)}
-      <rect x="3" y="3" width={w-6} height={h-6} fill="none" stroke="rgba(240,200,180,0.45)" strokeWidth="0.9" strokeDasharray="3.5 3" rx="1" />
+      {ys.map(y => <line key={`h${y}`} x1="0" y1={y} x2={w} y2={y} stroke={B.rustMid} strokeWidth="0.5" opacity="0.45" />)}
+      {xs.map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2={h} stroke={B.rustMid} strokeWidth="0.5" opacity="0.45" />)}
+      <rect x="2.5" y="2.5" width={w-5} height={h-5} fill="none" stroke="rgba(240,200,180,0.4)" strokeWidth="0.8" strokeDasharray="3 2.5" rx="1" />
     </svg>
   );
 }
 
-/** Lace corner patch — creamy off-white */
-function LacePatch({ style }: { style?: CSSProperties }) {
-  return (
-    <svg viewBox="0 0 55 55" style={style} aria-hidden="true">
-      <rect width="55" height="55" fill="#f0e8d8" rx="1" opacity="0.85" />
-      {/* lace grid */}
-      {[0,5,10,15,20,25,30,35,40,45,50,55].map(n => (
-        <line key={`h${n}`} x1="0" y1={n} x2="55" y2={n} stroke="#c8b89a" strokeWidth="0.5" opacity="0.6" />
-      ))}
-      {[0,5,10,15,20,25,30,35,40,45,50,55].map(n => (
-        <line key={`v${n}`} x1={n} y1="0" x2={n} y2="55" stroke="#c8b89a" strokeWidth="0.5" opacity="0.6" />
-      ))}
-      {/* lace flower at each grid intersection */}
-      {[10,25,40].flatMap(cx => [10,25,40].map(cy => (
-        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="2.5" fill="none" stroke="#c8b89a" strokeWidth="0.6" opacity="0.5" />
-      )))}
-      <rect x="2" y="2" width="51" height="51" fill="none" stroke="#b8a888" strokeWidth="0.8" strokeDasharray="3 2.5" />
-    </svg>
-  );
-}
-
-/** Pressed chrysanthemum flower (botanical accent) */
-function PressedChrysanthemum({ style }: { style?: CSSProperties }) {
-  const petals = Array.from({ length: 16 }, (_, i) => i * (360 / 16));
-  const innerPetals = Array.from({ length: 12 }, (_, i) => i * 30);
-  return (
-    <svg viewBox="0 0 60 70" style={style} aria-hidden="true">
-      {/* stem */}
-      <line x1="30" y1="65" x2="30" y2="42" stroke="#5a6e3a" strokeWidth="1.5" />
-      {/* leaves */}
-      <ellipse cx="22" cy="56" rx="6" ry="10" fill="#5a6e3a" opacity="0.45" transform="rotate(-20 22 56)" />
-      <ellipse cx="38" cy="50" rx="5" ry="9" fill="#5a6e3a" opacity="0.4" transform="rotate(20 38 50)" />
-      {/* outer ring of petals */}
-      {petals.map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const cx = 30 + 16 * Math.cos(rad);
-        const cy = 28 + 16 * Math.sin(rad);
-        return (
-          <ellipse key={`op${i}`} cx={cx} cy={cy} rx="4.5" ry="2.2"
-            fill="#9b5a2a" opacity="0.55"
-            transform={`rotate(${deg} ${cx} ${cy})`}
-          />
-        );
-      })}
-      {/* middle ring */}
-      {innerPetals.map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const cx = 30 + 10 * Math.cos(rad);
-        const cy = 28 + 10 * Math.sin(rad);
-        return (
-          <ellipse key={`ip${i}`} cx={cx} cy={cy} rx="3.5" ry="1.8"
-            fill="#b06830" opacity="0.65"
-            transform={`rotate(${deg} ${cx} ${cy})`}
-          />
-        );
-      })}
-      {/* inner ring */}
-      {[0,45,90,135,180,225,270,315].map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const cx = 30 + 5 * Math.cos(rad);
-        const cy = 28 + 5 * Math.sin(rad);
-        return (
-          <ellipse key={`ir${i}`} cx={cx} cy={cy} rx="2.5" ry="1.5"
-            fill="#c87840" opacity="0.75"
-            transform={`rotate(${deg} ${cx} ${cy})`}
-          />
-        );
-      })}
-      {/* center */}
-      <circle cx="30" cy="28" r="4" fill="#6b3a18" opacity="0.8" />
-      <circle cx="30" cy="28" r="2" fill="#8b5020" opacity="0.9" />
-    </svg>
-  );
-}
-
-/** Lavender bundle (multiple stalks) */
 function LavenderBundle({ style }: { style?: CSSProperties }) {
   return (
-    <svg viewBox="0 0 50 100" style={style} aria-hidden="true">
-      {/* stems */}
-      {[18, 22, 26, 30, 34].map((x, i) => (
-        <line key={`s${i}`} x1={x} y1="92" x2={x + (i-2)*1.5} y2="18" stroke="#6b7a4a" strokeWidth="1" opacity={0.7 + i*0.05} />
+    <svg viewBox="0 0 40 90" style={style} aria-hidden="true">
+      {[14,18,22,26,30].map((x,i) => (
+        <line key={`s${i}`} x1={x} y1="84" x2={x+(i-2)*1.2} y2="14" stroke="#6b7a4a" strokeWidth="1" opacity={0.65+i*0.05} />
       ))}
-      {/* binding */}
-      <path d="M16,72 Q25,76 34,72" fill="none" stroke="#9b8050" strokeWidth="1.5" />
-      <path d="M16,75 Q25,79 34,75" fill="none" stroke="#9b8050" strokeWidth="1.2" />
-      {/* buds on each stem */}
-      {[
-        [18, [18,25,32]], [22, [12,19,26,33]], [26, [10,17,24,31,38]],
-        [30, [12,19,26,33]], [34, [18,25,32]],
-      ].map(([x, ys], si) =>
-        (ys as number[]).map((y, bi) => (
+      <path d="M12,66 Q20,70 28,66" fill="none" stroke="#9b8050" strokeWidth="1.4" />
+      {([
+        [14,[16,22,28]], [18,[11,17,23,29]], [22,[9,15,21,27,33]],
+        [26,[11,17,23,29]], [30,[16,22,28]],
+      ] as [number, number[]][]).map(([x,ys],si) =>
+        ys.map((y,bi) => (
           <ellipse key={`b${si}${bi}`}
-            cx={(x as number) + (bi%2===0?-3:3)} cy={y} rx="2.5" ry="4.5"
-            fill="oklch(0.62 0.13 280)" opacity={0.7 + bi*0.04}
+            cx={x+(bi%2===0?-2.5:2.5)} cy={y} rx="2" ry="4"
+            fill="oklch(0.62 0.13 280)" opacity={0.68+bi*0.04}
           />
         ))
       )}
@@ -237,61 +154,79 @@ function LavenderBundle({ style }: { style?: CSSProperties }) {
   );
 }
 
-/** Masking tape strip */
+function PressedChrysanthemum({ style }: { style?: CSSProperties }) {
+  const outer = Array.from({ length: 14 }, (_, i) => i * (360/14));
+  const inner = Array.from({ length: 10 }, (_, i) => i * 36);
+  return (
+    <svg viewBox="0 0 52 60" style={style} aria-hidden="true">
+      <line x1="26" y1="56" x2="26" y2="36" stroke="#5a6e3a" strokeWidth="1.3" />
+      <ellipse cx="19" cy="49" rx="5" ry="8" fill="#5a6e3a" opacity="0.4" transform="rotate(-18 19 49)" />
+      <ellipse cx="33" cy="44" rx="4" ry="7" fill="#5a6e3a" opacity="0.35" transform="rotate(18 33 44)" />
+      {outer.map((deg,i) => {
+        const r=(deg*Math.PI)/180;
+        const cx=26+13*Math.cos(r), cy=24+13*Math.sin(r);
+        return <ellipse key={`o${i}`} cx={cx} cy={cy} rx="4" ry="2" fill="#9b5a2a" opacity="0.52" transform={`rotate(${deg} ${cx} ${cy})`} />;
+      })}
+      {inner.map((deg,i) => {
+        const r=(deg*Math.PI)/180;
+        const cx=26+8*Math.cos(r), cy=24+8*Math.sin(r);
+        return <ellipse key={`ip${i}`} cx={cx} cy={cy} rx="3" ry="1.6" fill="#b06830" opacity="0.65" transform={`rotate(${deg} ${cx} ${cy})`} />;
+      })}
+      <circle cx="26" cy="24" r="3.5" fill="#6b3a18" opacity="0.8" />
+      <circle cx="26" cy="24" r="1.8" fill="#8b5020" opacity="0.9" />
+    </svg>
+  );
+}
+
 function Tape({ w, h, style }: { w: number; h: number; style?: CSSProperties }) {
   return (
     <svg viewBox={`0 0 ${w} ${h}`} style={style} aria-hidden="true">
-      <rect width={w} height={h} fill="rgba(220,205,170,0.58)" />
-      {/* grain lines */}
-      {Array.from({ length: Math.ceil(w / 5) }, (_, i) => (
-        <line key={i} x1={i*5} y1="0" x2={i*5 + 2} y2={h} stroke="rgba(180,160,120,0.25)" strokeWidth="0.8" />
+      <rect width={w} height={h} fill="rgba(220,205,170,0.55)" />
+      {Array.from({ length: Math.ceil(w/5) }, (_,i) => (
+        <line key={i} x1={i*5} y1="0" x2={i*5+2} y2={h} stroke="rgba(180,160,120,0.22)" strokeWidth="0.7" />
       ))}
-      <rect width={w} height={h} fill="none" stroke="rgba(180,160,120,0.35)" strokeWidth="0.5" />
+      <rect width={w} height={h} fill="none" stroke="rgba(180,160,120,0.3)" strokeWidth="0.5" />
     </svg>
   );
 }
 
-/** Postage stamp */
 function PostageStamp({ style }: { style?: CSSProperties }) {
-  const perf = (count: number, total: number, axis: "h" | "v", pos: number) =>
+  const perf = (count: number, total: number, axis: "h"|"v", pos: number) =>
     Array.from({ length: count }, (_, i) => {
-      const p = (i / (count - 1)) * total;
-      return axis === "h"
-        ? <circle key={i} cx={p} cy={pos} r="2.2" fill={B.parchment} />
-        : <circle key={i} cx={pos} cy={p} r="2.2" fill={B.parchment} />;
+      const p = (i/(count-1))*total;
+      return axis==="h"
+        ? <circle key={i} cx={p} cy={pos} r="1.8" fill={B.parchment} />
+        : <circle key={i} cx={pos} cy={p} r="1.8" fill={B.parchment} />;
     });
   return (
-    <svg viewBox="0 0 52 66" style={style} aria-hidden="true">
-      <rect x="4" y="4" width="44" height="58" fill={B.parchmentDark} />
-      <rect x="7" y="7" width="38" height="52" fill="none" stroke={B.inkFaint} strokeWidth="0.7" />
-      {perf(10, 44, "h", 4)} {perf(10, 44, "h", 62)}
-      {perf(9, 58, "v", 4)} {perf(9, 58, "v", 48)}
-      {/* flower motif */}
+    <svg viewBox="0 0 42 54" style={style} aria-hidden="true">
+      <rect x="3" y="3" width="36" height="48" fill={B.parchmentDark} />
+      <rect x="5.5" y="5.5" width="31" height="43" fill="none" stroke={B.inkFaint} strokeWidth="0.6" />
+      {perf(8,36,"h",3)} {perf(8,36,"h",51)}
+      {perf(8,48,"v",3)} {perf(8,48,"v",39)}
       {[0,51,102,153,204,255,306].map((deg,i) => {
-        const r = (deg*Math.PI)/180;
-        return <ellipse key={i} cx={26+8*Math.cos(r)} cy={30+8*Math.sin(r)} rx="3.5" ry="1.8"
-          fill={B.accent} opacity="0.45" transform={`rotate(${deg} ${26+8*Math.cos(r)} ${30+8*Math.sin(r)})`} />;
+        const r=(deg*Math.PI)/180;
+        return <ellipse key={i} cx={21+7*Math.cos(r)} cy={25+7*Math.sin(r)} rx="2.8" ry="1.4"
+          fill={B.accent} opacity="0.4" transform={`rotate(${deg} ${21+7*Math.cos(r)} ${25+7*Math.sin(r)})`} />;
       })}
-      <circle cx="26" cy="30" r="4" fill={B.accent} opacity="0.6" />
-      <text x="26" y="50" textAnchor="middle" fontFamily={F.label} fontSize="5" fill={B.inkMuted} letterSpacing="0.5">20¢</text>
+      <circle cx="21" cy="25" r="3.5" fill={B.accent} opacity="0.55" />
+      <text x="21" y="41" textAnchor="middle" fontFamily={F.label} fontSize="4.5" fill={B.inkMuted} letterSpacing="0.4">20¢</text>
     </svg>
   );
 }
 
-/** Denim stitched heart (center fold detail) */
 function DenimHeart({ style }: { style?: CSSProperties }) {
   return (
-    <svg viewBox="0 0 56 52" style={style} aria-hidden="true">
-      <path d="M28 46 L4 24 C4 12 16 7 28 17 C40 7 52 12 52 24 Z" fill={B.denim} />
-      {[0,6,12,18,24,30,36,42,48,54].flatMap(n => [
-        <line key={`h${n}`} x1="0" y1={n} x2="56" y2={n} stroke={B.denimLight} strokeWidth="0.5" opacity="0.3" />,
-        <line key={`v${n}`} x1={n} y1="0" x2={n} y2="52" stroke={B.denimLight} strokeWidth="0.5" opacity="0.3" />,
+    <svg viewBox="0 0 48 44" style={style} aria-hidden="true">
+      <path d="M24 40 L3 20 C3 10 13 6 24 14 C35 6 45 10 45 20 Z" fill={B.denim} />
+      {[0,5,10,15,20,25,30,35,40,45].flatMap(n => [
+        <line key={`h${n}`} x1="0" y1={n} x2="48" y2={n} stroke={B.denimLight} strokeWidth="0.45" opacity="0.28" />,
+        <line key={`v${n}`} x1={n} y1="0" x2={n} y2="44" stroke={B.denimLight} strokeWidth="0.45" opacity="0.28" />,
       ])}
-      <path d="M28 46 L4 24 C4 12 16 7 28 17 C40 7 52 12 52 24 Z"
-        fill="none" stroke="rgba(220,215,210,0.65)" strokeWidth="1.3" strokeDasharray="3 2.5" />
-      {/* gold X stitch */}
-      <line x1="22" y1="24" x2="34" y2="32" stroke="#c8a050" strokeWidth="2" strokeLinecap="round" />
-      <line x1="34" y1="24" x2="22" y2="32" stroke="#c8a050" strokeWidth="2" strokeLinecap="round" />
+      <path d="M24 40 L3 20 C3 10 13 6 24 14 C35 6 45 10 45 20 Z"
+        fill="none" stroke="rgba(220,215,210,0.6)" strokeWidth="1.2" strokeDasharray="2.5 2" />
+      <line x1="19" y1="21" x2="29" y2="27" stroke="#c8a050" strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="29" y1="21" x2="19" y2="27" stroke="#c8a050" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -301,32 +236,37 @@ function DenimHeart({ style }: { style?: CSSProperties }) {
 export function PostcardReceipt({ style }: { style?: CSSProperties }) {
   const rowStyle: CSSProperties = { display: "flex", gap: "5px", alignItems: "flex-start" };
   const labelStyle: CSSProperties = {
-    fontFamily: F.label, fontSize: "7.2px", letterSpacing: "0.11em",
-    color: B.navy, flexShrink: 0, minWidth: "40px", lineHeight: 1.35,
-    textTransform: "uppercase", fontWeight: 700,
+    fontFamily: F.label,
+    fontSize: "8.5px",
+    letterSpacing: "0.10em",
+    color: B.navy,
+    flexShrink: 0,
+    minWidth: "42px",
+    lineHeight: 1.35,
+    textTransform: "uppercase",
+    fontWeight: 700,
   };
   const valStyle: CSSProperties = {
-    fontFamily: F.label, fontSize: "7.2px", color: B.inkMuted, lineHeight: 1.4,
+    fontFamily: F.label,
+    fontSize: "8.5px",
+    color: B.inkMuted,
+    lineHeight: 1.4,
   };
-  const sep = <div style={{ margin: "3.5px 0", borderTop: `1px dashed rgba(100,60,20,0.22)` }} />;
+  const sep = <div style={{ margin: "3px 0", borderTop: "1px dashed rgba(100,60,20,0.2)" }} />;
 
   return (
     <div style={{
       background: B.receiptBg,
-      // Navy stitched denim-style border — much more visible
-      border: `2px dashed rgba(26,45,74,0.38)`,
+      border: "1.8px dashed rgba(26,45,74,0.40)",
       borderRadius: "3px",
-      padding: "7px 9px 6px",
-      boxShadow: "inset 0 0 0 3px rgba(26,45,74,0.08)",
+      padding: "7px 10px 5px",
+      boxShadow: "inset 0 0 0 3px rgba(26,45,74,0.07)",
       position: "relative",
+      height: "100%",
+      boxSizing: "border-box",
       ...style,
     }}>
-      {/* stitched inner inset effect */}
-      <div style={{
-        position: "absolute", inset: "4px",
-        border: "1px dashed rgba(26,45,74,0.14)",
-        borderRadius: "1px", pointerEvents: "none",
-      }} />
+      <div style={{ position: "absolute", inset: "4px", border: "0.8px dashed rgba(26,45,74,0.13)", borderRadius: "1.5px", pointerEvents: "none" }} />
       <div style={rowStyle}>
         <span style={labelStyle}>FROM:</span>
         <span style={valStyle}>{POSTCARD_RECEIPT.from}</span>
@@ -346,11 +286,7 @@ export function PostcardReceipt({ style }: { style?: CSSProperties }) {
         <span style={labelStyle}>TOTAL:</span>
         <span style={valStyle}>{POSTCARD_RECEIPT.total}</span>
       </div>
-      {/* small heart accent at bottom-right */}
-      <HeartSVG style={{
-        position: "absolute", bottom: "5px", right: "6px",
-        width: "8px", height: "8px", color: B.accent, opacity: 0.7,
-      }} />
+      <HeartSVG style={{ position: "absolute", bottom: "5px", right: "6px", width: "7px", height: "7px", color: B.accent, opacity: 0.65 }} />
     </div>
   );
 }
@@ -360,36 +296,22 @@ export function PostcardReceipt({ style }: { style?: CSSProperties }) {
 export function PostcardBrandHeader() {
   return (
     <div style={{
-      position: "absolute", top: 0, left: 0, right: 0, height: "56px",
-      background: `linear-gradient(180deg, ${B.kraft} 0%, ${B.kraftLight} 50%, ${B.kraftDark} 100%)`,
-      display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
-      boxShadow: "0 3px 12px rgba(100,60,10,0.22), inset 0 1px 0 rgba(255,240,200,0.3)",
+      position: "absolute", top: 0, left: 0, right: 0, height: "44px",
+      background: `linear-gradient(180deg, ${B.kraft} 0%, ${B.kraftLight} 52%, ${B.kraftDark} 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
+      boxShadow: "0 3px 10px rgba(100,60,10,0.2), inset 0 1px 0 rgba(255,240,200,0.28)",
     }}>
-      {/* outer stitched frame */}
-      <div style={{
-        position: "absolute", inset: "4px",
-        border: "1.5px dashed rgba(80,50,10,0.35)",
-        borderRadius: "2px", pointerEvents: "none",
-      }} />
-      {/* inner stitched frame */}
-      <div style={{
-        position: "absolute", inset: "7px",
-        border: "0.8px dashed rgba(80,50,10,0.2)",
-        borderRadius: "1px", pointerEvents: "none",
-      }} />
-      <HeartSVG style={{ width: 11, height: 11, color: B.accent, flexShrink: 0 }} />
+      <div style={{ position: "absolute", inset: "3.5px", border: "1.3px dashed rgba(80,50,10,0.33)", borderRadius: "2px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: "6px", border: "0.7px dashed rgba(80,50,10,0.17)", borderRadius: "1px", pointerEvents: "none" }} />
+      <HeartSVG style={{ width: 9, height: 9, color: B.accent, flexShrink: 0 }} />
       <span style={{
-        fontFamily: F.label,
-        fontSize: "12.5px",
-        letterSpacing: "0.30em",
-        textTransform: "uppercase",
-        color: B.ink,
-        lineHeight: 1,
-        textShadow: "0 1px 2px rgba(255,240,200,0.4)",
+        fontFamily: F.label, fontSize: "11px", letterSpacing: "0.28em",
+        textTransform: "uppercase", color: B.ink, lineHeight: 1,
+        textShadow: "0 1px 2px rgba(255,240,200,0.35)",
       }}>
         The Note You Needed Today
       </span>
-      <HeartSVG style={{ width: 11, height: 11, color: B.accent, flexShrink: 0 }} />
+      <HeartSVG style={{ width: 9, height: 9, color: B.accent, flexShrink: 0 }} />
     </div>
   );
 }
@@ -401,43 +323,22 @@ export function PostcardSignature({ style }: { style?: CSSProperties }) {
     <div style={{
       position: "relative",
       background: B.parchmentLight,
-      padding: "7px 10px 5px",
-      // kraft paper shadow for the "attached patch" look
-      boxShadow: "2px 3px 10px rgba(60,30,10,0.38), 0 1px 3px rgba(60,30,10,0.2)",
+      padding: "6px 9px 5px",
+      boxShadow: "2px 3px 9px rgba(60,30,10,0.36), 0 1px 3px rgba(60,30,10,0.18)",
       borderRadius: "2px",
-      transform: "rotate(-4.5deg)",
+      transform: "rotate(-4deg)",
       ...style,
     }}>
-      {/* stitched navy border */}
-      <div style={{
-        position: "absolute", inset: "3px",
-        border: `1.5px dashed rgba(26,45,74,0.5)`,
-        borderRadius: "1px", pointerEvents: "none",
-      }} />
-      {/* inner stitching */}
-      <div style={{
-        position: "absolute", inset: "6px",
-        border: `0.7px dashed rgba(26,45,74,0.22)`,
-        borderRadius: "1px", pointerEvents: "none",
-      }} />
-      <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        gap: "2px",
-      }}>
-        <span style={{
-          fontFamily: F.display,
-          fontSize: "24px",
-          letterSpacing: "0.05em",
-          color: B.ink,
-          lineHeight: 1,
-        }}>
+      <div style={{ position: "absolute", inset: "3px", border: "1.3px dashed rgba(26,45,74,0.48)", borderRadius: "1px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: "6px", border: "0.6px dashed rgba(26,45,74,0.2)", borderRadius: "1px", pointerEvents: "none" }} />
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+        <span style={{ fontFamily: F.display, fontSize: "21px", letterSpacing: "0.05em", color: B.ink, lineHeight: 1 }}>
           MAD
         </span>
-        {/* hand-drawn underline */}
-        <svg viewBox="0 0 52 6" aria-hidden="true" style={{ width: "52px", height: "6px" }}>
-          <path d="M1,3 Q13,1 26,3 Q39,5 51,3" fill="none" stroke={B.ink} strokeWidth="1.5" strokeLinecap="round" />
+        <svg viewBox="0 0 46 5" aria-hidden="true" style={{ width: "46px", height: "5px" }}>
+          <path d="M1,2.5 Q11.5,1 23,2.5 Q34.5,4 45,2.5" fill="none" stroke={B.ink} strokeWidth="1.4" strokeLinecap="round" />
         </svg>
-        <HeartSVG style={{ width: 9, height: 9, color: B.accent, marginTop: "1px" }} />
+        <HeartSVG style={{ width: 8, height: 8, color: B.accent, marginTop: "1px" }} />
       </div>
     </div>
   );
@@ -448,38 +349,21 @@ export function PostcardSignature({ style }: { style?: CSSProperties }) {
 export function TitleLabel() {
   return (
     <div style={{
-      display: "inline-flex", alignItems: "center", gap: "7px",
+      display: "inline-flex", alignItems: "center", gap: "6px",
       background: B.navy,
-      padding: "5px 12px 5px 10px",
+      padding: "4.5px 10px 4.5px 9px",
       borderRadius: "2px",
       position: "relative",
-      boxShadow: "2px 3px 8px rgba(10,20,40,0.45)",
+      boxShadow: "2px 2px 7px rgba(10,20,40,0.42)",
     }}>
-      {/* stitched outer border */}
-      <div style={{
-        position: "absolute", inset: "3.5px",
-        border: "1.2px dashed rgba(180,200,230,0.45)",
-        borderRadius: "1px", pointerEvents: "none",
-      }} />
-      {/* weave texture lines */}
-      {[0,6,12,18,24].map(y => (
-        <div key={y} style={{
-          position: "absolute", left: 0, right: 0, top: `${y}px`, height: "1px",
-          background: "rgba(255,255,255,0.04)",
-        }} />
-      ))}
+      <div style={{ position: "absolute", inset: "3px", border: "1px dashed rgba(180,200,230,0.42)", borderRadius: "1px", pointerEvents: "none" }} />
       <span style={{
-        fontFamily: F.label,
-        fontSize: "11.5px",
-        letterSpacing: "0.24em",
-        textTransform: "uppercase",
-        color: "#e8ddd0",
-        lineHeight: 1,
-        position: "relative",
+        fontFamily: F.label, fontSize: "10px", letterSpacing: "0.22em",
+        textTransform: "uppercase", color: "#e8ddd0", lineHeight: 1, position: "relative",
       }}>
         Do It Anyway
       </span>
-      <HeartSVG style={{ width: 9, height: 9, color: "#d44c30", position: "relative" }} />
+      <HeartSVG style={{ width: 8, height: 8, color: "#d44c30", position: "relative" }} />
     </div>
   );
 }
@@ -489,6 +373,11 @@ export function TitleLabel() {
 export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
   function PostcardCanvas(_props, ref) {
 
+    const HEADER    = 44;
+    const TITLE_H   = 34;
+    const ENV_H     = 46;
+    const RECEIPT_H = 110;
+
     const noteStyle: CSSProperties = {
       fontFamily: F.note,
       fontSize: "9px",
@@ -497,18 +386,12 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
       whiteSpace: "pre-wrap",
     };
 
-    // Content area: y 56 – 408  (352px tall)
-    // Left/right panels stop 50px above canvas bottom (above envelope 42px)
-    const HEADER = 56;
-    const ENV_H = 42;
-    const PANEL_BOTTOM = ENV_H + 8; // 8px buffer above envelope
-
     return (
       <div
         ref={ref}
         style={{
-          width: "720px",
-          height: "450px",
+          width: "432px",
+          height: "540px",
           position: "relative",
           overflow: "hidden",
           background: B.parchment,
@@ -517,206 +400,147 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
           flexShrink: 0,
         }}
       >
-
-        {/* ── Warm paper texture ─────────────────────────────── */}
+        {/* Paper texture */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
           background: [
-            "radial-gradient(ellipse 55% 45% at 28% 52%, rgba(255,245,220,0.35) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 55% at 72% 28%, rgba(255,248,225,0.25) 0%, transparent 65%)",
-            "linear-gradient(160deg, rgba(255,252,240,0.15) 0%, transparent 50%, rgba(200,170,120,0.08) 100%)",
+            "radial-gradient(ellipse 60% 40% at 30% 48%, rgba(255,248,225,0.32) 0%, transparent 70%)",
+            "radial-gradient(ellipse 45% 50% at 72% 30%, rgba(255,248,225,0.22) 0%, transparent 65%)",
+            "linear-gradient(155deg, rgba(255,252,240,0.12) 0%, transparent 50%, rgba(200,170,120,0.07) 100%)",
           ].join(", "),
         }} />
 
-        {/* ── Corner decoration: navy fabric — top-left ──────── */}
-        <NavyPatch w={88} h={88} style={{
-          position: "absolute", top: -10, left: -10,
-          width: 88, height: 88,
-          transform: "rotate(-5deg)", opacity: 0.88,
-        }} />
+        {/* Navy fabric corner — top-left */}
+        <NavyPatch w={72} h={72} style={{ position: "absolute", top: -8, left: -8, width: 72, height: 72, transform: "rotate(-5deg)", opacity: 0.86 }} />
 
-        {/* ── Corner decoration: rust fabric — top-right ─────── */}
-        <RustPatch w={72} h={56} style={{
-          position: "absolute", top: -6, right: -8,
-          width: 72, height: 56,
-          transform: "rotate(6deg)", opacity: 0.82,
-        }} />
+        {/* Rust fabric corner — top-right */}
+        <RustPatch w={58} h={46} style={{ position: "absolute", top: -5, right: -6, width: 58, height: 46, transform: "rotate(6deg)", opacity: 0.8 }} />
 
-        {/* ── Corner decoration: rust fabric — bottom-left ───── */}
-        <RustPatch w={60} h={48} style={{
-          position: "absolute", bottom: 26, left: -8,
-          width: 60, height: 48,
-          transform: "rotate(-3deg)", opacity: 0.72,
-        }} />
+        {/* Rust fabric corner — bottom-left */}
+        <RustPatch w={50} h={40} style={{ position: "absolute", bottom: 28, left: -6, width: 50, height: 40, transform: "rotate(-3deg)", opacity: 0.68 }} />
 
-        {/* ── Corner decoration: lace — bottom-right ─────────── */}
-        <LacePatch style={{
-          position: "absolute", bottom: 20, right: -6,
-          width: 55, height: 55,
-          transform: "rotate(4deg)", opacity: 0.7,
-        }} />
+        {/* Tape strips */}
+        <Tape w={28} h={8} style={{ position: "absolute", top: HEADER + 6, left: 12, transform: "rotate(-8deg)", opacity: 0.88 }} />
+        <Tape w={24} h={7} style={{ position: "absolute", top: HEADER + 3, right: 26, transform: "rotate(7deg)", opacity: 0.82 }} />
 
-        {/* ── Tape strips ────────────────────────────────────── */}
-        <Tape w={34} h={9} style={{
-          position: "absolute", top: HEADER + 8, left: 14,
-          width: 34, height: 9,
-          transform: "rotate(-9deg)", opacity: 0.9,
-        }} />
-        <Tape w={30} h={8} style={{
-          position: "absolute", top: HEADER + 4, right: 32,
-          width: 30, height: 8,
-          transform: "rotate(7deg)", opacity: 0.85,
-        }} />
-        <Tape w={26} h={8} style={{
-          position: "absolute", top: 170, right: 18,
-          width: 26, height: 8,
-          transform: "rotate(-5deg)", opacity: 0.8,
-        }} />
+        {/* Chrysanthemum — left edge */}
+        <PressedChrysanthemum style={{ position: "absolute", top: HEADER + 10, left: 4, width: 40, height: 48, opacity: 0.8 }} />
 
-        {/* ── Botanical: chrysanthemum — left side ───────────── */}
-        <PressedChrysanthemum style={{
-          position: "absolute", top: HEADER + 12, left: 6,
-          width: 46, height: 54, opacity: 0.82,
-        }} />
+        {/* Lavender bundle — right edge */}
+        <LavenderBundle style={{ position: "absolute", top: HEADER - 2, right: 3, width: 36, height: 76, opacity: 0.78 }} />
 
-        {/* ── Botanical: lavender bundle — right side ─────────── */}
-        <LavenderBundle style={{
-          position: "absolute", top: HEADER - 4, right: 4,
-          width: 44, height: 90, opacity: 0.8,
-        }} />
+        {/* Postage stamp — bottom-left */}
+        <PostageStamp style={{ position: "absolute", bottom: ENV_H + 4, left: 14, width: 32, height: 41, opacity: 0.82 }} />
 
-        {/* ── Postage stamp — bottom left ────────────────────── */}
-        <PostageStamp style={{
-          position: "absolute", bottom: ENV_H + 6, left: 16,
-          width: 38, height: 48, opacity: 0.84,
-        }} />
-
-        {/* ── Brand header ──────────────────────────────────── */}
+        {/* Brand header */}
         <PostcardBrandHeader />
 
-        {/* ── Center fold line ──────────────────────────────── */}
+        {/* Title area */}
+        <div style={{
+          position: "absolute", top: `${HEADER}px`, left: 0, right: 0, height: `${TITLE_H}px`,
+          display: "flex", alignItems: "center", paddingLeft: "52px",
+        }}>
+          <TitleLabel />
+        </div>
+
+        {/* Center fold line */}
         <div style={{
           position: "absolute", top: `${HEADER}px`, bottom: `${ENV_H}px`,
           left: "calc(50% - 1px)", width: "2px",
           background: `linear-gradient(180deg, ${B.kraftDark}99 0%, ${B.kraftDark}66 30%, ${B.kraftDark}66 70%, ${B.kraftDark}99 100%)`,
-          opacity: 0.5,
+          opacity: 0.45,
         }} />
-        {/* fold shadow (right side of seam) */}
         <div style={{
           position: "absolute", top: `${HEADER}px`, bottom: `${ENV_H}px`,
-          left: "50%", width: "14px",
-          background: "linear-gradient(90deg, rgba(60,30,10,0.09) 0%, transparent 100%)",
+          left: "50%", width: "12px",
+          background: "linear-gradient(90deg, rgba(60,30,10,0.08) 0%, transparent 100%)",
           pointerEvents: "none",
         }} />
 
-        {/* ────────────────────── LEFT PANEL ─────────────────── */}
+        {/* LEFT text column — overflow hidden at receipt boundary */}
         <div style={{
           position: "absolute",
-          top: `${HEADER}px`,
+          top: `${HEADER + TITLE_H}px`,
           left: 0,
           width: "calc(50% - 1px)",
-          bottom: `${PANEL_BOTTOM}px`,
-          padding: "12px 14px 10px 20px",
+          bottom: `${ENV_H + RECEIPT_H}px`,
+          padding: "6px 10px 6px 18px",
           overflow: "hidden",
         }}>
-          <TitleLabel />
-          <div style={{ height: "7px" }} />
           <p style={noteStyle}>{POSTCARD_LEFT}</p>
         </div>
 
-        {/* ────────────────────── RIGHT PANEL ────────────────── */}
-        {/* Text zone — clipped, never pushes receipt */}
+        {/* RIGHT text column — overflow hidden at receipt boundary */}
         <div style={{
           position: "absolute",
-          top: `${HEADER}px`,
+          top: `${HEADER + TITLE_H}px`,
           right: 0,
           width: "calc(50% - 1px)",
-          // Reserve 116px at bottom for receipt, 10px padding
-          bottom: `${PANEL_BOTTOM + 116}px`,
-          padding: "12px 18px 0 14px",
+          bottom: `${ENV_H + RECEIPT_H}px`,
+          padding: "6px 16px 6px 10px",
           overflow: "hidden",
         }}>
           <p style={noteStyle}>{POSTCARD_RIGHT}</p>
         </div>
 
-        {/* Receipt zone — absolutely placed, always visible */}
+        {/* Receipt — absolute, always visible above envelope */}
         <div style={{
           position: "absolute",
-          right: 0,
-          bottom: `${PANEL_BOTTOM}px`,
-          width: "calc(50% - 1px)",
-          height: "110px",
-          padding: "0 80px 6px 14px", // right padding leaves room for MAD patch
+          bottom: `${ENV_H}px`,
+          left: 0, right: 0,
+          height: `${RECEIPT_H}px`,
+          padding: "0 68px 0 14px",
         }}>
-          <PostcardReceipt style={{ height: "100%" }} />
+          <PostcardReceipt />
         </div>
 
-        {/* ── Envelope base ─────────────────────────────────── */}
+        {/* Envelope base */}
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0,
           height: `${ENV_H}px`,
           background: B.kraft,
-          boxShadow: "inset 0 2px 8px rgba(60,30,10,0.15)",
+          boxShadow: "inset 0 2px 8px rgba(60,30,10,0.14)",
         }}>
-          {/* V-fold flaps — flatter angle, less intrusive */}
-          <svg viewBox="0 0 720 42" preserveAspectRatio="none"
+          <svg viewBox="0 0 432 46" preserveAspectRatio="none"
             style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
             aria-hidden="true"
           >
-            <polygon points="0,0 360,42 0,42" fill={B.kraftDark} opacity="0.7" />
-            <polygon points="720,0 360,42 720,42" fill={B.kraftDark} opacity="0.7" />
-            <line x1="1" y1="0" x2="359" y2="42" stroke={B.kraftDeep} strokeWidth="0.8" opacity="0.55" />
-            <line x1="719" y1="0" x2="361" y2="42" stroke={B.kraftDeep} strokeWidth="0.8" opacity="0.55" />
+            <polygon points="0,0 216,46 0,46" fill={B.kraftDark} opacity="0.65" />
+            <polygon points="432,0 216,46 432,46" fill={B.kraftDark} opacity="0.65" />
+            <line x1="1" y1="0" x2="215" y2="46" stroke={B.kraftDeep} strokeWidth="0.7" opacity="0.5" />
+            <line x1="431" y1="0" x2="217" y2="46" stroke={B.kraftDeep} strokeWidth="0.7" opacity="0.5" />
           </svg>
-          {/* stitched edge at top of envelope */}
+          <div style={{ position: "absolute", top: "3px", left: "7px", right: "7px", borderTop: "1px dashed rgba(80,50,10,0.28)" }} />
           <div style={{
-            position: "absolute", top: "3px", left: "8px", right: "8px", height: "1px",
-            borderTop: "1px dashed rgba(80,50,10,0.3)",
-          }} />
-
-          {/* Domain label — centered */}
-          <div style={{
-            position: "absolute", bottom: "7px", left: "50%",
-            transform: "translateX(-50%)",
-            background: B.parchmentDark,
-            border: `1px solid rgba(100,60,20,0.35)`,
-            borderRadius: "999px",
-            padding: "2.5px 11px",
-            display: "flex", alignItems: "center", gap: "5px",
-            whiteSpace: "nowrap",
-            boxShadow: "0 1px 4px rgba(60,30,10,0.2)",
+            position: "absolute", bottom: "7px", left: "50%", transform: "translateX(-50%)",
+            background: B.parchmentDark, border: "1px solid rgba(100,60,20,0.33)",
+            borderRadius: "999px", padding: "2px 10px",
+            display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap",
+            boxShadow: "0 1px 4px rgba(60,30,10,0.18)",
           }}>
-            <HeartSVG style={{ width: 6, height: 6, color: B.accent }} />
-            <span style={{
-              fontFamily: F.label, fontSize: "6.5px",
-              letterSpacing: "0.14em", color: B.inkMuted,
-            }}>
+            <HeartSVG style={{ width: 5, height: 5, color: B.accent }} />
+            <span style={{ fontFamily: F.label, fontSize: "6px", letterSpacing: "0.13em", color: B.inkMuted }}>
               thenoteyouneeded.today
             </span>
-            <HeartSVG style={{ width: 6, height: 6, color: B.accent }} />
+            <HeartSVG style={{ width: 5, height: 5, color: B.accent }} />
           </div>
         </div>
 
-        {/* ── Denim heart patch (center, on envelope edge) ───── */}
+        {/* Denim heart — center fold, envelope edge */}
         <DenimHeart style={{
-          position: "absolute",
-          bottom: "18px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "42px",
-          height: "38px",
-          filter: "drop-shadow(0 2px 5px rgba(20,30,60,0.35))",
+          position: "absolute", bottom: "18px", left: "50%", transform: "translateX(-50%)",
+          width: "36px", height: "32px",
+          filter: "drop-shadow(0 2px 5px rgba(20,30,60,0.32))",
         }} />
 
-        {/* ── MAD signature patch ─────────────────────────────
-             Positioned right of receipt, above envelope, no overlap.
-             Receipt right edge: calc(50% + 80px) from right = canvas x ~640
-             MAD left edge: canvas x = 720 - 10 - 66 = 644 → 4px gap ✓ */}
+        {/* MAD signature patch
+            Receipt right edge: 432 - 68 = 364px from left
+            MAD left: 432 - 10 - 60 = 362px → ~2px gap, no overlap ✓ */}
         <PostcardSignature style={{
           position: "absolute",
-          bottom: `${PANEL_BOTTOM + 2}px`,
+          bottom: `${ENV_H + 2}px`,
           right: "10px",
-          width: "66px",
+          width: "60px",
         }} />
 
       </div>
