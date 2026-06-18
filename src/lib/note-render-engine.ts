@@ -29,6 +29,8 @@ export interface PresetDefinition {
   carouselThreshold: number;
   // Receipt shown when rendered mainText.length <= this value. 0 = never.
   showReceiptThreshold: number;
+  // When true, always use note.mainText instead of socialExcerpt (full note format).
+  preferFullText: boolean;
   showHeart: boolean;
   showMAD: boolean;
   showDomain: boolean;
@@ -41,7 +43,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: null, ratio: null, refWidth: 0,
     outputWidth: 0, outputHeight: 0,
     maxChars: 9999, carouselThreshold: 9999,
-    showReceiptThreshold: 0,
+    showReceiptThreshold: 0, preferFullText: false,
     showHeart: false, showMAD: false, showDomain: true,
   },
   B: {
@@ -50,7 +52,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "9/16", ratio: "9:16", refWidth: 272,
     outputWidth: 1080, outputHeight: 1920,
     maxChars: 480, carouselThreshold: 750,
-    showReceiptThreshold: 0,
+    showReceiptThreshold: 0, preferFullText: false,
     showHeart: true, showMAD: true, showDomain: true,
   },
   C: {
@@ -59,7 +61,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "9/16", ratio: "9:16", refWidth: 272,
     outputWidth: 1080, outputHeight: 1920,
     maxChars: 480, carouselThreshold: 750,
-    showReceiptThreshold: 0,
+    showReceiptThreshold: 0, preferFullText: false,
     showHeart: true, showMAD: true, showDomain: true,
   },
   D: {
@@ -68,17 +70,17 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "1/1", ratio: "1:1", refWidth: 336,
     outputWidth: 1080, outputHeight: 1080,
     maxChars: 400, carouselThreshold: 600,
-    showReceiptThreshold: 180,
+    showReceiptThreshold: 180, preferFullText: false,
     showHeart: true, showMAD: true, showDomain: true,
   },
   E: {
-    id: "E", label: "LinkedIn Portrait", sub: "Editorial portrait",
+    id: "E", label: "Full Note Portrait", sub: "4:5 portrait — complete note",
     layoutType: "linkedin_portrait",
     aspectRatio: "4/5", ratio: "4:5", refWidth: 304,
     outputWidth: 1080, outputHeight: 1350,
-    maxChars: 380, carouselThreshold: 620,
-    showReceiptThreshold: 280,
-    showHeart: false, showMAD: true, showDomain: true,
+    maxChars: 600, carouselThreshold: 900,
+    showReceiptThreshold: 500, preferFullText: true,
+    showHeart: true, showMAD: true, showDomain: true,
   },
   F: {
     id: "F", label: "Pinterest Pin", sub: "Tall poster",
@@ -86,7 +88,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "2/3", ratio: "2:3", refWidth: 256,
     outputWidth: 1000, outputHeight: 1500,
     maxChars: 540, carouselThreshold: 850,
-    showReceiptThreshold: 360,
+    showReceiptThreshold: 360, preferFullText: false,
     showHeart: true, showMAD: true, showDomain: true,
   },
 };
@@ -124,8 +126,8 @@ export function truncateAtBoundary(text: string, maxChars: number): string {
   return (cut > 0 ? candidate.slice(0, cut + 1) : candidate).trimEnd() + "…";
 }
 
-export function getBestVisualText(note: NoteEntry, maxChars: number): string {
-  if (note.socialExcerpt) {
+export function getBestVisualText(note: NoteEntry, maxChars: number, preferFull = false): string {
+  if (!preferFull && note.socialExcerpt) {
     if (note.socialExcerpt.length <= maxChars) return note.socialExcerpt;
     return truncateAtBoundary(note.socialExcerpt, maxChars);
   }
@@ -158,7 +160,7 @@ function resolveReceipt(
 export function buildRenderPlan(note: NoteEntry, presetId: PresetId): RenderPlan {
   const preset = PRESET_DEFINITIONS[presetId];
   const contentMode = resolveContentMode(note, preset);
-  const mainText = getBestVisualText(note, preset.maxChars);
+  const mainText = getBestVisualText(note, preset.maxChars, preset.preferFullText);
   const categoryLabel = getCategoryBySlug(note.categorySlug)?.title ?? note.categorySlug;
 
   const warnings: string[] = [];

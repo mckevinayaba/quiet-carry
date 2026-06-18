@@ -8,6 +8,7 @@ import {
   B,
   F,
   InstagramSquareCanvas,
+  PortraitEnvelopeCanvas,
 } from "@/components/share-canvases";
 import {
   buildFilename,
@@ -35,10 +36,12 @@ const APPROVAL_NOTE = notes.find((n) => n.id === "note-im-fine-but-not-really") 
 
 function SharePreviewPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
   const [captionLabel, setCaptionLabel] = useState("Copy caption + hashtags");
 
   const renderPlan = buildRenderPlan(APPROVAL_NOTE, "D");
+  const portraitPlan = buildRenderPlan(APPROVAL_NOTE, "E");
 
   async function handleDownload() {
     if (!canvasRef.current) return;
@@ -99,9 +102,19 @@ function SharePreviewPage() {
         <p className="font-display text-xl leading-snug">{APPROVAL_NOTE.title}</p>
       </section>
 
-      {/* Card preview */}
-      <div style={{ maxWidth: 360, margin: "0 auto" }}>
-        <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />
+      {/* Cards side by side */}
+      <div className="space-y-2">
+        <p className="eyebrow-copy">D · Square (excerpt + receipt)</p>
+        <div style={{ maxWidth: 360, margin: "0 auto" }}>
+          <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="eyebrow-copy">E · Portrait 4:5 (full note + receipt)</p>
+        <div style={{ maxWidth: 360, margin: "0 auto" }}>
+          <PortraitEnvelopeCanvas ref={portraitRef} renderPlan={portraitPlan} />
+        </div>
       </div>
 
       {/* Diagnostics */}
