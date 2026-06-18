@@ -104,7 +104,7 @@ function HeartOutline({ style, color }: { style?: CSSProperties; color: string }
 
 /** Denim weave fill with optional stitched dashed border. */
 function denimSwatch(w: number, h: number, opts?: { borderColor?: string; rotate?: number }) {
-  const lines: JSX.Element[] = [];
+  const lines: ReactElement[] = [];
   for (let n = 0; n <= h; n += 4)
     lines.push(<line key={`h${n}`} x1="0" y1={n} x2={w} y2={n} stroke={B.navyLight} strokeWidth="0.6" opacity="0.55" />);
   for (let n = 0; n <= w; n += 4)
@@ -125,7 +125,7 @@ function denimSwatch(w: number, h: number, opts?: { borderColor?: string; rotate
 
 /** Rust fabric square (corner accents). */
 function RustFabric({ w, h, style }: { w: number; h: number; style?: CSSProperties }) {
-  const lines: JSX.Element[] = [];
+  const lines: ReactElement[] = [];
   for (let n = 0; n <= h; n += 4)
     lines.push(<line key={`h${n}`} x1="0" y1={n} x2={w} y2={n} stroke={B.rustLight} strokeWidth="0.5" opacity="0.5" />);
   for (let n = 0; n <= w; n += 4)
@@ -419,7 +419,7 @@ function Panel({
 
 // ─── Main canvas ──────────────────────────────────────────────────────────────
 
-export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
+export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, unknown>>(
   function PostcardCanvas(_props, ref) {
     const noteTextStyle: CSSProperties = {
       fontFamily: F.note,
