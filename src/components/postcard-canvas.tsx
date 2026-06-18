@@ -7,7 +7,7 @@
  */
 
 import { forwardRef } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, ReactElement } from "react";
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 
