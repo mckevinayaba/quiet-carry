@@ -11,16 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   B,
-  CanvasShell,
   F,
   InstagramSquareCanvas,
-  InstagramStoryCanvas,
-  LinkedInPortraitCanvas,
-  PinterestPinCanvas,
-  WhatsAppStatusCanvas,
 } from "@/components/share-canvases";
 import {
-  DOWNLOADABLE_PRESETS,
   PRESETS,
   buildFilename,
   buildRenderPlan,
@@ -34,6 +28,9 @@ import type { NoteEntry } from "@/lib/note-data";
 export { Share2 as ShareIcon };
 
 type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
+
+// Presets that are live now vs coming soon
+const ACTIVE_PRESETS: PresetId[] = ["A", "D"];
 
 export function ShareNoteModal({
   note,
@@ -51,9 +48,10 @@ export function ShareNoteModal({
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
 
   const canvasRef = useRef<HTMLDivElement>(null);
-  const renderPlan = buildRenderPlan(note, preset);
+  const squareRenderPlan = buildRenderPlan(note, "D");
 
   function selectPreset(id: PresetId) {
+    if (!ACTIVE_PRESETS.includes(id)) return;
     setPreset(id);
     setDownloadState("idle");
     trackEvent("share_preset_selected", {
@@ -101,7 +99,7 @@ export function ShareNoteModal({
     try {
       const { toPng } = await import("html-to-image");
       const dataUrl = await toPng(canvasRef.current, { pixelRatio: 4, cacheBust: true });
-      const filename = buildFilename(note, preset);
+      const filename = buildFilename(note, "D");
       const link = document.createElement("a");
       link.download = filename;
       link.href = dataUrl;
@@ -111,15 +109,16 @@ export function ShareNoteModal({
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
       setDownloadState(isIOS ? "manual" : "success");
       if (!isIOS) setTimeout(() => setDownloadState("idle"), 3000);
-      trackEvent("share_image_downloaded", { noteId: note.id, categorySlug: note.categorySlug, preset, contentMode: renderPlan.contentMode, source: "modal" });
+      trackEvent("share_image_downloaded", {
+        noteId: note.id, categorySlug: note.categorySlug, preset: "D",
+        contentMode: squareRenderPlan.contentMode, source: "modal",
+      });
     } catch {
       setDownloadState("error");
       setTimeout(() => setDownloadState("idle"), 4000);
-      trackEvent("share_image_download_failed", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
+      trackEvent("share_image_download_failed", { noteId: note.id, categorySlug: note.categorySlug, preset: "D", source: "modal" });
     }
   }
-
-  const isDownloadable = DOWNLOADABLE_PRESETS.includes(preset);
 
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
@@ -136,25 +135,36 @@ export function ShareNoteModal({
 
         {/* Preset selector */}
         <div className="flex flex-wrap gap-1.5">
-          {PRESETS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => selectPreset(p.id)}
-              style={{ fontFamily: F.label, letterSpacing: "0.07em" }}
-              className={[
-                "flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-1.5 text-left transition-colors",
-                preset === p.id
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-card text-muted-foreground hover:border-foreground/40",
-              ].join(" ")}
-            >
-              <span className="text-[0.65rem] font-medium">{p.id}. {p.label}</span>
-              {p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>}
-            </button>
-          ))}
+          {PRESETS.map((p) => {
+            const isActive = ACTIVE_PRESETS.includes(p.id);
+            const isSelected = preset === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => selectPreset(p.id)}
+                disabled={!isActive}
+                style={{ fontFamily: F.label, letterSpacing: "0.07em", opacity: isActive ? 1 : 0.45 }}
+                className={[
+                  "flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-1.5 text-left transition-colors",
+                  isSelected && isActive
+                    ? "border-foreground bg-foreground text-background"
+                    : isActive
+                    ? "border-border bg-card text-muted-foreground hover:border-foreground/40"
+                    : "border-border bg-card text-muted-foreground cursor-not-allowed",
+                ].join(" ")}
+              >
+                <span className="text-[0.65rem] font-medium">{p.id}. {p.label}</span>
+                {isActive ? (
+                  p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>
+                ) : (
+                  <span className="text-[0.52rem] opacity-50">Coming soon</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Canvas / text preview — constrained so the whole card is visible */}
+        {/* Canvas preview */}
         <div className="flex flex-col items-center gap-3">
           {preset === "A" && (
             <div
@@ -164,41 +174,24 @@ export function ShareNoteModal({
               {formatBrandedShareText(note)}
             </div>
           )}
-          {/* Tall formats (9:16, 2:3, 4:5) are width-capped so their full height fits the modal */}
-          {(preset === "B" || preset === "C") && (
-            <div style={{ width: "58%", margin: "0 auto" }}>
-              {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} renderPlan={renderPlan} />}
-              {preset === "C" && <InstagramStoryCanvas ref={canvasRef} renderPlan={renderPlan} />}
-            </div>
-          )}
           {preset === "D" && (
             <div style={{ width: "88%", margin: "0 auto" }}>
-              <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />
-            </div>
-          )}
-          {preset === "E" && (
-            <div style={{ width: "72%", margin: "0 auto" }}>
-              <LinkedInPortraitCanvas ref={canvasRef} renderPlan={renderPlan} />
-            </div>
-          )}
-          {preset === "F" && (
-            <div style={{ width: "62%", margin: "0 auto" }}>
-              <PinterestPinCanvas ref={canvasRef} renderPlan={renderPlan} />
+              <InstagramSquareCanvas ref={canvasRef} renderPlan={squareRenderPlan} />
             </div>
           )}
         </div>
 
-        {/* Content mode / receipt badge */}
-        {isDownloadable && (
+        {/* Receipt / excerpt badge */}
+        {preset === "D" && (
           <div className="space-y-1">
-            {renderPlan.contentMode !== "full" && (
+            {squareRenderPlan.contentMode !== "full" && (
               <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
-                {renderPlan.contentMode === "carousel_required"
+                {squareRenderPlan.contentMode === "carousel_required"
                   ? "Excerpt shown · full note too long for one card"
                   : "Excerpt shown · full note available on site"}
               </p>
             )}
-            {renderPlan.showReceipt && (
+            {squareRenderPlan.showReceipt && (
               <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
                 Receipt included
               </p>
@@ -216,7 +209,7 @@ export function ShareNoteModal({
                 <Button variant="paper" onClick={handleNativeShare}>Share now</Button>
               </div>
             </>
-          ) : (
+          ) : preset === "D" ? (
             <>
               <Button
                 variant="note"
@@ -229,7 +222,6 @@ export function ShareNoteModal({
                   : downloadState === "success" ? "Image downloaded"
                   : "Download PNG"}
               </Button>
-
               {downloadState === "error" && (
                 <p className="text-sm text-destructive">We could not create the image. Please try again.</p>
               )}
@@ -238,13 +230,15 @@ export function ShareNoteModal({
               )}
               {downloadState === "idle" && (
                 <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
-                  Download the image, then upload it to your Story, Status, or post.
+                  Download the image, then post it to Instagram, Facebook, or WhatsApp.
                 </p>
               )}
             </>
-          )}
+          ) : null}
 
-          <Button variant="paper" onClick={handleCopyCaption}>{captionLabel}</Button>
+          {preset !== "A" && (
+            <Button variant="paper" onClick={handleCopyCaption}>{captionLabel}</Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

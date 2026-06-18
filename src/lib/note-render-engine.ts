@@ -68,7 +68,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "1/1", ratio: "1:1", refWidth: 336,
     outputWidth: 1080, outputHeight: 1080,
     maxChars: 400, carouselThreshold: 600,
-    showReceiptThreshold: 260,
+    showReceiptThreshold: 180,
     showHeart: true, showMAD: true, showDomain: true,
   },
   E: {

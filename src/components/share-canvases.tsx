@@ -24,16 +24,6 @@ export const F = {
   label: "var(--font-label)",
 } as const;
 
-// ─── Adaptive font size ───────────────────────────────────────────────────────
-
-function getNoteSize(length: number): string {
-  if (length <= 120) return "1.08rem";
-  if (length <= 200) return "0.94rem";
-  if (length <= 300) return "0.82rem";
-  if (length <= 420) return "0.72rem";
-  return "0.62rem";
-}
-
 // ─── Shared atoms ─────────────────────────────────────────────────────────────
 
 export function HeartSVG({ style }: { style?: CSSProperties }) {
@@ -68,80 +58,6 @@ export function CtaDomain() {
   );
 }
 
-// ─── Brand header — identical across all presets ──────────────────────────────
-
-function BrandHeader({ compact = false }: { compact?: boolean }) {
-  return (
-    <div style={{
-      background: B.kraft,
-      padding: compact ? "0.55rem 1rem" : "0.68rem 1rem 0.52rem",
-      display: "flex", alignItems: "center", justifyContent: "center", gap: "0.45rem",
-      flexShrink: 0,
-    }}>
-      <HeartSVG style={{ width: 9, height: 9, color: B.accent }} />
-      <span style={{ fontFamily: F.label, fontSize: "0.48rem", letterSpacing: "0.22em", textTransform: "uppercase", color: B.ink }}>
-        The Note You Needed Today
-      </span>
-      <HeartSVG style={{ width: 9, height: 9, color: B.accent }} />
-    </div>
-  );
-}
-
-// ─── V-fold envelope crease ───────────────────────────────────────────────────
-
-function VCrease({ bg = B.parchment }: { bg?: string }) {
-  return (
-    <svg viewBox="0 0 200 9" preserveAspectRatio="none" style={{ display: "block", width: "100%", height: 9, background: B.kraft, flexShrink: 0 }} aria-hidden="true">
-      <polygon points="0,9 100,0 200,9" fill={bg} />
-      <polyline points="0,9 100,0 200,9" fill="none" stroke={B.inkFaint} strokeWidth="0.5" opacity="0.35" />
-    </svg>
-  );
-}
-
-// ─── Receipt block ────────────────────────────────────────────────────────────
-
-function ReceiptRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "2.6rem 1fr", gap: "0.25rem", alignItems: "flex-start" }}>
-      <span style={{ fontFamily: F.label, fontSize: "0.36rem", letterSpacing: "0.08em", color: B.ink, lineHeight: 1.45 }}>
-        {label}
-      </span>
-      <span style={{ fontFamily: F.label, fontSize: "0.36rem", color: B.inkMuted, lineHeight: 1.45 }}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function ReceiptBlock({ from, to, date, total }: { from?: string; to?: string; date?: string; total?: string }) {
-  const rows = [
-    { label: "FROM:", value: from },
-    { label: "TO:", value: to },
-    { label: "DATE:", value: date },
-    { label: "TOTAL:", value: total },
-  ].filter((r): r is { label: string; value: string } => Boolean(r.value));
-
-  if (rows.length === 0) return null;
-
-  return (
-    <div style={{
-      margin: "0 0.65rem 0.3rem",
-      border: `1px dashed ${B.accentBorder}`,
-      borderRadius: "3px",
-      padding: "0.38rem 0.5rem",
-      background: B.receiptBg,
-      flexShrink: 0,
-    }}>
-      {rows.map((row, i) => (
-        <div key={i}>
-          {i > 0 && <div style={{ borderTop: `1px dashed ${B.accentBorder}`, margin: "0.22rem 0", opacity: 0.6 }} />}
-          <ReceiptRow label={row.label} value={row.value} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ─── Canvas shell ─────────────────────────────────────────────────────────────
 
 export const CanvasShell = forwardRef<
@@ -167,188 +83,247 @@ export const CanvasShell = forwardRef<
   );
 });
 
-// ─── Canvas components ────────────────────────────────────────────────────────
-//
-// Gold standard: InstagramSquareCanvas (D).
-// All presets share: BrandHeader → VCrease → category → note text → receipt? → footer.
-// Only aspect ratio, font scale, title visibility, and receipt eligibility differ.
+// ─── Adaptive font size for the square card ───────────────────────────────────
 
-// ── D: Instagram Square / Facebook Square (gold standard) ─────────────────────
+function squareFontSize(length: number): string {
+  if (length <= 100) return "1.05rem";
+  if (length <= 180) return "0.92rem";
+  if (length <= 300) return "0.82rem";
+  if (length <= 420) return "0.70rem";
+  return "0.60rem";
+}
+
+// ─── D: Instagram Square — GOLD STANDARD ─────────────────────────────────────
+//
+// Layout uses absolute-positioned safe zones so sections NEVER overlap.
+//
+//  Zone        top      height    note
+//  ──────────  ───────  ────────  ──────────────────────────────────────────
+//  Header      0%       13%       kraft brand strip
+//  Crease      13%      2.5%      SVG V-fold
+//  Category    15.5%    4.5%      category label
+//  Text area   20%      57%†      note text, vertically centred
+//  Receipt     77%      13%†      FROM / TO / TOTAL (hidden when not shown)
+//  Footer      90%      10%       domain + MAD
+//
+// † When receipt is hidden the text area extends to 70% (20%→90%),
+//   giving the note text generous breathing room.
 
 export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
   function InstagramSquareCanvas({ renderPlan }, ref) {
-    const { mainText, categoryLabel, showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal } = renderPlan;
-    const fontSize = getNoteSize(mainText.length);
+    const {
+      mainText, categoryLabel,
+      showReceipt, receiptFrom, receiptTo, receiptTotal,
+    } = renderPlan;
+
+    const fontSize = squareFontSize(mainText.length);
+    // Split on double-newline so paragraph gaps render at 0.35em instead of a
+    // full blank line, reducing visual height for notes with multiple stanzas.
+    const paragraphs = mainText.split("\n\n");
+
     return (
       <CanvasShell ref={ref} cssRatio="1/1" maxWidth={336}>
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: B.parchment }}>
-          <BrandHeader />
-          <VCrease />
-          <div style={{ padding: "0.42rem 1rem 0.12rem", flexShrink: 0 }}>
-            <span style={{ fontFamily: F.label, fontSize: "0.4rem", letterSpacing: "0.14em", textTransform: "uppercase", color: B.inkMuted }}>
-              {categoryLabel}
-            </span>
-          </div>
-          <div style={{ flex: 1, padding: "0.12rem 1rem 0.32rem", minHeight: 0, display: "flex", alignItems: "center" }}>
-            <p style={{ fontFamily: F.note, fontSize, lineHeight: 1.28, color: B.ink, whiteSpace: "pre-line" }}>
-              {mainText}
-            </p>
-          </div>
-          {showReceipt && (
-            <ReceiptBlock from={receiptFrom} to={receiptTo} date={receiptDate} total={receiptTotal} />
-          )}
-          <div style={{ padding: "0.4rem 1rem 0.5rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <CtaDomain />
-            <MadMark />
-          </div>
+
+        {/* ── Header ─────────────────────────────────────────────── */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: "13%",
+          background: B.kraft,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: "0.45rem",
+        }}>
+          <HeartSVG style={{ width: 10, height: 10, color: B.accent }} />
+          <span style={{ fontFamily: F.label, fontSize: "0.48rem", letterSpacing: "0.22em", textTransform: "uppercase", color: B.ink }}>
+            The Note You Needed Today
+          </span>
+          <HeartSVG style={{ width: 10, height: 10, color: B.accent }} />
         </div>
+
+        {/* ── V-fold crease ──────────────────────────────────────── */}
+        <svg
+          viewBox="0 0 200 9"
+          preserveAspectRatio="none"
+          style={{ position: "absolute", top: "13%", left: 0, right: 0, width: "100%", height: "2.5%", background: B.kraft }}
+          aria-hidden="true"
+        >
+          <polygon points="0,9 100,0 200,9" fill={B.parchment} />
+          <polyline points="0,9 100,0 200,9" fill="none" stroke={B.inkFaint} strokeWidth="0.5" opacity="0.35" />
+        </svg>
+
+        {/* ── Category ───────────────────────────────────────────── */}
+        <div style={{
+          position: "absolute", top: "15.5%", left: "6%", right: "6%", height: "4.5%",
+          display: "flex", alignItems: "center",
+        }}>
+          <span style={{ fontFamily: F.label, fontSize: "0.38rem", letterSpacing: "0.14em", textTransform: "uppercase", color: B.inkMuted }}>
+            {categoryLabel}
+          </span>
+        </div>
+
+        {/* ── Note text ──────────────────────────────────────────── */}
+        {/* overflow:hidden is a safety net — the engine pre-truncates mainText */}
+        <div style={{
+          position: "absolute",
+          top: "20%",
+          left: "6%", right: "6%",
+          bottom: showReceipt ? "23%" : "10%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}>
+          {paragraphs.map((para, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: F.note,
+                fontSize,
+                lineHeight: 1.28,
+                color: B.ink,
+                whiteSpace: "pre-line",
+                margin: 0,
+                marginBottom: i < paragraphs.length - 1 ? "0.35em" : 0,
+              }}
+            >
+              {para}
+            </p>
+          ))}
+        </div>
+
+        {/* ── Receipt ────────────────────────────────────────────── */}
+        {showReceipt && (
+          <div style={{
+            position: "absolute",
+            bottom: "10%",
+            left: "4%", right: "4%",
+            height: "13%",
+            border: `1px dashed ${B.accentBorder}`,
+            borderRadius: "3px",
+            padding: "1% 2.5%",
+            background: B.receiptBg,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "1.2%",
+          }}>
+            {receiptFrom && (
+              <div style={{ display: "flex", gap: "1%" }}>
+                <span style={{ fontFamily: F.label, fontSize: "0.34rem", letterSpacing: "0.08em", color: B.ink, flexShrink: 0, minWidth: "12%" }}>FROM:</span>
+                <span style={{ fontFamily: F.label, fontSize: "0.34rem", color: B.inkMuted, lineHeight: 1.35 }}>{receiptFrom}</span>
+              </div>
+            )}
+            {receiptTo && (
+              <>
+                <div style={{ borderTop: `1px dashed ${B.accentBorder}`, opacity: 0.5 }} />
+                <div style={{ display: "flex", gap: "1%" }}>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", letterSpacing: "0.08em", color: B.ink, flexShrink: 0, minWidth: "12%" }}>TO:</span>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", color: B.inkMuted, lineHeight: 1.35 }}>{receiptTo}</span>
+                </div>
+              </>
+            )}
+            {receiptTotal && (
+              <>
+                <div style={{ borderTop: `1px dashed ${B.accentBorder}`, opacity: 0.5 }} />
+                <div style={{ display: "flex", gap: "1%" }}>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", letterSpacing: "0.08em", color: B.ink, flexShrink: 0, minWidth: "12%" }}>TOTAL:</span>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", color: B.inkMuted, lineHeight: 1.35 }}>{receiptTotal}</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Footer ─────────────────────────────────────────────── */}
+        <div style={{
+          position: "absolute",
+          bottom: 0, left: 0, right: 0,
+          height: "10%",
+          borderTop: `1px solid ${B.accentBorder}`,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0 6%",
+          background: B.parchment,
+        }}>
+          <CtaDomain />
+          <MadMark />
+        </div>
+
       </CanvasShell>
     );
   },
 );
 
-// ── B: WhatsApp Status ────────────────────────────────────────────────────────
+// ─── Coming Soon stubs — B, C, E, F are paused pending square approval ────────
+
+function ComingSoonCanvas({
+  cssRatio, maxWidth, label, ratio,
+}: { cssRatio: string; maxWidth: number; label: string; ratio?: string }) {
+  return (
+    <CanvasShell cssRatio={cssRatio} maxWidth={maxWidth}>
+      <div style={{ position: "absolute", inset: 0, background: B.parchment, display: "flex", flexDirection: "column" }}>
+        <div style={{ background: B.kraft, padding: "0.65rem 0.8rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", flexShrink: 0 }}>
+          <HeartSVG style={{ width: 8, height: 8, color: B.accent }} />
+          <span style={{ fontFamily: F.label, fontSize: "0.46rem", letterSpacing: "0.2em", textTransform: "uppercase", color: B.ink }}>
+            The Note You Needed Today
+          </span>
+          <HeartSVG style={{ width: 8, height: 8, color: B.accent }} />
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}>
+          <span style={{ fontFamily: F.label, fontSize: "0.5rem", letterSpacing: "0.16em", textTransform: "uppercase", color: B.inkMuted }}>
+            {label}
+          </span>
+          {ratio && (
+            <span style={{ fontFamily: F.label, fontSize: "0.38rem", color: B.inkFaint, letterSpacing: "0.1em" }}>
+              {ratio}
+            </span>
+          )}
+          <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.18em", textTransform: "uppercase", color: B.inkFaint, border: `1px dashed ${B.accentBorder}`, padding: "0.2rem 0.6rem", borderRadius: "999px" }}>
+            Coming Soon
+          </span>
+        </div>
+        <div style={{ padding: "0.4rem 0.8rem 0.5rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
+          <CtaDomain />
+          <MadMark />
+        </div>
+      </div>
+    </CanvasShell>
+  );
+}
 
 export const WhatsAppStatusCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
-  function WhatsAppStatusCanvas({ renderPlan }, ref) {
-    const { mainText, categoryLabel } = renderPlan;
-    const fontSize = getNoteSize(mainText.length);
+  function WhatsAppStatusCanvas(_props, ref) {
     return (
-      <CanvasShell ref={ref} cssRatio="9/16" maxWidth={272}>
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: B.parchment }}>
-          <BrandHeader />
-          <VCrease />
-          <div style={{ padding: "0.55rem 1rem 0.2rem", flexShrink: 0 }}>
-            <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.13em", textTransform: "uppercase", color: B.inkMuted }}>
-              {categoryLabel}
-            </span>
-          </div>
-          <div style={{ flex: 1, padding: "0.2rem 1rem 0.5rem", minHeight: 0, display: "flex", alignItems: "center" }}>
-            <p style={{ fontFamily: F.note, fontSize, lineHeight: 1.3, color: B.ink, whiteSpace: "pre-line" }}>
-              {mainText}
-            </p>
-          </div>
-          <div style={{ padding: "0.5rem 1rem 0.65rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <CtaDomain />
-            <MadMark />
-          </div>
-        </div>
-      </CanvasShell>
+      <div ref={ref} style={{ width: "100%", maxWidth: 272, aspectRatio: "9/16" }}>
+        <ComingSoonCanvas cssRatio="9/16" maxWidth={272} label="WhatsApp Status" ratio="9:16" />
+      </div>
     );
   },
 );
-
-// ── C: Instagram Story ────────────────────────────────────────────────────────
 
 export const InstagramStoryCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
-  function InstagramStoryCanvas({ renderPlan }, ref) {
-    const { mainText, categoryLabel } = renderPlan;
-    const fontSize = getNoteSize(mainText.length);
+  function InstagramStoryCanvas(_props, ref) {
     return (
-      <CanvasShell
-        ref={ref}
-        cssRatio="9/16"
-        maxWidth={272}
-        bg={`linear-gradient(170deg, ${B.cream} 0%, ${B.parchment} 55%, oklch(0.92 0.025 75) 100%)`}
-      >
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-          <BrandHeader />
-          <VCrease bg={B.cream} />
-          <div style={{ padding: "0.6rem 1rem 0.2rem", flexShrink: 0 }}>
-            <span style={{ fontFamily: F.label, fontSize: "0.42rem", letterSpacing: "0.11em", textTransform: "uppercase", color: B.inkMuted, border: `1px dashed ${B.accentBorder}`, borderRadius: "999px", padding: "0.15rem 0.5rem" }}>
-              {categoryLabel}
-            </span>
-          </div>
-          <div style={{ flex: 1, padding: "0.3rem 1rem 0.5rem", minHeight: 0, display: "flex", alignItems: "center" }}>
-            <p style={{ fontFamily: F.note, fontSize, lineHeight: 1.3, color: B.ink, whiteSpace: "pre-line" }}>
-              {mainText}
-            </p>
-          </div>
-          <div style={{ padding: "0.5rem 1rem 0.7rem", borderTop: `1px dashed ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <CtaDomain />
-            <MadMark />
-          </div>
-        </div>
-      </CanvasShell>
+      <div ref={ref} style={{ width: "100%", maxWidth: 272, aspectRatio: "9/16" }}>
+        <ComingSoonCanvas cssRatio="9/16" maxWidth={272} label="Instagram Story" ratio="9:16" />
+      </div>
     );
   },
 );
-
-// ── E: LinkedIn Portrait ──────────────────────────────────────────────────────
 
 export const LinkedInPortraitCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
-  function LinkedInPortraitCanvas({ renderPlan }, ref) {
-    const { mainText, title, categoryLabel, showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal } = renderPlan;
-    const fontSize = getNoteSize(mainText.length);
+  function LinkedInPortraitCanvas(_props, ref) {
     return (
-      <CanvasShell ref={ref} cssRatio="4/5" maxWidth={304} bg={B.cream}>
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-          <BrandHeader compact />
-          <VCrease bg={B.cream} />
-          <div style={{ flex: 1, padding: "0.6rem 1rem 0.3rem", display: "flex", flexDirection: "column", minHeight: 0 }}>
-            <p style={{ fontFamily: F.display, fontSize: "0.92rem", lineHeight: 1.15, color: B.ink, marginBottom: "0.28rem", flexShrink: 0 }}>
-              {title}
-            </p>
-            <p style={{ fontFamily: F.label, fontSize: "0.4rem", letterSpacing: "0.12em", textTransform: "uppercase", color: B.inkMuted, marginBottom: "0.5rem", flexShrink: 0 }}>
-              {categoryLabel}
-            </p>
-            <p style={{ fontFamily: F.note, fontSize, lineHeight: 1.3, color: B.ink, flex: 1, whiteSpace: "pre-line", minHeight: 0 }}>
-              {mainText}
-            </p>
-          </div>
-          {showReceipt && (
-            <ReceiptBlock from={receiptFrom} to={receiptTo} date={receiptDate} total={receiptTotal} />
-          )}
-          <div style={{ padding: "0.4rem 1rem 0.5rem", borderTop: `1px solid ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <CtaDomain />
-            <MadMark />
-          </div>
-        </div>
-      </CanvasShell>
+      <div ref={ref} style={{ width: "100%", maxWidth: 304, aspectRatio: "4/5" }}>
+        <ComingSoonCanvas cssRatio="4/5" maxWidth={304} label="LinkedIn Portrait" ratio="4:5" />
+      </div>
     );
   },
 );
 
-// ── F: Pinterest Pin ──────────────────────────────────────────────────────────
-
 export const PinterestPinCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
-  function PinterestPinCanvas({ renderPlan }, ref) {
-    const { mainText, title, categoryLabel, showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal } = renderPlan;
-    const fontSize = getNoteSize(mainText.length);
+  function PinterestPinCanvas(_props, ref) {
     return (
-      <CanvasShell
-        ref={ref}
-        cssRatio="2/3"
-        maxWidth={256}
-        bg={`linear-gradient(175deg, ${B.cream} 0%, ${B.parchment} 50%, oklch(0.94 0.022 76) 100%)`}
-      >
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-          <BrandHeader />
-          <VCrease bg={B.cream} />
-          <div style={{ padding: "0.5rem 1rem 0.15rem", flexShrink: 0 }}>
-            <span style={{ fontFamily: F.label, fontSize: "0.4rem", letterSpacing: "0.1em", textTransform: "uppercase", color: B.inkMuted, border: `1px dashed ${B.accentBorder}`, borderRadius: "999px", padding: "0.12rem 0.48rem" }}>
-              {categoryLabel}
-            </span>
-          </div>
-          <div style={{ padding: "0.15rem 1rem 0.25rem", flexShrink: 0 }}>
-            <p style={{ fontFamily: F.display, fontSize: "0.88rem", lineHeight: 1.16, color: B.ink }}>
-              {title}
-            </p>
-          </div>
-          <div style={{ flex: 1, padding: "0 1rem 0.3rem", minHeight: 0 }}>
-            <p style={{ fontFamily: F.note, fontSize, lineHeight: 1.28, color: B.ink, whiteSpace: "pre-line" }}>
-              {mainText}
-            </p>
-          </div>
-          {showReceipt && (
-            <ReceiptBlock from={receiptFrom} to={receiptTo} date={receiptDate} total={receiptTotal} />
-          )}
-          <div style={{ padding: "0.45rem 1rem 0.6rem", borderTop: `1px dashed ${B.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <CtaDomain />
-            <MadMark />
-          </div>
-        </div>
-      </CanvasShell>
+      <div ref={ref} style={{ width: "100%", maxWidth: 256, aspectRatio: "2/3" }}>
+        <ComingSoonCanvas cssRatio="2/3" maxWidth={256} label="Pinterest Pin" ratio="2:3" />
+      </div>
     );
   },
 );
