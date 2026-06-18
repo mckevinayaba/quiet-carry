@@ -237,19 +237,20 @@ export function PostcardReceipt({ style }: { style?: CSSProperties }) {
   const rowStyle: CSSProperties = { display: "flex", gap: "5px", alignItems: "flex-start" };
   const labelStyle: CSSProperties = {
     fontFamily: F.label,
-    fontSize: "8.5px",
+    fontSize: "9px",
     letterSpacing: "0.10em",
     color: B.navy,
     flexShrink: 0,
-    minWidth: "42px",
+    minWidth: "44px",
     lineHeight: 1.35,
     textTransform: "uppercase",
     fontWeight: 700,
   };
   const valStyle: CSSProperties = {
     fontFamily: F.label,
-    fontSize: "8.5px",
-    color: B.inkMuted,
+    fontSize: "9px",
+    fontWeight: 600,
+    color: "#3a2510",
     lineHeight: 1.4,
   };
   const sep = <div style={{ margin: "3px 0", borderTop: "1px dashed rgba(100,60,20,0.2)" }} />;
@@ -381,8 +382,9 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
     const noteStyle: CSSProperties = {
       fontFamily: F.note,
       fontSize: "9px",
+      fontWeight: 600,
       lineHeight: 1.48,
-      color: B.ink,
+      color: "#1a0e06",
       whiteSpace: "pre-wrap",
     };
 
