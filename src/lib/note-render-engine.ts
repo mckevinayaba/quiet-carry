@@ -21,12 +21,14 @@ export interface PresetDefinition {
   sub: string;
   layoutType: LayoutType;
   aspectRatio: string | null;
-  ratio: string | null;          // display string e.g. "9:16"
-  refWidth: number;              // preview canvas width in px
+  ratio: string | null;
+  refWidth: number;
   outputWidth: number;
   outputHeight: number;
-  maxChars: number;              // safe text budget
-  carouselThreshold: number;     // above this length: carousel recommended
+  maxChars: number;
+  carouselThreshold: number;
+  // Receipt shown when rendered mainText.length <= this value. 0 = never.
+  showReceiptThreshold: number;
   showHeart: boolean;
   showMAD: boolean;
   showDomain: boolean;
@@ -39,6 +41,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: null, ratio: null, refWidth: 0,
     outputWidth: 0, outputHeight: 0,
     maxChars: 9999, carouselThreshold: 9999,
+    showReceiptThreshold: 0,
     showHeart: false, showMAD: false, showDomain: true,
   },
   B: {
@@ -47,6 +50,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "9/16", ratio: "9:16", refWidth: 272,
     outputWidth: 1080, outputHeight: 1920,
     maxChars: 480, carouselThreshold: 750,
+    showReceiptThreshold: 0,
     showHeart: true, showMAD: true, showDomain: true,
   },
   C: {
@@ -55,6 +59,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "9/16", ratio: "9:16", refWidth: 272,
     outputWidth: 1080, outputHeight: 1920,
     maxChars: 480, carouselThreshold: 750,
+    showReceiptThreshold: 0,
     showHeart: true, showMAD: true, showDomain: true,
   },
   D: {
@@ -62,7 +67,8 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     layoutType: "square_post",
     aspectRatio: "1/1", ratio: "1:1", refWidth: 336,
     outputWidth: 1080, outputHeight: 1080,
-    maxChars: 260, carouselThreshold: 420,
+    maxChars: 400, carouselThreshold: 600,
+    showReceiptThreshold: 260,
     showHeart: true, showMAD: true, showDomain: true,
   },
   E: {
@@ -71,6 +77,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "4/5", ratio: "4:5", refWidth: 304,
     outputWidth: 1080, outputHeight: 1350,
     maxChars: 380, carouselThreshold: 620,
+    showReceiptThreshold: 280,
     showHeart: false, showMAD: true, showDomain: true,
   },
   F: {
@@ -79,14 +86,12 @@ export const PRESET_DEFINITIONS: Record<PresetId, PresetDefinition> = {
     aspectRatio: "2/3", ratio: "2:3", refWidth: 256,
     outputWidth: 1000, outputHeight: 1500,
     maxChars: 540, carouselThreshold: 850,
+    showReceiptThreshold: 360,
     showHeart: true, showMAD: true, showDomain: true,
   },
 };
 
-/** Ordered list for UI preset selectors. */
 export const PRESETS: PresetDefinition[] = Object.values(PRESET_DEFINITIONS);
-
-/** Preset IDs that support PNG download. */
 export const DOWNLOADABLE_PRESETS: PresetId[] = ["B", "C", "D", "E", "F"];
 
 // ─── Render plan ──────────────────────────────────────────────────────────────
@@ -99,11 +104,15 @@ export interface RenderPlan {
   title: string;
   categoryLabel: string;
   layoutWarnings: string[];
+  showReceipt: boolean;
+  receiptFrom?: string;
+  receiptTo?: string;
+  receiptDate?: string;
+  receiptTotal?: string;
 }
 
 // ─── Engine ───────────────────────────────────────────────────────────────────
 
-/** Truncate text at the cleanest natural boundary near maxChars. */
 export function truncateAtBoundary(text: string, maxChars: number): string {
   if (text.length <= maxChars) return text;
   const candidate = text.slice(0, maxChars);
@@ -115,16 +124,9 @@ export function truncateAtBoundary(text: string, maxChars: number): string {
   return (cut > 0 ? candidate.slice(0, cut + 1) : candidate).trimEnd() + "…";
 }
 
-/**
- * Return the best text for a visual canvas:
- *   1. socialExcerpt if it exists and fits within budget + small grace
- *   2. mainText truncated to budget
- */
 export function getBestVisualText(note: NoteEntry, maxChars: number): string {
   if (note.socialExcerpt) {
     if (note.socialExcerpt.length <= maxChars) return note.socialExcerpt;
-    // Truncate socialExcerpt rather than falling back to mainText —
-    // it has been crafted to read well even when cut.
     return truncateAtBoundary(note.socialExcerpt, maxChars);
   }
   return truncateAtBoundary(note.mainText, maxChars);
@@ -137,6 +139,22 @@ function resolveContentMode(note: NoteEntry, preset: PresetDefinition): ContentM
   return "excerpt";
 }
 
+function resolveReceipt(
+  note: NoteEntry,
+  preset: PresetDefinition,
+  mainTextLength: number,
+): Pick<RenderPlan, "showReceipt" | "receiptFrom" | "receiptTo" | "receiptDate" | "receiptTotal"> {
+  if (preset.showReceiptThreshold === 0 || mainTextLength > preset.showReceiptThreshold) {
+    return { showReceipt: false };
+  }
+  const from  = note.shortReceiptFrom  ?? note.receiptFrom;
+  const to    = note.shortReceiptTo    ?? note.receiptTo;
+  const date  = note.shortReceiptDate  ?? note.receiptDate;
+  const total = note.shortReceiptTotal ?? note.receiptTotal;
+  if (!from && !to && !total) return { showReceipt: false };
+  return { showReceipt: true, receiptFrom: from, receiptTo: to, receiptDate: date, receiptTotal: total };
+}
+
 export function buildRenderPlan(note: NoteEntry, presetId: PresetId): RenderPlan {
   const preset = PRESET_DEFINITIONS[presetId];
   const contentMode = resolveContentMode(note, preset);
@@ -146,15 +164,17 @@ export function buildRenderPlan(note: NoteEntry, presetId: PresetId): RenderPlan
   const warnings: string[] = [];
   if (contentMode === "carousel_required") {
     warnings.push(
-      `Note is ${(note.socialExcerpt ?? note.mainText).length} chars — exceeds carousel threshold (${preset.carouselThreshold}). Showing best excerpt; carousel recommended for full note.`,
+      `Note is ${(note.socialExcerpt ?? note.mainText).length} chars — exceeds carousel threshold (${preset.carouselThreshold}). Showing best excerpt; carousel recommended.`,
     );
   } else if (contentMode === "excerpt") {
     warnings.push(
-      `Note uses excerpt mode (${(note.socialExcerpt ?? note.mainText).length} chars > ${preset.maxChars} limit).`,
+      `Excerpt mode: ${(note.socialExcerpt ?? note.mainText).length} chars > ${preset.maxChars} limit.`,
     );
   }
 
-  return { presetId, preset, contentMode, mainText, title: note.title, categoryLabel, layoutWarnings: warnings };
+  const receipt = resolveReceipt(note, preset, mainText.length);
+
+  return { presetId, preset, contentMode, mainText, title: note.title, categoryLabel, layoutWarnings: warnings, ...receipt };
 }
 
 // ─── Text formatters ──────────────────────────────────────────────────────────

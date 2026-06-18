@@ -154,7 +154,7 @@ export function ShareNoteModal({
           ))}
         </div>
 
-        {/* Canvas / text preview */}
+        {/* Canvas / text preview — constrained so the whole card is visible */}
         <div className="flex flex-col items-center gap-3">
           {preset === "A" && (
             <div
@@ -164,23 +164,46 @@ export function ShareNoteModal({
               {formatBrandedShareText(note)}
             </div>
           )}
-          {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} renderPlan={renderPlan} />}
-          {preset === "C" && <InstagramStoryCanvas ref={canvasRef} renderPlan={renderPlan} />}
-          {preset === "D" && <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />}
-          {preset === "E" && <LinkedInPortraitCanvas ref={canvasRef} renderPlan={renderPlan} />}
-          {preset === "F" && <PinterestPinCanvas ref={canvasRef} renderPlan={renderPlan} />}
+          {/* Tall formats (9:16, 2:3, 4:5) are width-capped so their full height fits the modal */}
+          {(preset === "B" || preset === "C") && (
+            <div style={{ width: "58%", margin: "0 auto" }}>
+              {preset === "B" && <WhatsAppStatusCanvas ref={canvasRef} renderPlan={renderPlan} />}
+              {preset === "C" && <InstagramStoryCanvas ref={canvasRef} renderPlan={renderPlan} />}
+            </div>
+          )}
+          {preset === "D" && (
+            <div style={{ width: "88%", margin: "0 auto" }}>
+              <InstagramSquareCanvas ref={canvasRef} renderPlan={renderPlan} />
+            </div>
+          )}
+          {preset === "E" && (
+            <div style={{ width: "72%", margin: "0 auto" }}>
+              <LinkedInPortraitCanvas ref={canvasRef} renderPlan={renderPlan} />
+            </div>
+          )}
+          {preset === "F" && (
+            <div style={{ width: "62%", margin: "0 auto" }}>
+              <PinterestPinCanvas ref={canvasRef} renderPlan={renderPlan} />
+            </div>
+          )}
         </div>
 
-        {/* Content mode badge (excerpt / carousel warning) */}
-        {isDownloadable && renderPlan.contentMode !== "full" && (
-          <p
-            className="text-center text-xs text-muted-foreground"
-            style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}
-          >
-            {renderPlan.contentMode === "carousel_required"
-              ? "Showing best excerpt · full note is too long for one card"
-              : "Showing excerpt · full note available on site"}
-          </p>
+        {/* Content mode / receipt badge */}
+        {isDownloadable && (
+          <div className="space-y-1">
+            {renderPlan.contentMode !== "full" && (
+              <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                {renderPlan.contentMode === "carousel_required"
+                  ? "Excerpt shown · full note too long for one card"
+                  : "Excerpt shown · full note available on site"}
+              </p>
+            )}
+            {renderPlan.showReceipt && (
+              <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                Receipt included
+              </p>
+            )}
+          </div>
         )}
 
         {/* Actions */}

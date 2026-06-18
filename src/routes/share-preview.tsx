@@ -151,6 +151,8 @@ function SharePreviewPage() {
           <span>{renderPlan.mainText.length}</span>
           <span style={{ color: B.inkMuted }}>socialExcerpt</span>
           <span>{note.socialExcerpt ? `yes (${note.socialExcerpt.length} chars)` : "none"}</span>
+          <span style={{ color: B.inkMuted }}>showReceipt</span>
+          <span style={{ fontWeight: renderPlan.showReceipt ? 600 : 400 }}>{renderPlan.showReceipt ? "yes" : "no"}</span>
         </div>
         {renderPlan.layoutWarnings.length > 0 && (
           <div className="mt-2 space-y-1">
