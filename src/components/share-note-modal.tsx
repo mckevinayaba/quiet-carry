@@ -14,6 +14,7 @@ import {
   F,
   InstagramSquareCanvas,
 } from "@/components/share-canvases";
+import { PostcardCanvas } from "@/components/postcard-canvas";
 import {
   PRESETS,
   buildFilename,
@@ -28,6 +29,7 @@ import type { NoteEntry } from "@/lib/note-data";
 export { Share2 as ShareIcon };
 
 type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
+type ModalPreset = PresetId | "P";
 
 // Presets that are live now vs coming soon
 const ACTIVE_PRESETS: PresetId[] = ["A", "D"];
@@ -36,31 +38,66 @@ export function ShareNoteModal({
   note,
   open,
   onClose,
+  initialPreset = "A",
 }: {
   note: NoteEntry;
   open: boolean;
   onClose: () => void;
+  initialPreset?: ModalPreset;
 }) {
-  const [preset, setPreset] = useState<PresetId>("A");
+  const [preset, setPreset] = useState<ModalPreset>(initialPreset);
   const [copyLabel, setCopyLabel] = useState("Copy share text");
   const [captionLabel, setCaptionLabel] = useState("Copy caption");
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+  const [portraitDownloadState, setPortraitDownloadState] = useState<DownloadState>("idle");
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
   const squareRenderPlan = buildRenderPlan(note, "D");
 
-  function selectPreset(id: PresetId) {
-    if (!ACTIVE_PRESETS.includes(id)) return;
+  function selectPreset(id: ModalPreset) {
+    if (id !== "P" && !ACTIVE_PRESETS.includes(id as PresetId)) return;
     setPreset(id);
     setDownloadState("idle");
-    trackEvent("share_preset_selected", {
-      noteId: note.id,
-      categorySlug: note.categorySlug,
-      preset: id,
-      contentMode: buildRenderPlan(note, id).contentMode,
-      source: "modal",
-    });
+    setPortraitDownloadState("idle");
+    if (id !== "P") {
+      trackEvent("share_preset_selected", {
+        noteId: note.id,
+        categorySlug: note.categorySlug,
+        preset: id,
+        contentMode: buildRenderPlan(note, id as PresetId).contentMode,
+        source: "modal",
+      });
+    }
+  }
+
+  async function handlePortraitDownload() {
+    if (!portraitRef.current) return;
+    setPortraitDownloadState("downloading");
+    try {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(portraitRef.current, {
+        pixelRatio: 2.5, cacheBust: true, width: 432, height: 540,
+      });
+      const slug = note.id.replace(/^note-/, "");
+      const link = document.createElement("a");
+      link.download = `the-note-you-needed-today-${slug}-portrait.png`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      setPortraitDownloadState(isIOS ? "manual" : "success");
+      if (!isIOS) setTimeout(() => setPortraitDownloadState("idle"), 3000);
+      trackEvent("share_image_downloaded", {
+        noteId: note.id, categorySlug: note.categorySlug,
+        preset: "P", contentMode: "full", source: "modal",
+      });
+    } catch {
+      setPortraitDownloadState("error");
+      setTimeout(() => setPortraitDownloadState("idle"), 4000);
+    }
   }
 
   async function handleCopyText() {
@@ -162,6 +199,20 @@ export function ShareNoteModal({
               </button>
             );
           })}
+          {/* Portrait postcard — always active */}
+          <button
+            onClick={() => selectPreset("P")}
+            style={{ fontFamily: F.label, letterSpacing: "0.07em" }}
+            className={[
+              "flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-1.5 text-left transition-colors",
+              preset === "P"
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-card text-muted-foreground hover:border-foreground/40",
+            ].join(" ")}
+          >
+            <span className="text-[0.65rem] font-medium">P. Full Note Portrait</span>
+            <span className="text-[0.55rem] opacity-60">4:5 · Full note</span>
+          </button>
         </div>
 
         {/* Canvas preview */}
@@ -178,6 +229,20 @@ export function ShareNoteModal({
             <div style={{ width: "88%", margin: "0 auto" }}>
               <InstagramSquareCanvas ref={canvasRef} renderPlan={squareRenderPlan} />
             </div>
+          )}
+          {preset === "P" && (
+            <>
+              {/* Off-screen full-size canvas captured by html-to-image */}
+              <div style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none", userSelect: "none", zIndex: -1 }}>
+                <PostcardCanvas ref={portraitRef} note={note} />
+              </div>
+              {/* Scaled preview — 65% of 432×540 */}
+              <div style={{ width: "281px", height: "351px", overflow: "hidden", margin: "0 auto", borderRadius: "4px", boxShadow: "0 4px 20px rgba(60,30,10,0.18)", flexShrink: 0 }}>
+                <div style={{ transform: "scale(0.651)", transformOrigin: "top left", width: "432px", height: "540px" }}>
+                  <PostcardCanvas note={note} />
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -231,6 +296,31 @@ export function ShareNoteModal({
               {downloadState === "idle" && (
                 <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
                   Download the image, then post it to Instagram, Facebook, or WhatsApp.
+                </p>
+              )}
+            </>
+          ) : preset === "P" ? (
+            <>
+              <Button
+                variant="note"
+                onClick={handlePortraitDownload}
+                disabled={portraitDownloadState === "downloading"}
+                className="flex items-center justify-center gap-2"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                {portraitDownloadState === "downloading" ? "Creating image…"
+                  : portraitDownloadState === "success" ? "Image downloaded"
+                  : "Download Portrait PNG"}
+              </Button>
+              {portraitDownloadState === "error" && (
+                <p className="text-sm text-destructive">Could not create the image. Please try again.</p>
+              )}
+              {portraitDownloadState === "manual" && (
+                <p className="text-sm text-muted-foreground">Your image is ready. Long press or open it to save.</p>
+              )}
+              {portraitDownloadState === "idle" && (
+                <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
+                  1080×1350 PNG — ready for Instagram, TikTok, and Facebook.
                 </p>
               )}
             </>

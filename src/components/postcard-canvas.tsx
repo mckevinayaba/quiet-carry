@@ -21,6 +21,15 @@
 
 import { forwardRef } from "react";
 import type { CSSProperties } from "react";
+import type { NoteEntry } from "@/lib/note-data";
+
+// Split mainText into two roughly equal halves by paragraph for the two columns
+function splitNoteForColumns(mainText: string): [string, string] {
+  const paragraphs = mainText.split("\n\n");
+  if (paragraphs.length <= 2) return [mainText, ""];
+  const mid = Math.ceil(paragraphs.length / 2);
+  return [paragraphs.slice(0, mid).join("\n\n"), paragraphs.slice(mid).join("\n\n")];
+}
 
 // ─── Brand tokens ──────────────────────────────────────────────────────────────
 
@@ -233,7 +242,12 @@ function DenimHeart({ style }: { style?: CSSProperties }) {
 
 // ─── Receipt ───────────────────────────────────────────────────────────────────
 
-export function PostcardReceipt({ style }: { style?: CSSProperties }) {
+export function PostcardReceipt({
+  from, to, date, total, style,
+}: {
+  from?: string; to?: string; date?: string; total?: string;
+  style?: CSSProperties;
+}) {
   const rowStyle: CSSProperties = { display: "flex", gap: "5px", alignItems: "flex-start" };
   const labelStyle: CSSProperties = {
     fontFamily: F.label,
@@ -270,22 +284,22 @@ export function PostcardReceipt({ style }: { style?: CSSProperties }) {
       <div style={{ position: "absolute", inset: "4px", border: "0.8px dashed rgba(26,45,74,0.13)", borderRadius: "1.5px", pointerEvents: "none" }} />
       <div style={rowStyle}>
         <span style={labelStyle}>FROM:</span>
-        <span style={valStyle}>{POSTCARD_RECEIPT.from}</span>
+        <span style={valStyle}>{from ?? POSTCARD_RECEIPT.from}</span>
       </div>
       {sep}
       <div style={rowStyle}>
         <span style={labelStyle}>TO:</span>
-        <span style={valStyle}>{POSTCARD_RECEIPT.to}</span>
+        <span style={valStyle}>{to ?? POSTCARD_RECEIPT.to}</span>
       </div>
       {sep}
       <div style={rowStyle}>
         <span style={labelStyle}>DATE:</span>
-        <span style={valStyle}>{POSTCARD_RECEIPT.date}</span>
+        <span style={valStyle}>{date ?? POSTCARD_RECEIPT.date}</span>
       </div>
       {sep}
       <div style={rowStyle}>
         <span style={labelStyle}>TOTAL:</span>
-        <span style={valStyle}>{POSTCARD_RECEIPT.total}</span>
+        <span style={valStyle}>{total ?? POSTCARD_RECEIPT.total}</span>
       </div>
       <HeartSVG style={{ position: "absolute", bottom: "5px", right: "6px", width: "7px", height: "7px", color: B.accent, opacity: 0.65 }} />
     </div>
@@ -347,7 +361,7 @@ export function PostcardSignature({ style }: { style?: CSSProperties }) {
 
 // ─── DO IT ANYWAY label ────────────────────────────────────────────────────────
 
-export function TitleLabel() {
+export function TitleLabel({ text = "Do It Anyway" }: { text?: string }) {
   return (
     <div style={{
       display: "inline-flex", alignItems: "center", gap: "6px",
@@ -356,28 +370,42 @@ export function TitleLabel() {
       borderRadius: "2px",
       position: "relative",
       boxShadow: "2px 2px 7px rgba(10,20,40,0.42)",
+      maxWidth: "calc(50% - 4px)",
     }}>
       <div style={{ position: "absolute", inset: "3px", border: "1px dashed rgba(180,200,230,0.42)", borderRadius: "1px", pointerEvents: "none" }} />
       <span style={{
-        fontFamily: F.label, fontSize: "10px", letterSpacing: "0.22em",
-        textTransform: "uppercase", color: "#e8ddd0", lineHeight: 1, position: "relative",
+        fontFamily: F.label, fontSize: "9px", letterSpacing: "0.18em",
+        textTransform: "uppercase", color: "#e8ddd0", lineHeight: 1.2, position: "relative",
+        overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
       }}>
-        Do It Anyway
+        {text}
       </span>
-      <HeartSVG style={{ width: 8, height: 8, color: "#d44c30", position: "relative" }} />
+      <HeartSVG style={{ width: 8, height: 8, color: "#d44c30", position: "relative", flexShrink: 0 }} />
     </div>
   );
 }
 
 // ─── Main canvas ───────────────────────────────────────────────────────────────
 
-export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
-  function PostcardCanvas(_props, ref) {
+export const PostcardCanvas = forwardRef<HTMLDivElement, { note?: NoteEntry }>(
+  function PostcardCanvas({ note }, ref) {
+
+    const [leftText, rightText] = note
+      ? splitNoteForColumns(note.mainText)
+      : [POSTCARD_LEFT, POSTCARD_RIGHT];
+
+    const titleText = note?.title ?? "Do It Anyway";
+
+    const receiptFrom  = note?.shortReceiptFrom  ?? note?.receiptFrom;
+    const receiptTo    = note?.shortReceiptTo    ?? note?.receiptTo;
+    const receiptDate  = note?.shortReceiptDate  ?? note?.receiptDate;
+    const receiptTotal = note?.shortReceiptTotal ?? note?.receiptTotal;
+    const hasReceipt   = !!(receiptFrom || receiptTo || receiptTotal);
 
     const HEADER    = 44;
     const TITLE_H   = 34;
     const ENV_H     = 46;
-    const RECEIPT_H = 110;
+    const RECEIPT_H = hasReceipt ? 110 : 0;
 
     const noteStyle: CSSProperties = {
       fontFamily: F.note,
@@ -442,7 +470,7 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
           position: "absolute", top: `${HEADER}px`, left: 0, right: 0, height: `${TITLE_H}px`,
           display: "flex", alignItems: "center", paddingLeft: "52px",
         }}>
-          <TitleLabel />
+          <TitleLabel text={titleText} />
         </div>
 
         {/* Center fold line */}
@@ -469,7 +497,7 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
           padding: "6px 10px 6px 18px",
           overflow: "hidden",
         }}>
-          <p style={noteStyle}>{POSTCARD_LEFT}</p>
+          <p style={noteStyle}>{leftText}</p>
         </div>
 
         {/* RIGHT text column — overflow hidden at receipt boundary */}
@@ -482,19 +510,24 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, Record<string, never>>(
           padding: "6px 16px 6px 10px",
           overflow: "hidden",
         }}>
-          <p style={noteStyle}>{POSTCARD_RIGHT}</p>
+          <p style={noteStyle}>{rightText}</p>
         </div>
 
-        {/* Receipt — absolute, always visible above envelope */}
-        <div style={{
-          position: "absolute",
-          bottom: `${ENV_H}px`,
-          left: 0, right: 0,
-          height: `${RECEIPT_H}px`,
-          padding: "0 68px 0 14px",
-        }}>
-          <PostcardReceipt />
-        </div>
+        {/* Receipt — only shown when note has receipt data */}
+        {hasReceipt && (
+          <div style={{
+            position: "absolute",
+            bottom: `${ENV_H}px`,
+            left: 0, right: 0,
+            height: `${RECEIPT_H}px`,
+            padding: "0 68px 0 14px",
+          }}>
+            <PostcardReceipt
+              from={receiptFrom} to={receiptTo}
+              date={receiptDate} total={receiptTotal}
+            />
+          </div>
+        )}
 
         {/* Envelope base */}
         <div style={{

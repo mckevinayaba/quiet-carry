@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpenText, Layers2, LockKeyhole, Mail, NotebookPen, Share2 } from "lucide-react";
+import { ArrowLeft, BookOpenText, ImageDown, Layers2, LockKeyhole, Mail, NotebookPen, Share2 } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
@@ -54,6 +54,7 @@ function NotePage() {
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const [isKept, setIsKept] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [shareInitialPreset, setShareInitialPreset] = useState<"A" | "D" | "P">("A");
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
@@ -170,6 +171,7 @@ function NotePage() {
               hint="Share as image or private message"
               icon={Share2}
               onClick={() => {
+                setShareInitialPreset("A");
                 setShareOpen(true);
                 trackEvent("share_modal_opened", {
                   noteId: note.id,
@@ -179,6 +181,21 @@ function NotePage() {
               }}
             >
               Share this Note
+            </ActionButton>
+            <ActionButton
+              hint="Download as a portrait image for Instagram or TikTok"
+              icon={ImageDown}
+              onClick={() => {
+                setShareInitialPreset("P");
+                setShareOpen(true);
+                trackEvent("share_modal_opened", {
+                  noteId: note.id,
+                  categorySlug: category.slug,
+                  source: "note_page_portrait",
+                });
+              }}
+            >
+              Save as Portrait
             </ActionButton>
             <ActionButton
               asChild
@@ -203,6 +220,7 @@ function NotePage() {
         note={note}
         open={shareOpen}
         onClose={() => setShareOpen(false)}
+        initialPreset={shareInitialPreset}
       />
 
       <section id="similar-notes" className="space-y-3 scroll-mt-6">
