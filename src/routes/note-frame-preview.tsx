@@ -59,7 +59,7 @@ function NoteFramePreviewPage() {
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
 
   useEffect(() => {
-    setIsKept(getKeptNotes().some((n) => n.id === SAMPLE_NOTE.id));
+    setIsKept(getKeptNotes().some((n) => n.noteId === SAMPLE_NOTE.id));
   }, []);
 
   function handleKeep() {
