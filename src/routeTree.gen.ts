@@ -14,6 +14,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShelfRouteImport } from './routes/shelf'
 import { Route as SharePreviewRouteImport } from './routes/share-preview'
+import { Route as PostcardPreviewRouteImport } from './routes/postcard-preview'
 import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
 import { Route as FeelingsRouteImport } from './routes/feelings'
 import { Route as CollectionsRouteImport } from './routes/collections'
@@ -45,6 +46,11 @@ const ShelfRoute = ShelfRouteImport.update({
 const SharePreviewRoute = SharePreviewRouteImport.update({
   id: '/share-preview',
   path: '/share-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostcardPreviewRoute = PostcardPreviewRouteImport.update({
+  id: '/postcard-preview',
+  path: '/postcard-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NoteFramePreviewRoute = NoteFramePreviewRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
+  '/postcard-preview': typeof PostcardPreviewRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
+  '/postcard-preview': typeof PostcardPreviewRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
+  '/postcard-preview': typeof PostcardPreviewRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/feelings'
     | '/note-frame-preview'
+    | '/postcard-preview'
     | '/share-preview'
     | '/shelf'
     | '/sitemap.xml'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/feelings'
     | '/note-frame-preview'
+    | '/postcard-preview'
     | '/share-preview'
     | '/shelf'
     | '/sitemap.xml'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/feelings'
     | '/note-frame-preview'
+    | '/postcard-preview'
     | '/share-preview'
     | '/shelf'
     | '/sitemap.xml'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRoute
   FeelingsRoute: typeof FeelingsRoute
   NoteFramePreviewRoute: typeof NoteFramePreviewRoute
+  PostcardPreviewRoute: typeof PostcardPreviewRoute
   SharePreviewRoute: typeof SharePreviewRoute
   ShelfRoute: typeof ShelfRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/share-preview'
       fullPath: '/share-preview'
       preLoaderRoute: typeof SharePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/postcard-preview': {
+      id: '/postcard-preview'
+      path: '/postcard-preview'
+      fullPath: '/postcard-preview'
+      preLoaderRoute: typeof PostcardPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/note-frame-preview': {
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRoute,
   FeelingsRoute: FeelingsRoute,
   NoteFramePreviewRoute: NoteFramePreviewRoute,
+  PostcardPreviewRoute: PostcardPreviewRoute,
   SharePreviewRoute: SharePreviewRoute,
   ShelfRoute: ShelfRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
