@@ -112,6 +112,7 @@ export const notes: NoteEntry[] = [
     socialExcerpt: `They asked, "How are you?"\nand this time, they really meant it.\n\nBut you still smiled.\nYou still said, "I'm fine."\n\nBecause the truth\nwas too heavy\nto carry out loud.`,
     shortReceiptFrom: "Every truth you swallowed with a smile.",
     shortReceiptTo: "One safe place where you do not have to edit your pain.",
+    shortReceiptDate: "The first time someone asks and you do not flinch.",
     shortReceiptTotal: "The tears you saved for the dark were never shame.",
     journalPrompt: "What truth reached your throat but never became words?",
     sendableText:

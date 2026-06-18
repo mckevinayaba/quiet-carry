@@ -113,7 +113,7 @@ export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: Re
   function InstagramSquareCanvas({ renderPlan }, ref) {
     const {
       mainText, categoryLabel,
-      showReceipt, receiptFrom, receiptTo, receiptTotal,
+      showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal,
     } = renderPlan;
 
     const fontSize = squareFontSize(mainText.length);
@@ -164,7 +164,7 @@ export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: Re
           position: "absolute",
           top: "20%",
           left: "6%", right: "6%",
-          bottom: showReceipt ? "23%" : "10%",
+          bottom: showReceipt ? "27%" : "10%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -194,7 +194,7 @@ export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: Re
             position: "absolute",
             bottom: "10%",
             left: "4%", right: "4%",
-            height: "13%",
+            height: "17%",
             border: `1px dashed ${B.accentBorder}`,
             borderRadius: "3px",
             padding: "1% 2.5%",
@@ -217,6 +217,15 @@ export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: Re
                 <div style={{ display: "flex", gap: "1%" }}>
                   <span style={{ fontFamily: F.label, fontSize: "0.34rem", letterSpacing: "0.08em", color: B.ink, flexShrink: 0, minWidth: "12%" }}>TO:</span>
                   <span style={{ fontFamily: F.label, fontSize: "0.34rem", color: B.inkMuted, lineHeight: 1.35 }}>{receiptTo}</span>
+                </div>
+              </>
+            )}
+            {receiptDate && (
+              <>
+                <div style={{ borderTop: `1px dashed ${B.accentBorder}`, opacity: 0.5 }} />
+                <div style={{ display: "flex", gap: "1%" }}>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", letterSpacing: "0.08em", color: B.ink, flexShrink: 0, minWidth: "12%" }}>DATE:</span>
+                  <span style={{ fontFamily: F.label, fontSize: "0.34rem", color: B.inkMuted, lineHeight: 1.35 }}>{receiptDate}</span>
                 </div>
               </>
             )}
