@@ -31,7 +31,7 @@ export const Route = createFileRoute("/share-preview")({
 
 type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
 
-const APPROVAL_NOTE = notes.find((n) => n.id === "note-people-who-watched-you-bleed") as NoteEntry;
+const APPROVAL_NOTE = notes.find((n) => n.id === "note-im-fine-but-not-really") as NoteEntry;
 
 function SharePreviewPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
