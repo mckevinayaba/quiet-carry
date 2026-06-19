@@ -85,6 +85,12 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
               Safety &amp; Support
             </Link>
             <Link
+              to="/about"
+              className="text-xs text-muted-foreground hover:text-foreground sm:hidden"
+            >
+              About
+            </Link>
+            <Link
               to="/account"
               aria-label="Account"
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:hidden"

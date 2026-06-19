@@ -627,10 +627,9 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, { note?: NoteEntry }>(
             Patch: right=10, width=62 → left edge at x=432-10-62=360 (4px clear) ✓ */}
         <PostcardSignature style={{
           position: "absolute",
-          bottom: `${ENV_H + 2}px`,
-          right: "10px",
-          width: "62px",
-          transform: "rotate(-3deg)",
+          bottom: `${ENV_H + 4}px`,
+          right: "12px",
+          width: "60px",
         }} />
 
       </div>
