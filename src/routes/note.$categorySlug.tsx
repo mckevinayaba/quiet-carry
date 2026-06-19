@@ -218,6 +218,17 @@ function NotePage() {
         }
       />
 
+      {note.safetyNote ? (
+        <div className="paper-panel space-y-3 border-l-4 border-l-destructive/50">
+          <p className="text-sm font-medium leading-6 text-foreground">
+            If you are struggling right now, you do not have to carry this alone.
+          </p>
+          <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+            <Link to="/support">Find support now</Link>
+          </Button>
+        </div>
+      ) : null}
+
       <ShareNoteModal
         note={note}
         open={shareOpen}
