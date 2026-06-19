@@ -275,7 +275,8 @@ export const collections: CollectionEntry[] = [
       "5 private letters",
     ],
     price: "R149 launch price",
-    ctaLabel: "Join the Volume 1 waitlist",
+    ctaLabel: "Get Volume 1",
+    ctaHref: "#volume-1-coming-soon",
     comingSoon: true,
   },
   {

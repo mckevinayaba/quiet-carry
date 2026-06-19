@@ -48,10 +48,19 @@ export function CollectionCard({ collection, onWaitlistClick }: CollectionCardPr
       </div>
 
       {hasWaitlistCta ? (
-        <Button variant="note" className="min-h-12" onClick={onWaitlistClick}>
-          {collection.ctaLabel}
-          <ArrowRight aria-hidden="true" />
-        </Button>
+        collection.ctaHref ? (
+          <Button asChild variant="note" className="min-h-12">
+            <a href={collection.ctaHref}>
+              {collection.ctaLabel}
+              <ArrowRight aria-hidden="true" />
+            </a>
+          </Button>
+        ) : (
+          <Button variant="note" className="min-h-12" onClick={onWaitlistClick}>
+            {collection.ctaLabel}
+            <ArrowRight aria-hidden="true" />
+          </Button>
+        )
       ) : null}
     </article>
   );

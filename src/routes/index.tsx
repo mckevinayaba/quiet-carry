@@ -272,7 +272,11 @@ function CategoriesPreview() {
           <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
             Ten quiet doors.
           </h2>
-          <p className="text-base leading-7 text-muted-foreground">
+          <p className="text-base leading-7 text-foreground">
+            Choose what you are feeling. Read the note. Keep it, send it, or share it when the
+            words are too heavy to find alone.
+          </p>
+          <p className="text-sm leading-6 text-muted-foreground">
             Every feeling has a room. Choose the one that knows your name today.
           </p>
         </div>
@@ -388,6 +392,11 @@ function TodaysNote() {
           your own reflection from it.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
+          <Button asChild variant="note" className="min-h-11">
+            <Link to="/note/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
+              Read today's note
+            </Link>
+          </Button>
           <Button asChild variant="paper" className="min-h-11">
             <Link to="/feelings">Choose another feeling</Link>
           </Button>
