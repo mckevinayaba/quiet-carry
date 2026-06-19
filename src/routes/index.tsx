@@ -730,6 +730,7 @@ function SiteFooter() {
               Collections
             </span>
           </FooterLink>
+          <FooterLink to="/about">About</FooterLink>
         </FooterCol>
 
         <FooterCol title="Care">

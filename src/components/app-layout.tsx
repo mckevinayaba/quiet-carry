@@ -29,6 +29,7 @@ const desktopNavLinks = [
   { to: "/today", label: "Today" },
   { to: "/shelf", label: "Shelf" },
   { to: "/collections", label: "Collections" },
+  { to: "/about", label: "About" },
   { to: "/support", label: "Safety & Support" },
 ] as const;
 
