@@ -245,5 +245,75 @@ These rules govern everything built under embedded distribution. They are not as
 
 ---
 
+## I. Product Led Distribution
+
+The Note You Needed Today must not depend on the founder posting consistently or on paid marketing to grow. The product itself must create distribution through the way people use it.
+
+When someone reads a note and feels seen, they do not need to be asked to share it. The emotional response does the work. The product must make it effortless to let that feeling travel — and every time it travels, it must carry something that brings the next person back.
+
+### The Distribution Loop
+
+```
+Feel something
+    ↓
+Choose a category
+    ↓
+Read a note
+    ↓
+Feel seen
+    ↓
+Keep it, write from it, or share it
+    ↓
+Download a branded image or send a private note
+    ↓
+The shared asset carries The Note You Needed Today
+and thenoteyouneeded.today
+    ↓
+Someone else discovers the platform
+    ↓
+They find their own note
+    ↓
+The loop repeats
+```
+
+This loop does not require the founder to be the distributor. It does not require ads. It requires the product to work well enough that people want to pass it on — and that every asset they pass on silently points back.
+
+### Product Actions and Their Distribution Effects
+
+| Product action | Distribution effect | What must be built |
+|---|---|---|
+| **Keep This Note** | Creates personal habit — users return to saved notes | Shelf (live); future account sync for cross-device access |
+| **Send this Quietly** | Creates private one-to-one distribution — a note sent to one person can open the platform to a new user | Branded share text with domain (live) |
+| **Share this Note** | Creates public social distribution — one post can reach hundreds | Downloadable branded images, all presets reliable |
+| **Copy Caption** | Reduces friction for posting — users who want to post but do not know what to write | Platform-specific captions (live); per-note captions where relevant |
+| **Download PNG** | Turns notes into portable emotional assets that live in camera rolls and get re-shared | Reliable render engine — no cut text, no broken layout, domain on every image |
+| **PWA Install** | Turns the platform into a daily phone habit — home screen presence drives return visits | Installable web app (manifest and service worker live; native prompt needed) |
+| **Volume 1** | Turns emotional value into a paid product — buyers become advocates | Selar checkout (link swap needed; no in-app payment infrastructure required) |
+| **Language selector** | Expands global reach — emotional language is cultural, not universal | Approved multilingual note translations (Phase 3; English engine must be stable first) |
+
+### Distribution Rules
+
+**Every public share asset must:**
+- Include the brand — kraft visual identity, MAD mark, consistent typeface
+- Include the domain — `thenoteyouneeded.today` on every image, every time
+- Be readable at mobile screen size — no text smaller than 12px at export resolution
+- Contain no cut text — truncation is a distribution failure
+
+**Every private share must:**
+- Feel intimate, not broadcast
+- Be safe to send to one specific person in a moment of pain
+- Contain no tracking pixels, no read receipts, no data sent to any server
+
+**What must never enter public distribution assets:**
+- Private reflections written in the Write from This editor
+- Email addresses or waitlist submissions
+- Feedback form text
+- Any user-generated content
+- Any data tied to an individual user
+
+The emotional honesty of the notes is the distribution engine. That honesty must be protected. The moment a user feels unsafe sharing something from this platform, the loop breaks.
+
+---
+
 *Document created: 2026-06-19*  
 *Product: The Note You Needed Today — thenoteyouneeded.today*
