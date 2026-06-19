@@ -126,7 +126,7 @@ function Hero() {
           </div>
 
           <p className="text-sm leading-6 text-muted-foreground">
-            We are building this slowly and carefully.
+            Find words for what you carry quietly.
           </p>
         </div>
 

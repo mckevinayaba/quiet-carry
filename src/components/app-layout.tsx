@@ -70,7 +70,7 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
         {/* Second row: tagline + utility links (mobile-visible) */}
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs leading-5 text-muted-foreground">
-            We are building this slowly and carefully.
+            Find words for what you carry quietly.
           </p>
           <div className="flex items-center gap-3">
             <button
