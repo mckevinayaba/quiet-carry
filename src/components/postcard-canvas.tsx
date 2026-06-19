@@ -331,31 +331,44 @@ export function PostcardBrandHeader() {
   );
 }
 
-// ─── MAD signature patch ───────────────────────────────────────────────────────
+// ─── MAD signature patch — navy stitched fabric patch ─────────────────────────
 
 export function PostcardSignature({ style }: { style?: CSSProperties }) {
   return (
-    <div style={{
-      position: "relative",
-      background: B.parchmentLight,
-      padding: "6px 9px 5px",
-      boxShadow: "2px 3px 9px rgba(60,30,10,0.36), 0 1px 3px rgba(60,30,10,0.18)",
-      borderRadius: "2px",
-      transform: "rotate(-4deg)",
-      ...style,
-    }}>
-      <div style={{ position: "absolute", inset: "3px", border: "1.3px dashed rgba(26,45,74,0.48)", borderRadius: "1px", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", inset: "6px", border: "0.6px dashed rgba(26,45,74,0.2)", borderRadius: "1px", pointerEvents: "none" }} />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-        <span style={{ fontFamily: F.display, fontSize: "21px", letterSpacing: "0.05em", color: B.ink, lineHeight: 1 }}>
-          MAD
-        </span>
-        <svg viewBox="0 0 46 5" aria-hidden="true" style={{ width: "46px", height: "5px" }}>
-          <path d="M1,2.5 Q11.5,1 23,2.5 Q34.5,4 45,2.5" fill="none" stroke={B.ink} strokeWidth="1.4" strokeLinecap="round" />
-        </svg>
-        <HeartSVG style={{ width: 8, height: 8, color: B.accent, marginTop: "1px" }} />
-      </div>
-    </div>
+    <svg
+      viewBox="0 0 62 58"
+      style={{ display: "block", filter: "drop-shadow(1.5px 2.5px 3.5px rgba(10,20,50,0.42))", ...style }}
+      aria-label="MAD"
+    >
+      {/* Navy fabric base */}
+      <rect x="2" y="2" width="58" height="54" rx="4.5" fill={B.navy} />
+      {/* Fabric grain — horizontal */}
+      {Array.from({ length: 10 }, (_, i) => (
+        <line key={`h${i}`} x1="2" y1={2 + (i + 0.5) * 5.4} x2="60" y2={2 + (i + 0.5) * 5.4}
+          stroke={B.navyMid} strokeWidth="0.55" opacity="0.42" />
+      ))}
+      {/* Fabric grain — vertical */}
+      {Array.from({ length: 11 }, (_, i) => (
+        <line key={`v${i}`} x1={2 + (i + 0.5) * 5.3} y1="2" x2={2 + (i + 0.5) * 5.3} y2="56"
+          stroke={B.navyMid} strokeWidth="0.55" opacity="0.42" />
+      ))}
+      {/* Outer stitching border */}
+      <rect x="5" y="5" width="52" height="48" rx="3"
+        fill="none" stroke="rgba(215,200,178,0.88)" strokeWidth="1.25" strokeDasharray="3.2 2.2" />
+      {/* Inner stitching border */}
+      <rect x="8" y="8" width="46" height="42" rx="2"
+        fill="none" stroke="rgba(215,200,178,0.32)" strokeWidth="0.65" strokeDasharray="2 3.2" />
+      {/* MAD text */}
+      <text x="31" y="31" textAnchor="middle"
+        fontFamily="var(--font-display)" fontSize="19" letterSpacing="3"
+        fill="rgba(242,234,220,0.96)">MAD</text>
+      {/* Script underline */}
+      <path d="M10,37 Q31,40 52,37"
+        fill="none" stroke="rgba(195,165,115,0.78)" strokeWidth="1.3" strokeLinecap="round" />
+      {/* Heart */}
+      <path d="M31 50 L23.5 44 C23.5 40.5 27 38.5 31 41.5 C35 38.5 38.5 40.5 38.5 44 Z"
+        fill="rgba(180,62,42,0.9)" />
+    </svg>
   );
 }
 
@@ -529,53 +542,75 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, { note?: NoteEntry }>(
           </div>
         )}
 
-        {/* Envelope base */}
+        {/* Envelope base — handmade V-fold with stitching */}
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0,
           height: `${ENV_H}px`,
-          background: B.kraft,
-          boxShadow: "inset 0 2px 8px rgba(60,30,10,0.14)",
+          background: `linear-gradient(180deg, ${B.kraftLight} 0%, ${B.kraft} 35%, ${B.kraftDark} 100%)`,
+          boxShadow: "inset 0 3px 10px rgba(60,30,10,0.16)",
         }}>
           <svg viewBox="0 0 432 46" preserveAspectRatio="none"
             style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
             aria-hidden="true"
           >
-            <polygon points="0,0 216,46 0,46" fill={B.kraftDark} opacity="0.65" />
-            <polygon points="432,0 216,46 432,46" fill={B.kraftDark} opacity="0.65" />
-            <line x1="1" y1="0" x2="215" y2="46" stroke={B.kraftDeep} strokeWidth="0.7" opacity="0.5" />
-            <line x1="431" y1="0" x2="217" y2="46" stroke={B.kraftDeep} strokeWidth="0.7" opacity="0.5" />
+            {/* Left flap wing */}
+            <polygon points="0,0 216,46 0,46" fill={B.kraftDark} opacity="0.52" />
+            {/* Right flap wing */}
+            <polygon points="432,0 216,46 432,46" fill={B.kraftDark} opacity="0.52" />
+            {/* Fold shadow — left */}
+            <line x1="1" y1="0" x2="215" y2="46" stroke={B.kraftDeep} strokeWidth="1.1" opacity="0.55" />
+            {/* Fold shadow — right */}
+            <line x1="431" y1="0" x2="217" y2="46" stroke={B.kraftDeep} strokeWidth="1.1" opacity="0.55" />
+            {/* Stitching dots — left fold */}
+            {Array.from({ length: 7 }, (_, i) => {
+              const t = (i + 0.5) / 7;
+              return <circle key={`sl${i}`} cx={1 + t * 214} cy={t * 46} r="1.3" fill="rgba(70,40,12,0.5)" />;
+            })}
+            {/* Stitching dots — right fold */}
+            {Array.from({ length: 7 }, (_, i) => {
+              const t = (i + 0.5) / 7;
+              return <circle key={`sr${i}`} cx={431 - t * 214} cy={t * 46} r="1.3" fill="rgba(70,40,12,0.5)" />;
+            })}
+            {/* Stitching dots — top edge */}
+            {Array.from({ length: 20 }, (_, i) => (
+              <circle key={`ht${i}`} cx={11 + i * 21} cy="3" r="1.1" fill="rgba(70,40,12,0.38)" />
+            ))}
+            {/* Center fold marker */}
+            <circle cx="216" cy="43.5" r="2.2" fill={B.kraftDeep} opacity="0.65" />
+            <circle cx="216" cy="43.5" r="0.9" fill="rgba(255,240,200,0.5)" />
           </svg>
-          <div style={{ position: "absolute", top: "3px", left: "7px", right: "7px", borderTop: "1px dashed rgba(80,50,10,0.28)" }} />
+          {/* Top edge crease line */}
+          <div style={{ position: "absolute", top: "4px", left: "8px", right: "8px", borderTop: "1px dashed rgba(80,50,10,0.22)" }} />
+          {/* Domain stamp */}
           <div style={{
-            position: "absolute", bottom: "7px", left: "50%", transform: "translateX(-50%)",
-            background: B.parchmentDark, border: "1px solid rgba(100,60,20,0.33)",
-            borderRadius: "999px", padding: "2px 10px",
-            display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap",
-            boxShadow: "0 1px 4px rgba(60,30,10,0.18)",
+            position: "absolute", bottom: "8px", left: "50%", transform: "translateX(-50%)",
+            display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap",
           }}>
-            <HeartSVG style={{ width: 5, height: 5, color: B.accent }} />
-            <span style={{ fontFamily: F.label, fontSize: "6px", letterSpacing: "0.13em", color: B.inkMuted }}>
+            <HeartSVG style={{ width: 5, height: 5, color: B.accent, opacity: 0.8 }} />
+            <span style={{ fontFamily: F.label, fontSize: "6.5px", letterSpacing: "0.12em", color: B.inkMuted }}>
               thenoteyouneeded.today
             </span>
-            <HeartSVG style={{ width: 5, height: 5, color: B.accent }} />
+            <HeartSVG style={{ width: 5, height: 5, color: B.accent, opacity: 0.8 }} />
           </div>
         </div>
 
-        {/* Denim heart — center fold, envelope edge */}
+        {/* Denim heart — straddling the envelope top edge as a wax seal */}
         <DenimHeart style={{
-          position: "absolute", bottom: "18px", left: "50%", transform: "translateX(-50%)",
+          position: "absolute", bottom: `${Math.round(ENV_H / 2) + 8}px`, left: "50%",
+          transform: "translateX(-50%)",
           width: "36px", height: "32px",
-          filter: "drop-shadow(0 2px 5px rgba(20,30,60,0.32))",
+          filter: "drop-shadow(0 2.5px 6px rgba(20,30,60,0.38))",
         }} />
 
-        {/* MAD signature patch
-            Receipt right edge: 432 - 68 = 364px from left
-            MAD left: 432 - 10 - 60 = 362px → ~2px gap, no overlap ✓ */}
+        {/* MAD stitched signature patch
+            Receipt right padding: 68px → receipt right edge at x=364
+            Patch: right=10, width=62 → left edge at x=432-10-62=360 (4px clear) ✓ */}
         <PostcardSignature style={{
           position: "absolute",
           bottom: `${ENV_H + 2}px`,
           right: "10px",
-          width: "60px",
+          width: "62px",
+          transform: "rotate(-3deg)",
         }} />
 
       </div>

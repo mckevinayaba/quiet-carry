@@ -90,6 +90,7 @@ export const CanvasShell = forwardRef<
 // Takes full text so line count (not just char count) drives the size decision.
 // Notes with many short \n-separated lines are visually denser than char count implies.
 function squareFontSize(text: string): string {
+  if (typeof text !== "string") return "0.72rem";
   const lines = text.split("\n").length;
   const len = text.length;
   if (lines > 14 || len > 420) return "0.60rem";
@@ -100,6 +101,7 @@ function squareFontSize(text: string): string {
 }
 
 function portraitFontSize(text: string): string {
+  if (typeof text !== "string") return "0.64rem";
   const lines = text.split("\n").length;
   const len = text.length;
   if (lines > 20 || len > 560) return "0.56rem";
@@ -107,6 +109,16 @@ function portraitFontSize(text: string): string {
   if (lines > 10 || len > 260) return "0.74rem";
   if (lines > 6  || len > 150) return "0.84rem";
   return "1.0rem";
+}
+
+function statusFontSize(text: string): string {
+  if (typeof text !== "string") return "0.68rem";
+  const lines = text.split("\n").length;
+  const len = text.length;
+  if (lines > 16 || len > 360) return "0.52rem";
+  if (lines > 11 || len > 240) return "0.60rem";
+  if (lines > 7  || len > 140) return "0.68rem";
+  return "0.78rem";
 }
 
 // ─── Receipt rows (shared by both canvases) ───────────────────────────────────
@@ -156,10 +168,11 @@ function ReceiptRows({
 export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
   function InstagramSquareCanvas({ renderPlan }, ref) {
     const {
-      mainText, categoryLabel,
+      mainText: rawText, categoryLabel,
       showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal,
     } = renderPlan;
 
+    const mainText = typeof rawText === "string" ? rawText : "";
     const fontSize = squareFontSize(mainText);
     const paragraphs = mainText.split("\n\n");
 
@@ -363,10 +376,11 @@ export const InstagramSquareCanvas = forwardRef<HTMLDivElement, { renderPlan: Re
 export const PortraitEnvelopeCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
   function PortraitEnvelopeCanvas({ renderPlan }, ref) {
     const {
-      mainText, categoryLabel,
+      mainText: rawText, categoryLabel,
       showReceipt, receiptFrom, receiptTo, receiptDate, receiptTotal,
     } = renderPlan;
 
+    const mainText = typeof rawText === "string" ? rawText : "";
     const fontSize = portraitFontSize(mainText);
     const paragraphs = mainText.split("\n\n");
 
@@ -549,7 +563,178 @@ export const PortraitEnvelopeCanvas = forwardRef<HTMLDivElement, { renderPlan: R
   },
 );
 
-// ─── Coming Soon stubs — B, C, F are paused pending approval ─────────────────
+// ─── B: WhatsApp Status — 9:16 Vertical Card ─────────────────────────────────
+//
+// Vertical envelope aesthetic for WhatsApp Status and Instagram Story.
+// Uses excerpt only — no receipt (keeps the card clean for a status post).
+//
+//  Canvas zones (% of 9:16 height)
+//  ──────────────────────────────────────────────────────────────────
+//  Header strip             0% → 8%    kraft, brand name + hearts
+//  V-crease                 8% → 10%   fold detail
+//  Inner parchment card    10% → 93%   note content
+//    ├─ Category label       3% → 8%   of card
+//    ├─ Title                8% → 27%  of card (display font)
+//    ├─ Separator line      27% → 27%
+//    ├─ Note text           29% → 89%  of card
+//    └─ Footer              89% → 100% of card (domain + MAD)
+//  Bottom kraft strip      93% → 100%
+
+export const WhatsAppStatusCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
+  function WhatsAppStatusCanvas({ renderPlan }, ref) {
+    const { mainText: rawText, title, categoryLabel } = renderPlan;
+    const mainText = typeof rawText === "string" ? rawText : "";
+    const paragraphs = mainText.split("\n\n").filter(Boolean);
+    const fontSize = statusFontSize(mainText);
+
+    return (
+      <CanvasShell ref={ref} cssRatio="9/16" maxWidth={272} bg={B.kraft}>
+
+        {/* ── Subtle paper texture ───────────────────────────────── */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 70% 50% at 30% 35%, rgba(255,248,225,0.14) 0%, transparent 70%)",
+        }} />
+
+        {/* ── Kraft header strip ─────────────────────────────────── */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: "8%",
+          background: `linear-gradient(180deg, ${B.kraftDark} 0%, ${B.kraft} 100%)`,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: "0.38rem",
+          boxShadow: "0 2px 8px oklch(0.28 0.03 55 / 0.18)",
+        }}>
+          <div style={{ position: "absolute", inset: "3px 5px", border: `1px dashed ${B.accentBorder}`, borderRadius: "1.5px", opacity: 0.6, pointerEvents: "none" }} />
+          <HeartSVG style={{ width: 7, height: 7, color: B.accent }} />
+          <span style={{ fontFamily: F.label, fontSize: "0.38rem", letterSpacing: "0.22em", textTransform: "uppercase", color: B.ink }}>
+            The Note You Needed Today
+          </span>
+          <HeartSVG style={{ width: 7, height: 7, color: B.accent }} />
+        </div>
+
+        {/* ── V-crease fold ──────────────────────────────────────── */}
+        <svg
+          viewBox="0 0 100 10"
+          preserveAspectRatio="none"
+          style={{ position: "absolute", top: "8%", left: 0, width: "100%", height: "2%", background: `linear-gradient(180deg, ${B.kraftDark} 0%, ${B.kraft} 100%)` }}
+          aria-hidden="true"
+        >
+          <polygon points="0,10 50,0 100,10" fill={B.parchment} />
+          <polyline points="0,10 50,0 100,10" fill="none" stroke={B.inkFaint} strokeWidth="0.5" opacity="0.35" />
+        </svg>
+
+        {/* ── Inner parchment card ───────────────────────────────── */}
+        <div style={{
+          position: "absolute",
+          top: "10%", left: "5%", right: "5%", bottom: "7%",
+          background: B.parchment,
+          borderRadius: "3px",
+          boxShadow: "0 4px 20px oklch(0.25 0.03 55 / 0.28), 0 1px 5px oklch(0.25 0.03 55 / 0.14)",
+          overflow: "hidden",
+        }}>
+
+          {/* Category */}
+          <div style={{
+            position: "absolute", top: "3%", left: "6%", right: "6%", height: "5%",
+            display: "flex", alignItems: "center",
+          }}>
+            <span style={{ fontFamily: F.label, fontSize: "0.32rem", letterSpacing: "0.14em", textTransform: "uppercase", color: B.inkMuted }}>
+              {categoryLabel}
+            </span>
+          </div>
+
+          {/* Title */}
+          <div style={{
+            position: "absolute", top: "8%", left: "6%", right: "6%", height: "19%",
+            display: "flex", alignItems: "flex-start",
+            overflow: "hidden",
+          }}>
+            <span style={{
+              fontFamily: F.display, fontSize: "0.88rem", lineHeight: 1.08, color: B.ink,
+              display: "block",
+            }}>
+              {title}
+            </span>
+          </div>
+
+          {/* Separator */}
+          <div style={{
+            position: "absolute", top: "28%", left: "6%", right: "6%",
+            borderTop: `1px solid ${B.accentBorder}`, opacity: 0.65,
+          }} />
+
+          {/* Note text */}
+          <div style={{
+            position: "absolute", top: "30%", left: "6%", right: "6%", bottom: "11%",
+            display: "flex", flexDirection: "column", justifyContent: "flex-start",
+            overflow: "hidden",
+          }}>
+            {paragraphs.map((para, i) => (
+              <p key={i} style={{
+                fontFamily: F.note,
+                fontSize,
+                lineHeight: 1.35,
+                color: B.ink,
+                whiteSpace: "pre-line",
+                margin: 0,
+                marginBottom: i < paragraphs.length - 1 ? "0.5em" : 0,
+              }}>
+                {para}
+              </p>
+            ))}
+          </div>
+
+          {/* Card footer */}
+          <div style={{
+            position: "absolute",
+            bottom: 0, left: 0, right: 0, height: "11%",
+            borderTop: `1px solid ${B.accentBorder}`,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "0 5%",
+            background: B.parchment,
+          }}>
+            <CtaDomain />
+            <MadMark />
+          </div>
+        </div>
+
+        {/* ── Postmark stamp ────────────────────────────────────── */}
+        <svg
+          viewBox="0 0 80 80"
+          style={{
+            position: "absolute", top: "3%", right: "3%",
+            width: "15%", height: "8%",
+            opacity: 0.6,
+            transform: "rotate(-10deg)",
+          }}
+          aria-hidden="true"
+        >
+          <circle cx="40" cy="40" r="38" fill="oklch(0.94 0.018 75)" />
+          <circle cx="40" cy="40" r="38" fill="none" stroke="oklch(0.38 0.05 55)" strokeWidth="2.5" />
+          <circle cx="40" cy="40" r="27" fill="none" stroke="oklch(0.38 0.05 55)" strokeWidth="1" />
+          <line x1="9" y1="34" x2="71" y2="34" stroke="oklch(0.38 0.05 55)" strokeWidth="1.5" />
+          <line x1="9" y1="40" x2="71" y2="40" stroke="oklch(0.38 0.05 55)" strokeWidth="1.5" />
+          <line x1="9" y1="46" x2="71" y2="46" stroke="oklch(0.38 0.05 55)" strokeWidth="1.5" />
+          <text x="40" y="27" textAnchor="middle" fontFamily="var(--font-label)" fontSize="5.5" letterSpacing="1" fill="oklch(0.38 0.05 55)">THE NOTE</text>
+          <text x="40" y="57" textAnchor="middle" fontFamily="var(--font-label)" fontSize="5.5" letterSpacing="1" fill="oklch(0.38 0.05 55)">TODAY</text>
+        </svg>
+
+        {/* ── Bottom kraft strip ─────────────────────────────────── */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: "7%",
+          background: `linear-gradient(0deg, ${B.kraftDark} 0%, ${B.kraft} 100%)`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <span style={{ fontFamily: F.label, fontSize: "0.3rem", letterSpacing: "0.13em", color: B.inkMuted }}>
+            thenoteyouneeded.today
+          </span>
+        </div>
+
+      </CanvasShell>
+    );
+  },
+);
+
+// ─── Coming Soon stubs — C, E, F are paused pending approval ─────────────────
 
 function ComingSoonCanvas({
   cssRatio, maxWidth, label, ratio,
@@ -585,16 +770,6 @@ function ComingSoonCanvas({
     </CanvasShell>
   );
 }
-
-export const WhatsAppStatusCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
-  function WhatsAppStatusCanvas(_props, ref) {
-    return (
-      <div ref={ref} style={{ width: "100%", maxWidth: 272, aspectRatio: "9/16" }}>
-        <ComingSoonCanvas cssRatio="9/16" maxWidth={272} label="WhatsApp Status" ratio="9:16" />
-      </div>
-    );
-  },
-);
 
 export const InstagramStoryCanvas = forwardRef<HTMLDivElement, { renderPlan: RenderPlan }>(
   function InstagramStoryCanvas(_props, ref) {

@@ -13,6 +13,7 @@ import {
   B,
   F,
   InstagramSquareCanvas,
+  WhatsAppStatusCanvas,
 } from "@/components/share-canvases";
 import { PostcardCanvas } from "@/components/postcard-canvas";
 import {
@@ -32,7 +33,7 @@ type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
 type ModalPreset = PresetId | "P";
 
 // Presets that are live now vs coming soon
-const ACTIVE_PRESETS: PresetId[] = ["A", "D"];
+const ACTIVE_PRESETS: PresetId[] = ["A", "B", "D"];
 
 export function ShareNoteModal({
   note,
@@ -50,16 +51,20 @@ export function ShareNoteModal({
   const [captionLabel, setCaptionLabel] = useState("Copy caption");
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+  const [statusDownloadState, setStatusDownloadState] = useState<DownloadState>("idle");
   const [portraitDownloadState, setPortraitDownloadState] = useState<DownloadState>("idle");
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const squareRenderPlan = buildRenderPlan(note, "D");
+  const statusRenderPlan = buildRenderPlan(note, "B");
 
   function selectPreset(id: ModalPreset) {
     if (id !== "P" && !ACTIVE_PRESETS.includes(id as PresetId)) return;
     setPreset(id);
     setDownloadState("idle");
+    setStatusDownloadState("idle");
     setPortraitDownloadState("idle");
     if (id !== "P") {
       trackEvent("share_preset_selected", {
@@ -69,6 +74,34 @@ export function ShareNoteModal({
         contentMode: buildRenderPlan(note, id as PresetId).contentMode,
         source: "modal",
       });
+    }
+  }
+
+  async function handleStatusDownload() {
+    if (!statusRef.current) return;
+    setStatusDownloadState("downloading");
+    try {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(statusRef.current, {
+        pixelRatio: 4, cacheBust: true,
+      });
+      const filename = buildFilename(note, "B");
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      setStatusDownloadState(isIOS ? "manual" : "success");
+      if (!isIOS) setTimeout(() => setStatusDownloadState("idle"), 3000);
+      trackEvent("share_image_downloaded", {
+        noteId: note.id, categorySlug: note.categorySlug,
+        preset: "B", contentMode: statusRenderPlan.contentMode, source: "modal",
+      });
+    } catch {
+      setStatusDownloadState("error");
+      setTimeout(() => setStatusDownloadState("idle"), 4000);
     }
   }
 
@@ -225,6 +258,11 @@ export function ShareNoteModal({
               {formatBrandedShareText(note)}
             </div>
           )}
+          {preset === "B" && (
+            <div style={{ width: "52%", margin: "0 auto" }}>
+              <WhatsAppStatusCanvas ref={statusRef} renderPlan={statusRenderPlan} />
+            </div>
+          )}
           {preset === "D" && (
             <div style={{ width: "88%", margin: "0 auto" }}>
               <InstagramSquareCanvas ref={canvasRef} renderPlan={squareRenderPlan} />
@@ -247,6 +285,13 @@ export function ShareNoteModal({
         </div>
 
         {/* Receipt / excerpt badge */}
+        {preset === "B" && statusRenderPlan.contentMode !== "full" && (
+          <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+            {statusRenderPlan.contentMode === "carousel_required"
+              ? "Excerpt shown · full note too long for one card"
+              : "Excerpt shown · full note available on site"}
+          </p>
+        )}
         {preset === "D" && (
           <div className="space-y-1">
             {squareRenderPlan.contentMode !== "full" && (
@@ -273,6 +318,31 @@ export function ShareNoteModal({
                 <Button variant="note" onClick={handleCopyText}>{copyLabel}</Button>
                 <Button variant="paper" onClick={handleNativeShare}>Share now</Button>
               </div>
+            </>
+          ) : preset === "B" ? (
+            <>
+              <Button
+                variant="note"
+                onClick={handleStatusDownload}
+                disabled={statusDownloadState === "downloading"}
+                className="flex items-center justify-center gap-2"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                {statusDownloadState === "downloading" ? "Creating image…"
+                  : statusDownloadState === "success" ? "Image downloaded"
+                  : "Download WhatsApp Status PNG"}
+              </Button>
+              {statusDownloadState === "error" && (
+                <p className="text-sm text-destructive">Could not create the image. Please try again.</p>
+              )}
+              {statusDownloadState === "manual" && (
+                <p className="text-sm text-muted-foreground">Your image is ready. Long press or open it to save.</p>
+              )}
+              {statusDownloadState === "idle" && (
+                <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
+                  1080×1920 PNG — post directly to WhatsApp Status or Instagram Story.
+                </p>
+              )}
             </>
           ) : preset === "D" ? (
             <>

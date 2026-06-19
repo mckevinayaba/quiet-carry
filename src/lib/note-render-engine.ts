@@ -116,6 +116,7 @@ export interface RenderPlan {
 // ─── Engine ───────────────────────────────────────────────────────────────────
 
 export function truncateAtBoundary(text: string, maxChars: number): string {
+  if (typeof text !== "string" || !text) return "";
   if (text.length <= maxChars) return text;
   const candidate = text.slice(0, maxChars);
   const lastNewline = candidate.lastIndexOf("\n");
@@ -131,7 +132,7 @@ export function getBestVisualText(note: NoteEntry, maxChars: number, preferFull 
     if (note.socialExcerpt.length <= maxChars) return note.socialExcerpt;
     return truncateAtBoundary(note.socialExcerpt, maxChars);
   }
-  return truncateAtBoundary(note.mainText, maxChars);
+  return truncateAtBoundary(note.mainText ?? "", maxChars);
 }
 
 function resolveContentMode(note: NoteEntry, preset: PresetDefinition): ContentMode {
