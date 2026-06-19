@@ -274,9 +274,9 @@ export function ShareNoteModal({
               <div style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none", userSelect: "none", zIndex: -1 }}>
                 <PostcardCanvas ref={portraitRef} note={note} />
               </div>
-              {/* Scaled preview — 65% of 432×540 */}
-              <div style={{ width: "281px", height: "351px", overflow: "hidden", margin: "0 auto", borderRadius: "4px", boxShadow: "0 4px 20px rgba(60,30,10,0.18)", flexShrink: 0 }}>
-                <div style={{ transform: "scale(0.651)", transformOrigin: "top left", width: "432px", height: "540px" }}>
+              {/* Scaled preview — 56% of 432×540 so all receipt rows stay visible inside modal */}
+              <div style={{ width: "242px", height: "303px", overflow: "hidden", margin: "0 auto", borderRadius: "4px", boxShadow: "0 4px 20px rgba(60,30,10,0.18)", flexShrink: 0 }}>
+                <div style={{ transform: "scale(0.56)", transformOrigin: "top left", width: "432px", height: "540px" }}>
                   <PostcardCanvas note={note} />
                 </div>
               </div>
