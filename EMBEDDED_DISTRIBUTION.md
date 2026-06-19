@@ -313,6 +313,23 @@ This loop does not require the founder to be the distributor. It does not requir
 
 The emotional honesty of the notes is the distribution engine. That honesty must be protected. The moment a user feels unsafe sharing something from this platform, the loop breaks.
 
+**Long notes and mobile share cards:**
+
+Long notes must not be forced into mobile social share cards. A card that renders unreadably small text is not a distribution asset — it is a broken one.
+
+For social sharing (mobile cards), use:
+- A short emotional excerpt
+- A clear title
+- Brand and domain
+- A CTA pointing back to the full note in the app
+
+For the full note, use:
+- The Full Note Keepsake (portrait postcard, printable, readable when zoomed)
+- A future carousel format (multiple cards)
+- The site itself — the full note lives at a permanent URL
+
+The Instagram Square format (Preset D) is the primary mobile sharing format. It shows a curated excerpt with receipt, CTA, brand, and domain. It is readable on a phone without zooming. The Full Note Keepsake (Preset P) is a premium format for saving, printing, and reading later — not for quick social shares.
+
 ---
 
 *Document created: 2026-06-19*  

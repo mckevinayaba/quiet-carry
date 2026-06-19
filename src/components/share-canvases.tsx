@@ -50,8 +50,8 @@ export function MadMark() {
 export function CtaDomain() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      <span style={{ fontFamily: F.label, fontSize: "0.36rem", letterSpacing: "0.1em", textTransform: "uppercase", color: B.inkFaint, lineHeight: 1 }}>
-        Read the full note at
+      <span style={{ fontFamily: F.label, fontSize: "0.30rem", letterSpacing: "0.08em", textTransform: "uppercase", color: B.inkFaint, lineHeight: 1.2 }}>
+        Read the full note and find more at
       </span>
       <span style={{ fontFamily: F.label, fontSize: "0.4rem", letterSpacing: "0.12em", color: B.inkMuted, lineHeight: 1 }}>
         {PRODUCT_DOMAIN}

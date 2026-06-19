@@ -66,6 +66,7 @@ function NotePage() {
   const handleKeep = () => {
     if (isKept) {
       setActionResult({ text: "Already kept in your Shelf.", shelfLink: true });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     keepNote(note);
@@ -76,6 +77,7 @@ function NotePage() {
       shelfLink: true,
     });
     registerMeaningfulGuestAction();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSend = async () => {
@@ -183,7 +185,7 @@ function NotePage() {
               Share this Note
             </ActionButton>
             <ActionButton
-              hint="Download as a portrait image for Instagram or TikTok"
+              hint="Download full note as a keepsake portrait image"
               icon={ImageDown}
               onClick={() => {
                 setShareInitialPreset("P");
@@ -195,7 +197,7 @@ function NotePage() {
                 });
               }}
             >
-              Save as Portrait
+              Download as Keepsake
             </ActionButton>
             <ActionButton
               asChild

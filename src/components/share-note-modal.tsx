@@ -35,6 +35,13 @@ type ModalPreset = PresetId | "P";
 // Presets that are live now vs coming soon
 const ACTIVE_PRESETS: PresetId[] = ["A", "B", "D"];
 
+// Format recommendation labels shown inside each preset button
+const PRESET_RECOMMENDATION: Partial<Record<PresetId | "P", string>> = {
+  D: "Recommended for mobile",
+  B: "Best for WhatsApp Status",
+  A: "Private · no image",
+};
+
 export function ShareNoteModal({
   note,
   open,
@@ -225,7 +232,12 @@ export function ShareNoteModal({
               >
                 <span className="text-[0.65rem] font-medium">{p.id}. {p.label}</span>
                 {isActive ? (
-                  p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>
+                  <>
+                    {p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>}
+                    {PRESET_RECOMMENDATION[p.id] && (
+                      <span className="text-[0.52rem] opacity-75">{PRESET_RECOMMENDATION[p.id]}</span>
+                    )}
+                  </>
                 ) : (
                   <span className="text-[0.52rem] opacity-50">Coming soon</span>
                 )}
@@ -243,8 +255,9 @@ export function ShareNoteModal({
                 : "border-border bg-card text-muted-foreground hover:border-foreground/40",
             ].join(" ")}
           >
-            <span className="text-[0.65rem] font-medium">P. Full Note Portrait</span>
-            <span className="text-[0.55rem] opacity-60">4:5 · Full note</span>
+            <span className="text-[0.65rem] font-medium">P. Full Note Keepsake</span>
+            <span className="text-[0.55rem] opacity-60">4:5 · Keepsake</span>
+            <span className="text-[0.52rem] opacity-75">Best for saving or printing</span>
           </button>
         </div>
 
@@ -274,12 +287,15 @@ export function ShareNoteModal({
               <div style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none", userSelect: "none", zIndex: -1 }}>
                 <PostcardCanvas ref={portraitRef} note={note} />
               </div>
-              {/* Scaled preview — 56% of 432×540 so all receipt rows stay visible inside modal */}
+              {/* Scaled preview — 56% of 432×540 — all receipt rows visible */}
               <div style={{ width: "242px", height: "303px", overflow: "hidden", margin: "0 auto", borderRadius: "4px", boxShadow: "0 4px 20px rgba(60,30,10,0.18)", flexShrink: 0 }}>
                 <div style={{ transform: "scale(0.56)", transformOrigin: "top left", width: "432px", height: "540px" }}>
                   <PostcardCanvas note={note} />
                 </div>
               </div>
+              <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
+                Best for saving, printing, or reading later. For mobile sharing, use Instagram Square or WhatsApp Status.
+              </p>
             </>
           )}
         </div>
@@ -380,7 +396,7 @@ export function ShareNoteModal({
                 <Download className="size-4" aria-hidden="true" />
                 {portraitDownloadState === "downloading" ? "Creating image…"
                   : portraitDownloadState === "success" ? "Image downloaded"
-                  : "Download Portrait PNG"}
+                  : "Download Full Note Keepsake PNG"}
               </Button>
               {portraitDownloadState === "error" && (
                 <p className="text-sm text-destructive">Could not create the image. Please try again.</p>
