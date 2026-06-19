@@ -31,6 +31,18 @@ function splitNoteForColumns(mainText: string): [string, string] {
   return [paragraphs.slice(0, mid).join("\n\n"), paragraphs.slice(mid).join("\n\n")];
 }
 
+// Adaptive body font — scales up aggressively for short notes, holds at 9.5px for very long ones.
+// Paragraph count drives the decision because that determines column split depth.
+// Verified against all 11 notes at RECEIPT_H=116 and body height=306px.
+function postcardBodyFont(mainText: string): { size: number; lh: number } {
+  const paras = mainText.split("\n\n").length;
+  if (paras <= 3)  return { size: 13.5, lh: 1.55 }; // short   → +50 % vs old 9px
+  if (paras <= 5)  return { size: 12,   lh: 1.52 }; // medium-short → +33 %
+  if (paras <= 8)  return { size: 11,   lh: 1.50 }; // medium  → +22 %
+  if (paras <= 12) return { size: 10,   lh: 1.48 }; // medium-long → +11 %
+  return                  { size: 9.5,  lh: 1.46 }; // long    → +6 %
+}
+
 // ─── Brand tokens ──────────────────────────────────────────────────────────────
 
 const B = {
@@ -416,15 +428,19 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, { note?: NoteEntry }>(
     const hasReceipt   = !!(receiptFrom || receiptTo || receiptTotal);
 
     const HEADER    = 44;
-    const TITLE_H   = 34;
+    const TITLE_H   = 28; // reduced from 34 — frees 6px for content
     const ENV_H     = 46;
-    const RECEIPT_H = hasReceipt ? 110 : 0;
+    const RECEIPT_H = hasReceipt ? 116 : 0; // increased from 110 — more breathing room per row
+
+    const { size: bodySize, lh: bodyLh } = postcardBodyFont(
+      note?.mainText ?? (POSTCARD_LEFT + "\n\n" + POSTCARD_RIGHT),
+    );
 
     const noteStyle: CSSProperties = {
       fontFamily: F.note,
-      fontSize: "9px",
+      fontSize: `${bodySize}px`,
       fontWeight: 600,
-      lineHeight: 1.48,
+      lineHeight: bodyLh,
       color: "#1a0e06",
       whiteSpace: "pre-wrap",
     };
@@ -581,16 +597,20 @@ export const PostcardCanvas = forwardRef<HTMLDivElement, { note?: NoteEntry }>(
           </svg>
           {/* Top edge crease line */}
           <div style={{ position: "absolute", top: "4px", left: "8px", right: "8px", borderTop: "1px dashed rgba(80,50,10,0.22)" }} />
-          {/* Domain stamp */}
+          {/* Domain label — paper strip so it reads clearly over the kraft envelope */}
           <div style={{
-            position: "absolute", bottom: "8px", left: "50%", transform: "translateX(-50%)",
+            position: "absolute", bottom: "6px", left: "50%", transform: "translateX(-50%)",
             display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap",
+            background: "rgba(250,245,230,0.90)",
+            padding: "2.5px 9px",
+            borderRadius: "99px",
+            border: "1px dashed rgba(80,50,10,0.28)",
           }}>
-            <HeartSVG style={{ width: 5, height: 5, color: B.accent, opacity: 0.8 }} />
-            <span style={{ fontFamily: F.label, fontSize: "6.5px", letterSpacing: "0.12em", color: B.inkMuted }}>
+            <HeartSVG style={{ width: 6, height: 6, color: B.accent, opacity: 0.95 }} />
+            <span style={{ fontFamily: F.label, fontSize: "8px", letterSpacing: "0.14em", color: B.ink, fontWeight: 700 }}>
               thenoteyouneeded.today
             </span>
-            <HeartSVG style={{ width: 5, height: 5, color: B.accent, opacity: 0.8 }} />
+            <HeartSVG style={{ width: 6, height: 6, color: B.accent, opacity: 0.95 }} />
           </div>
         </div>
 

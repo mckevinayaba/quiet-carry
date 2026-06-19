@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Download, Share2 } from "lucide-react";
 
 import {
@@ -66,6 +66,17 @@ export function ShareNoteModal({
   const portraitRef = useRef<HTMLDivElement>(null);
   const squareRenderPlan = buildRenderPlan(note, "D");
   const statusRenderPlan = buildRenderPlan(note, "B");
+
+  // When the modal opens, honour the caller's intent: jump straight to the requested preset
+  // and reset all download states so the UI is clean.
+  useEffect(() => {
+    if (open) {
+      setPreset(initialPreset);
+      setDownloadState("idle");
+      setStatusDownloadState("idle");
+      setPortraitDownloadState("idle");
+    }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function selectPreset(id: ModalPreset) {
     if (id !== "P" && !ACTIVE_PRESETS.includes(id as PresetId)) return;
@@ -208,6 +219,11 @@ export function ShareNoteModal({
           <DialogDescription className="text-base leading-7 text-muted-foreground">
             Choose how you want this note to travel.
           </DialogDescription>
+          {initialPreset === "P" && preset === "P" && (
+            <p className="text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              Full Note Keepsake selected
+            </p>
+          )}
         </DialogHeader>
 
         {/* Preset selector */}
