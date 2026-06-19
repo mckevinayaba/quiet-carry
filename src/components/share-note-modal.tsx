@@ -17,12 +17,10 @@ import {
 } from "@/components/share-canvases";
 import { PostcardCanvas } from "@/components/postcard-canvas";
 import {
-  PRESETS,
   buildFilename,
   buildRenderPlan,
   formatBrandedShareText,
   formatSocialCaption,
-  type PresetId,
 } from "@/lib/note-render-engine";
 import { trackEvent } from "@/lib/analytics";
 import type { NoteEntry } from "@/lib/note-data";
@@ -30,16 +28,42 @@ import type { NoteEntry } from "@/lib/note-data";
 export { Share2 as ShareIcon };
 
 type DownloadState = "idle" | "downloading" | "success" | "error" | "manual";
-type ModalPreset = PresetId | "P";
 
-// Presets that are live now vs coming soon
-const ACTIVE_PRESETS: PresetId[] = ["A", "B", "D"];
+// "FB" and "LN" are modal-only virtual presets — they reuse the InstagramSquare canvas
+// with different filenames. C (Instagram Story) and F (Pinterest) are hidden until live.
+type ModalPreset = "A" | "B" | "D" | "FB" | "LN" | "P";
 
-// Format recommendation labels shown inside each preset button
-const PRESET_RECOMMENDATION: Partial<Record<PresetId | "P", string>> = {
-  D: "Recommended for mobile",
-  B: "Best for WhatsApp Status",
-  A: "Private · no image",
+// Ordered list of formats shown in the modal. displayId is what the user sees (A-E, P).
+// id is the internal key used for state, canvas routing, and analytics.
+const VISIBLE_PRESETS: ReadonlyArray<{
+  id: ModalPreset;
+  displayId: string;
+  label: string;
+  sub: string | null;
+  rec: string;
+}> = [
+  { id: "A",  displayId: "A", label: "Send Quietly",     sub: null,   rec: "Private · no image" },
+  { id: "B",  displayId: "B", label: "WhatsApp Status",  sub: "9:16", rec: "Best for WhatsApp Status" },
+  { id: "D",  displayId: "C", label: "Instagram Square", sub: "1:1",  rec: "Recommended for mobile" },
+  { id: "FB", displayId: "D", label: "Facebook Post",    sub: "1:1",  rec: "Recommended for Facebook" },
+  { id: "LN", displayId: "E", label: "LinkedIn Post",    sub: "1:1",  rec: "Recommended for LinkedIn" },
+];
+
+// Analytics-friendly names for each preset
+const ANALYTICS_PRESET: Record<ModalPreset, string> = {
+  A:  "send_quietly",
+  B:  "whatsapp_status",
+  D:  "instagram_square",
+  FB: "facebook_post",
+  LN: "linkedin_post",
+  P:  "full_note_keepsake",
+};
+
+// Download suffixes for square variants
+const SQUARE_SUFFIX: Record<"D" | "FB" | "LN", string> = {
+  D:  "instagram-square",
+  FB: "facebook-post",
+  LN: "linkedin-post",
 };
 
 export function ShareNoteModal({
@@ -57,40 +81,71 @@ export function ShareNoteModal({
   const [copyLabel, setCopyLabel] = useState("Copy share text");
   const [captionLabel, setCaptionLabel] = useState("Copy caption");
   const [shareStatus, setShareStatus] = useState<string | null>(null);
-  const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+  const [squareDownloadState, setSquareDownloadState] = useState<DownloadState>("idle");
   const [statusDownloadState, setStatusDownloadState] = useState<DownloadState>("idle");
   const [portraitDownloadState, setPortraitDownloadState] = useState<DownloadState>("idle");
 
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const squareRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
+
   const squareRenderPlan = buildRenderPlan(note, "D");
   const statusRenderPlan = buildRenderPlan(note, "B");
 
-  // When the modal opens, honour the caller's intent: jump straight to the requested preset
-  // and reset all download states so the UI is clean.
+  // Honour caller intent: jump to the requested preset and reset download state on open
   useEffect(() => {
     if (open) {
       setPreset(initialPreset);
-      setDownloadState("idle");
+      setSquareDownloadState("idle");
       setStatusDownloadState("idle");
       setPortraitDownloadState("idle");
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function selectPreset(id: ModalPreset) {
-    if (id !== "P" && !ACTIVE_PRESETS.includes(id as PresetId)) return;
     setPreset(id);
-    setDownloadState("idle");
+    setSquareDownloadState("idle");
     setStatusDownloadState("idle");
     setPortraitDownloadState("idle");
-    if (id !== "P") {
+    if (id !== "A") {
       trackEvent("share_preset_selected", {
         noteId: note.id,
         categorySlug: note.categorySlug,
-        preset: id,
-        contentMode: buildRenderPlan(note, id as PresetId).contentMode,
+        preset: ANALYTICS_PRESET[id],
         source: "modal",
+      });
+    }
+  }
+
+  // Square variants (D, FB, LN) all use the same canvas and render plan;
+  // only the download filename and analytics event differ.
+  async function handleSquareDownload(variant: "D" | "FB" | "LN") {
+    if (!squareRef.current) return;
+    setSquareDownloadState("downloading");
+    try {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(squareRef.current, { pixelRatio: 4, cacheBust: true });
+      const slug = note.id.replace(/^note-/, "");
+      const filename = `the-note-you-needed-today-${slug}-${SQUARE_SUFFIX[variant]}.png`;
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      setSquareDownloadState(isIOS ? "manual" : "success");
+      if (!isIOS) setTimeout(() => setSquareDownloadState("idle"), 3000);
+      trackEvent("share_image_downloaded", {
+        noteId: note.id, categorySlug: note.categorySlug,
+        preset: ANALYTICS_PRESET[variant], contentMode: squareRenderPlan.contentMode, source: "modal",
+      });
+    } catch {
+      setSquareDownloadState("error");
+      setTimeout(() => setSquareDownloadState("idle"), 4000);
+      trackEvent("share_image_download_failed", {
+        noteId: note.id, categorySlug: note.categorySlug,
+        preset: ANALYTICS_PRESET[variant], source: "modal",
       });
     }
   }
@@ -100,9 +155,7 @@ export function ShareNoteModal({
     setStatusDownloadState("downloading");
     try {
       const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(statusRef.current, {
-        pixelRatio: 4, cacheBust: true,
-      });
+      const dataUrl = await toPng(statusRef.current, { pixelRatio: 4, cacheBust: true });
       const filename = buildFilename(note, "B");
       const link = document.createElement("a");
       link.download = filename;
@@ -115,7 +168,7 @@ export function ShareNoteModal({
       if (!isIOS) setTimeout(() => setStatusDownloadState("idle"), 3000);
       trackEvent("share_image_downloaded", {
         noteId: note.id, categorySlug: note.categorySlug,
-        preset: "B", contentMode: statusRenderPlan.contentMode, source: "modal",
+        preset: ANALYTICS_PRESET["B"], contentMode: statusRenderPlan.contentMode, source: "modal",
       });
     } catch {
       setStatusDownloadState("error");
@@ -133,7 +186,7 @@ export function ShareNoteModal({
       });
       const slug = note.id.replace(/^note-/, "");
       const link = document.createElement("a");
-      link.download = `the-note-you-needed-today-${slug}-portrait.png`;
+      link.download = `the-note-you-needed-today-${slug}-full-note-keepsake.png`;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
@@ -143,7 +196,7 @@ export function ShareNoteModal({
       if (!isIOS) setTimeout(() => setPortraitDownloadState("idle"), 3000);
       trackEvent("share_image_downloaded", {
         noteId: note.id, categorySlug: note.categorySlug,
-        preset: "P", contentMode: "full", source: "modal",
+        preset: ANALYTICS_PRESET["P"], contentMode: "full", source: "modal",
       });
     } catch {
       setPortraitDownloadState("error");
@@ -153,7 +206,7 @@ export function ShareNoteModal({
 
   async function handleCopyText() {
     await navigator.clipboard.writeText(formatBrandedShareText(note));
-    trackEvent("share_text_copied", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
+    trackEvent("share_text_copied", { noteId: note.id, categorySlug: note.categorySlug, preset: ANALYTICS_PRESET["A"], source: "modal" });
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy share text"), 2500);
   }
@@ -163,7 +216,7 @@ export function ShareNoteModal({
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ text });
-        trackEvent("share_native_opened", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
+        trackEvent("share_native_opened", { noteId: note.id, categorySlug: note.categorySlug, preset: ANALYTICS_PRESET["A"], source: "modal" });
         setShareStatus("Shared.");
         setTimeout(() => setShareStatus(null), 2500);
       } catch { /* cancelled */ }
@@ -176,37 +229,12 @@ export function ShareNoteModal({
 
   async function handleCopyCaption() {
     await navigator.clipboard.writeText(formatSocialCaption(note));
-    trackEvent("share_caption_copied", { noteId: note.id, categorySlug: note.categorySlug, preset, source: "modal" });
+    trackEvent("share_caption_copied", { noteId: note.id, categorySlug: note.categorySlug, preset: ANALYTICS_PRESET[preset], source: "modal" });
     setCaptionLabel("Copied!");
     setTimeout(() => setCaptionLabel("Copy caption"), 2500);
   }
 
-  async function handleDownload() {
-    if (!canvasRef.current) return;
-    setDownloadState("downloading");
-    try {
-      const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(canvasRef.current, { pixelRatio: 4, cacheBust: true });
-      const filename = buildFilename(note, "D");
-      const link = document.createElement("a");
-      link.download = filename;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      setDownloadState(isIOS ? "manual" : "success");
-      if (!isIOS) setTimeout(() => setDownloadState("idle"), 3000);
-      trackEvent("share_image_downloaded", {
-        noteId: note.id, categorySlug: note.categorySlug, preset: "D",
-        contentMode: squareRenderPlan.contentMode, source: "modal",
-      });
-    } catch {
-      setDownloadState("error");
-      setTimeout(() => setDownloadState("idle"), 4000);
-      trackEvent("share_image_download_failed", { noteId: note.id, categorySlug: note.categorySlug, preset: "D", source: "modal" });
-    }
-  }
+  const isSquare = preset === "D" || preset === "FB" || preset === "LN";
 
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
@@ -228,39 +256,27 @@ export function ShareNoteModal({
 
         {/* Preset selector */}
         <div className="flex flex-wrap gap-1.5">
-          {PRESETS.map((p) => {
-            const isActive = ACTIVE_PRESETS.includes(p.id);
+          {VISIBLE_PRESETS.map((p) => {
             const isSelected = preset === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => selectPreset(p.id)}
-                disabled={!isActive}
-                style={{ fontFamily: F.label, letterSpacing: "0.07em", opacity: isActive ? 1 : 0.45 }}
+                style={{ fontFamily: F.label, letterSpacing: "0.07em" }}
                 className={[
                   "flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-1.5 text-left transition-colors",
-                  isSelected && isActive
+                  isSelected
                     ? "border-foreground bg-foreground text-background"
-                    : isActive
-                    ? "border-border bg-card text-muted-foreground hover:border-foreground/40"
-                    : "border-border bg-card text-muted-foreground cursor-not-allowed",
+                    : "border-border bg-card text-muted-foreground hover:border-foreground/40",
                 ].join(" ")}
               >
-                <span className="text-[0.65rem] font-medium">{p.id}. {p.label}</span>
-                {isActive ? (
-                  <>
-                    {p.ratio && <span className="text-[0.55rem] opacity-60">{p.ratio}</span>}
-                    {PRESET_RECOMMENDATION[p.id] && (
-                      <span className="text-[0.52rem] opacity-75">{PRESET_RECOMMENDATION[p.id]}</span>
-                    )}
-                  </>
-                ) : (
-                  <span className="text-[0.52rem] opacity-50">Coming soon</span>
-                )}
+                <span className="text-[0.65rem] font-medium">{p.displayId}. {p.label}</span>
+                {p.sub && <span className="text-[0.55rem] opacity-60">{p.sub}</span>}
+                <span className="text-[0.52rem] opacity-75">{p.rec}</span>
               </button>
             );
           })}
-          {/* Portrait postcard — always active */}
+          {/* Full Note Keepsake — portrait postcard */}
           <button
             onClick={() => selectPreset("P")}
             style={{ fontFamily: F.label, letterSpacing: "0.07em" }}
@@ -292,9 +308,10 @@ export function ShareNoteModal({
               <WhatsAppStatusCanvas ref={statusRef} renderPlan={statusRenderPlan} />
             </div>
           )}
-          {preset === "D" && (
+          {/* D, FB, LN all render the same square canvas — only download differs */}
+          {isSquare && (
             <div style={{ width: "88%", margin: "0 auto" }}>
-              <InstagramSquareCanvas ref={canvasRef} renderPlan={squareRenderPlan} />
+              <InstagramSquareCanvas ref={squareRef} renderPlan={squareRenderPlan} />
             </div>
           )}
           {preset === "P" && (
@@ -310,13 +327,13 @@ export function ShareNoteModal({
                 </div>
               </div>
               <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
-                Best for saving, printing, or reading later. For mobile sharing, use Instagram Square or WhatsApp Status.
+                Best for saving, printing, or reading later. For mobile sharing, use Instagram Square.
               </p>
             </>
           )}
         </div>
 
-        {/* Receipt / excerpt badge */}
+        {/* Excerpt / receipt badges */}
         {preset === "B" && statusRenderPlan.contentMode !== "full" && (
           <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
             {statusRenderPlan.contentMode === "carousel_required"
@@ -324,7 +341,7 @@ export function ShareNoteModal({
               : "Excerpt shown · full note available on site"}
           </p>
         )}
-        {preset === "D" && (
+        {isSquare && (
           <div className="space-y-1">
             {squareRenderPlan.contentMode !== "full" && (
               <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.07em", textTransform: "uppercase" }}>
@@ -376,28 +393,32 @@ export function ShareNoteModal({
                 </p>
               )}
             </>
-          ) : preset === "D" ? (
+          ) : isSquare ? (
             <>
               <Button
                 variant="note"
-                onClick={handleDownload}
-                disabled={downloadState === "downloading"}
+                onClick={() => handleSquareDownload(preset as "D" | "FB" | "LN")}
+                disabled={squareDownloadState === "downloading"}
                 className="flex items-center justify-center gap-2"
               >
                 <Download className="size-4" aria-hidden="true" />
-                {downloadState === "downloading" ? "Creating image…"
-                  : downloadState === "success" ? "Image downloaded"
-                  : "Download PNG"}
+                {squareDownloadState === "downloading" ? "Creating image…"
+                  : squareDownloadState === "success" ? "Image downloaded"
+                  : preset === "FB" ? "Download Facebook Post PNG"
+                  : preset === "LN" ? "Download LinkedIn Post PNG"
+                  : "Download Instagram Square PNG"}
               </Button>
-              {downloadState === "error" && (
+              {squareDownloadState === "error" && (
                 <p className="text-sm text-destructive">We could not create the image. Please try again.</p>
               )}
-              {downloadState === "manual" && (
+              {squareDownloadState === "manual" && (
                 <p className="text-sm text-muted-foreground">Your image is ready. Long press or open it to save.</p>
               )}
-              {downloadState === "idle" && (
+              {squareDownloadState === "idle" && (
                 <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
-                  Download the image, then post it to Instagram, Facebook, or WhatsApp.
+                  {preset === "FB" ? "1080×1080 PNG — post directly to Facebook." :
+                   preset === "LN" ? "1080×1080 PNG — share to LinkedIn as a reflective post." :
+                   "1080×1080 PNG — post directly to Instagram or Facebook."}
                 </p>
               )}
             </>
@@ -422,7 +443,7 @@ export function ShareNoteModal({
               )}
               {portraitDownloadState === "idle" && (
                 <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: F.label, letterSpacing: "0.06em" }}>
-                  1080×1350 PNG — ready for Instagram, TikTok, and Facebook.
+                  1080×1350 PNG — save, print, or share the full note.
                 </p>
               )}
             </>
