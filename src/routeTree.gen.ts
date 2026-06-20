@@ -24,7 +24,9 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
+import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
+import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
 
 const Volume1Route = Volume1RouteImport.update({
   id: '/volume-1',
@@ -101,10 +103,20 @@ const WriteCategorySlugRoute = WriteCategorySlugRouteImport.update({
   path: '/write/$categorySlug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Volume1UnlockRoute = Volume1UnlockRouteImport.update({
+  id: '/unlock',
+  path: '/unlock',
+  getParentRoute: () => Volume1Route,
+} as any)
 const NoteCategorySlugRoute = NoteCategorySlugRouteImport.update({
   id: '/note/$categorySlug',
   path: '/note/$categorySlug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const Volume1ReadChapterRoute = Volume1ReadChapterRouteImport.update({
+  id: '/read/$chapter',
+  path: '/read/$chapter',
+  getParentRoute: () => Volume1Route,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -121,9 +133,11 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/volume-1': typeof Volume1Route
+  '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,9 +153,11 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/volume-1': typeof Volume1Route
+  '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,9 +174,11 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/volume-1': typeof Volume1Route
+  '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,7 +198,9 @@ export interface FileRouteTypes {
     | '/today'
     | '/volume-1'
     | '/note/$categorySlug'
+    | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1/read/$chapter'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -198,7 +218,9 @@ export interface FileRouteTypes {
     | '/today'
     | '/volume-1'
     | '/note/$categorySlug'
+    | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1/read/$chapter'
   id:
     | '__root__'
     | '/'
@@ -216,7 +238,9 @@ export interface FileRouteTypes {
     | '/today'
     | '/volume-1'
     | '/note/$categorySlug'
+    | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1/read/$chapter'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -233,7 +257,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TodayRoute: typeof TodayRoute
-  Volume1Route: typeof Volume1Route
+  Volume1Route: typeof Volume1RouteWithChildren
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
 }
@@ -345,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WriteCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volume-1/unlock': {
+      id: '/volume-1/unlock'
+      path: '/unlock'
+      fullPath: '/volume-1/unlock'
+      preLoaderRoute: typeof Volume1UnlockRouteImport
+      parentRoute: typeof Volume1Route
+    }
     '/note/$categorySlug': {
       id: '/note/$categorySlug'
       path: '/note/$categorySlug'
@@ -352,8 +383,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NoteCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volume-1/read/$chapter': {
+      id: '/volume-1/read/$chapter'
+      path: '/read/$chapter'
+      fullPath: '/volume-1/read/$chapter'
+      preLoaderRoute: typeof Volume1ReadChapterRouteImport
+      parentRoute: typeof Volume1Route
+    }
   }
 }
+
+interface Volume1RouteChildren {
+  Volume1UnlockRoute: typeof Volume1UnlockRoute
+  Volume1ReadChapterRoute: typeof Volume1ReadChapterRoute
+}
+
+const Volume1RouteChildren: Volume1RouteChildren = {
+  Volume1UnlockRoute: Volume1UnlockRoute,
+  Volume1ReadChapterRoute: Volume1ReadChapterRoute,
+}
+
+const Volume1RouteWithChildren =
+  Volume1Route._addFileChildren(Volume1RouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -369,7 +420,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TodayRoute: TodayRoute,
-  Volume1Route: Volume1Route,
+  Volume1Route: Volume1RouteWithChildren,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
 }
