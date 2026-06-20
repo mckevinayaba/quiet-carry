@@ -23,6 +23,7 @@ export type Database = {
           page_path: string | null
           source: string
           user_agent: string | null
+          wished_sentence: string | null
         }
         Insert: {
           created_at?: string
@@ -32,6 +33,7 @@ export type Database = {
           page_path?: string | null
           source?: string
           user_agent?: string | null
+          wished_sentence?: string | null
         }
         Update: {
           created_at?: string
@@ -41,6 +43,7 @@ export type Database = {
           page_path?: string | null
           source?: string
           user_agent?: string | null
+          wished_sentence?: string | null
         }
         Relationships: []
       }
