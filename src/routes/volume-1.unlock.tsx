@@ -28,8 +28,10 @@ function UnlockPage() {
     setError(null);
 
     try {
+      // Live DB uses exact match — normalize to uppercase before sending.
+      const normalized = code.trim().toUpperCase();
       const { data, error: rpcError } = await supabase.rpc("redeem_volume1_code", {
-        input_code: code.trim(),
+        input_code: normalized,
       });
 
       if (rpcError) throw rpcError;
@@ -40,6 +42,7 @@ function UnlockPage() {
         localStorage.setItem("volume1_unlocked", "true");
         navigate({ to: "/volume-1/read/$chapter", params: { chapter: "1" } });
       } else {
+        // reason is "not_found" or "already_redeemed" from the live RPC.
         setError(
           "This code was not found or has already been used. If you believe this is an error, contact hello@thenoteyouneededtoday.com",
         );
