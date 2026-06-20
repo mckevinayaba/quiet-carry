@@ -1,4 +1,5 @@
 import { ArrowRight, Clock3 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import type { CollectionEntry } from "@/lib/note-data";
@@ -47,21 +48,31 @@ export function CollectionCard({ collection, onWaitlistClick }: CollectionCardPr
         ) : null}
       </div>
 
-      {hasWaitlistCta ? (
-        collection.ctaHref ? (
-          <Button asChild variant="note" className="min-h-12">
-            <a href={collection.ctaHref}>
+      <div className="flex flex-wrap gap-3">
+        {hasWaitlistCta ? (
+          collection.ctaHref ? (
+            <Button asChild variant="note" className="min-h-12">
+              <a href={collection.ctaHref}>
+                {collection.ctaLabel}
+                <ArrowRight aria-hidden="true" />
+              </a>
+            </Button>
+          ) : (
+            <Button variant="note" className="min-h-12" onClick={onWaitlistClick}>
               {collection.ctaLabel}
               <ArrowRight aria-hidden="true" />
-            </a>
+            </Button>
+          )
+        ) : null}
+        {collection.detailHref ? (
+          <Button asChild variant="paper" className="min-h-12">
+            <Link to={collection.detailHref as never}>
+              Explore Volume 1
+              <ArrowRight aria-hidden="true" />
+            </Link>
           </Button>
-        ) : (
-          <Button variant="note" className="min-h-12" onClick={onWaitlistClick}>
-            {collection.ctaLabel}
-            <ArrowRight aria-hidden="true" />
-          </Button>
-        )
-      ) : null}
+        ) : null}
+      </div>
     </article>
   );
 }

@@ -6,6 +6,8 @@ export type VolumeChapter =
   | "Starting Over"
   | "Becoming Visible";
 
+export type VolumeOneStatus = "free" | "included" | "exclusive" | "notIncluded";
+
 export interface StorySpine {
   wound: string;
   witness: string;
@@ -51,6 +53,7 @@ export interface NoteEntry {
   safetyNote?: boolean;
   needsSafetyCue?: boolean;
   safetyCueText?: string;
+  volumeOneStatus?: VolumeOneStatus;
 }
 
 export interface CollectionEntry {
@@ -63,7 +66,10 @@ export interface CollectionEntry {
   ctaLabel?: string;
   ctaHref?: string;
   comingSoon?: boolean;
+  detailHref?: string;
 }
+
+export const volumeOneSelarUrl = "#volume-1-coming-soon";
 
 export const categories: EmotionalCategory[] = [
   {
@@ -184,6 +190,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     receiptFrom:
       "Every time the truth climbed your throat and you swallowed it back down. every question you dodged with a smile. every night you cried alone because no one asked when you were ready to answer.",
     receiptTo:
@@ -215,6 +222,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     receiptFrom: "Every sentence that entered your heart and started calling itself truth.",
     receiptTo: "The day your own voice becomes louder than what they said.",
     receiptDate: "The first time you remember it without becoming small again.",
@@ -238,6 +246,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Survival",
+    volumeOneStatus: "included",
     receiptFrom: "Every wound you dressed in strength so no one would worry.",
     receiptTo: "A life where surviving is not mistaken for being okay.",
     receiptDate: "The day you stop performing strength for people who never asked what it cost.",
@@ -261,6 +270,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "low",
     volumeChapter: "Starting Over",
+    volumeOneStatus: "included",
     receiptFrom: "Every argument that stole your peace.",
     receiptTo: "A silence that finally protects you.",
     receiptDate: "The day you stop explaining your absence.",
@@ -288,6 +298,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Survival",
+    volumeOneStatus: "free",
     receiptFrom: "Every ring that felt like a judge.",
     receiptTo: "A phone that only brings news you can handle.",
     receiptDate: "The first month you do not flinch.",
@@ -311,6 +322,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     receiptFrom: "Grief that lives in your thumb.",
     receiptTo: "A memory that no longer cuts.",
     receiptDate: "The first day love feels soft again.",
@@ -334,6 +346,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     needsSafetyCue: true,
     safetyCueText:
       "If this brought up something heavy, please pause here. You do not have to carry it alone. Visit Safety & Support or reach out to someone you trust.",
@@ -360,6 +373,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "free",
     receiptFrom: "Every wound that had to heal without a confession.",
     receiptTo: "A life that no longer waits for their honesty.",
     receiptDate: "The day closure stops needing their permission.",
@@ -383,6 +397,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Becoming Visible",
+    volumeOneStatus: "included",
     receiptFrom: "Every version of you that survived what almost broke you.",
     receiptTo: "The person you are still becoming.",
     receiptDate: "The day you remember you did not come this far by accident.",
@@ -406,6 +421,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Becoming Visible",
+    volumeOneStatus: "free",
     receiptFrom:
       "The nights you cried when no one was watching. the days you smiled through pain. the times you started over with nothing but hope.",
     receiptTo: "A single moment of peace without someone wishing you would fail.",
@@ -431,6 +447,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Becoming Visible",
+    volumeOneStatus: "free",
     socialExcerpt: `Do it anyway.\n\nStop expecting recognition\nfrom people who watched you bleed\nand still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.`,
     shortReceiptFrom: "Every silent room where you expected support and received distance.",
     shortReceiptTo: "The day you stop needing witnesses before you believe yourself.",
@@ -458,6 +475,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Survival",
+    volumeOneStatus: "included",
     receiptFrom: "Every month that asked you to become a miracle worker.",
     receiptTo: "The part of you that felt ashamed for not having enough.",
     receiptDate: "The first day you stop calling survival a failure.",
@@ -485,6 +503,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Starting Over",
+    volumeOneStatus: "included",
     receiptFrom: "The door that closed before you were ready.",
     receiptTo: "The version of you learning how to stand without the title.",
     receiptDate: "The morning you realize your usefulness did not end with the job.",
@@ -512,6 +531,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "free",
     receiptFrom: "The home that stopped feeling like home.",
     receiptTo: "The heart learning how to release without erasing.",
     receiptDate: "The day you stop calling your grief an embarrassment.",
@@ -539,6 +559,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "free",
     receiptFrom: "The love that left but did not leave your body quickly.",
     receiptTo: "The part of you still checking for what is no longer coming.",
     receiptDate: "The first day memory stops feeling like a wound reopening.",
@@ -566,6 +587,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     needsSafetyCue: true,
     safetyCueText:
       "If this brought up something heavy, please pause. You do not have to process family pain alone. Stay close to someone you trust or visit Safety & Support.",
@@ -596,6 +618,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "heavy",
     volumeChapter: "Unsaid Grief",
+    volumeOneStatus: "included",
     needsSafetyCue: true,
     safetyCueText:
       "If this brought up something heavy, please pause. You do not have to carry loneliness alone. Stay close to someone or visit Safety & Support.",
@@ -626,6 +649,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Becoming Visible",
+    volumeOneStatus: "included",
     receiptFrom: "The years that made your dream look like it was not working.",
     receiptTo: "The part of you still believing without enough evidence.",
     receiptDate: "The day you stop measuring purpose only by speed.",
@@ -653,6 +677,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "medium",
     volumeChapter: "Survival",
+    volumeOneStatus: "included",
     receiptFrom: "The body that kept the score while you kept pretending.",
     receiptTo: "The part of you that thought exhaustion was a personal failure.",
     receiptDate: "The first time you listen before you collapse.",
@@ -680,6 +705,7 @@ export const notes: NoteEntry[] = [
     },
     emotionalIntensity: "crisisAdjacent",
     volumeChapter: "Survival",
+    volumeOneStatus: "included",
     safetyNote: true,
     needsSafetyCue: true,
     safetyCueText:
@@ -704,18 +730,21 @@ export const collections: CollectionEntry[] = [
     title: "The Note You Needed Today, Volume 1:",
     subtitle: "The Things We Do Not Say Out Loud",
     description:
-      "A digital collection of emotional notes, mobile wallpapers, captions, journal prompts, and private letters for people healing quietly, starting over, grieving privately, feeling unseen, or carrying things they do not always know how to say.",
+      "When life is too heavy to explain, Volume 1 gives you words you can keep, return to, and quietly share.",
     contents: [
       "15 designed notes",
       "15 mobile wallpapers",
-      "15 captions",
+      "15 quiet captions",
       "15 journal prompts",
       "5 private letters",
+      "Opening letter from MAD",
+      "Safety and care page",
+      "Closing receipt page",
     ],
-    price: "R149 launch price",
-    ctaLabel: "Get Volume 1",
-    ctaHref: "#volume-1-coming-soon",
+    price: "R149 · $7–$9",
+    ctaLabel: "Join the quiet list for first access",
     comingSoon: true,
+    detailHref: "/volume-1",
   },
   {
     id: "words-that-stayed",

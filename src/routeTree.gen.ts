@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Volume1RouteImport } from './routes/volume-1'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -25,6 +26,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 
+const Volume1Route = Volume1RouteImport.update({
+  id: '/volume-1',
+  path: '/volume-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TodayRoute = TodayRouteImport.update({
   id: '/today',
   path: '/today',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/volume-1': typeof Volume1Route
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/volume-1': typeof Volume1Route
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/volume-1': typeof Volume1Route
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
 }
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/volume-1'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/volume-1'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/volume-1'
     | '/note/$categorySlug'
     | '/write/$categorySlug'
   fileRoutesById: FileRoutesById
@@ -221,12 +233,20 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TodayRoute: typeof TodayRoute
+  Volume1Route: typeof Volume1Route
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/volume-1': {
+      id: '/volume-1'
+      path: '/volume-1'
+      fullPath: '/volume-1'
+      preLoaderRoute: typeof Volume1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/today': {
       id: '/today'
       path: '/today'
@@ -349,9 +369,20 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TodayRoute: TodayRoute,
+  Volume1Route: Volume1Route,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
-import { categories, featuredNote } from "@/lib/note-data";
+import { categories, featuredNote, volumeOneSelarUrl } from "@/lib/note-data";
 import {
   getKeptNotes,
   keepNote,
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A private-first emotional language platform. For the feelings you cannot always explain. Join the private beta.",
+          "Find words for what you carry quietly. A private-first emotional language platform for the feelings you cannot always explain.",
       },
       { property: "og:title", content: "The Note You Needed Today" },
       {
@@ -95,10 +95,10 @@ function Hero() {
           <div className="flex flex-wrap items-center gap-2">
             <span
               className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-2.5 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted-foreground"
-              aria-label="Private Beta"
+              aria-label="Now open quietly"
             >
               <span className="size-1.5 rounded-full bg-primary" aria-hidden />
-              Private Beta
+              Now open quietly
             </span>
             <span className="eyebrow-copy">A private-first emotional language platform</span>
           </div>
@@ -119,7 +119,7 @@ function Hero() {
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="note" className="min-h-14 text-base">
-              <a href="#waitlist">Join the Private Beta</a>
+              <Link to="/feelings">Find your note</Link>
             </Button>
             <Button asChild size="lg" variant="paper" className="min-h-14 text-base">
               <Link to="/note/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
@@ -568,10 +568,19 @@ function VolumeOne() {
             ))}
           </ul>
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Button variant="note" className="min-h-12" onClick={() => openWaitlist("volume")}>
-              Join the Volume 1 waitlist
+            {volumeOneSelarUrl === "#volume-1-coming-soon" ? (
+              <Button variant="note" className="min-h-12" onClick={() => openWaitlist("volume")}>
+                Join the quiet list for first access
+              </Button>
+            ) : (
+              <Button asChild variant="note" className="min-h-12">
+                <a href={volumeOneSelarUrl}>Get Volume 1</a>
+              </Button>
+            )}
+            <Button asChild variant="paper" className="min-h-12">
+              <Link to="/volume-1">Explore Volume 1</Link>
             </Button>
-            <span className="font-label text-base text-foreground">R149 launch price</span>
+            <span className="font-label text-base text-foreground">R149 · $7–$9</span>
           </div>
         </div>
         <div className="relative overflow-hidden rounded-[24px] border border-border shadow-[0_30px_60px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)] rotate-[1deg]">
@@ -641,12 +650,12 @@ function Waitlist() {
     <section id="waitlist" className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-24">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--accent)_18%,transparent),transparent_60%)]" />
       <div className="mx-auto max-w-2xl space-y-6 text-center">
-        <span className="eyebrow-copy">The private beta</span>
+        <span className="eyebrow-copy">Be first for Volume 1</span>
         <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-6xl">
-          Be first to experience<br />The Note You Needed Today.
+          Join the quiet list.<br />Get early access to Volume 1.
         </h2>
         <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-          Join the private beta and get early access to the platform and Volume 1.
+          One quiet email when Volume 1 is ready. No spam. No noise.
         </p>
 
         {submitted ? (
@@ -737,7 +746,7 @@ function SiteFooter() {
         </FooterCol>
 
         <FooterCol title="Care">
-          <FooterAnchor href="#waitlist">Private Beta</FooterAnchor>
+          <FooterLink to="/volume-1">Volume 1</FooterLink>
           <FooterLink to="/support">Safety &amp; Support</FooterLink>
           <button
             type="button"

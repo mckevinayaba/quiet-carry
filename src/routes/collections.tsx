@@ -12,11 +12,14 @@ import { collections } from "@/lib/note-data";
 export const Route = createFileRoute("/collections")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
+    links: [
+      { rel: "canonical", href: "https://thenoteyouneeded.today/collections" },
+    ],
     meta: [
-      { title: "Collections" },
-      { name: "description", content: "Deeper notes for the things people carry quietly." },
-      { property: "og:title", content: "Collections" },
-      { property: "og:description", content: "Deeper notes for the things people carry quietly." },
+      { title: "Collections | The Note You Needed Today" },
+      { name: "description", content: "Volume 1 and deeper collections for the things people carry quietly." },
+      { property: "og:title", content: "Collections | The Note You Needed Today" },
+      { property: "og:description", content: "Volume 1 and deeper collections for the things people carry quietly." },
     ],
   }),
   component: CollectionsPage,
