@@ -37,6 +37,9 @@ import volumeCollage from "@/assets/volume-one-collage.jpg";
 export const Route = createFileRoute("/")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
+    links: [
+      { rel: "canonical", href: "https://thenoteyouneeded.today/" },
+    ],
     meta: [
       { title: "The Note You Needed Today — Find words for what you carry quietly" },
       {

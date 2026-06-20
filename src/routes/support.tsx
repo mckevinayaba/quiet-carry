@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/support")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
+    links: [
+      { rel: "canonical", href: "https://thenoteyouneeded.today/support" },
+    ],
     meta: [
       { title: "Before you go further" },
       {

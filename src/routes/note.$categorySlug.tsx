@@ -28,6 +28,12 @@ export const Route = createFileRoute("/note/$categorySlug")({
   errorComponent: RouteErrorBoundary,
   notFoundComponent: NoteNotFound,
   head: ({ loaderData }) => ({
+    links: [
+      {
+        rel: "canonical",
+        href: `https://thenoteyouneeded.today/note/${loaderData?.note.categorySlug ?? ""}`,
+      },
+    ],
     meta: [
       { title: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
       {
@@ -38,6 +44,10 @@ export const Route = createFileRoute("/note/$categorySlug")({
       {
         property: "og:description",
         content: loaderData?.category.subtitle ?? "A private note for what you carry quietly.",
+      },
+      {
+        property: "og:url",
+        content: `https://thenoteyouneeded.today/note/${loaderData?.note.categorySlug ?? ""}`,
       },
     ],
   }),
