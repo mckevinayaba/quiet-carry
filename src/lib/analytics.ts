@@ -38,6 +38,8 @@ export type AnalyticsEventName =
   | "waitlist_opened"
   | "waitlist_submitted"
   | "volume_waitlist_clicked"
+  | "volume1_waitlist_clicked"
+  | "volume1_purchase_clicked"
   | "account_waitlist_clicked"
   | "feedback_opened"
   | "feedback_submitted"

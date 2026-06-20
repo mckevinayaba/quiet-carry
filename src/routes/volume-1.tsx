@@ -71,10 +71,18 @@ export const Route = createFileRoute("/volume-1")({
 });
 
 function VolumeOnePage() {
+  return (
+    <AppLayout className="space-y-14 pb-12">
+      <VolumeOneContent />
+    </AppLayout>
+  );
+}
+
+function VolumeOneContent() {
   const { openWaitlist } = useAppModals();
 
   return (
-    <AppLayout className="space-y-14 pb-12">
+    <>
       {/* Header */}
       <section className="space-y-4 py-2">
         <div className="flex flex-wrap items-center gap-2 pb-1">
@@ -232,6 +240,6 @@ function VolumeOnePage() {
           <Link to="/support">Safety &amp; Support</Link>
         </Button>
       </section>
-    </AppLayout>
+    </>
   );
 }
