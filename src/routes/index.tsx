@@ -145,7 +145,7 @@ function HeroVisual() {
           alt="A handmade collage: an opened vintage envelope, a handwritten note that reads ‘the truth was too heavy’, a typewritten FROM TO DATE TOTAL receipt, pressed flowers, a navy stitched fabric ribbon and a small hand-drawn heart"
           width={1536}
           height={2048}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-[center_62%]"
         />
       </div>
 
