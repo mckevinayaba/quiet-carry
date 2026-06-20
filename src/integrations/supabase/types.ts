@@ -47,6 +47,30 @@ export type Database = {
         }
         Relationships: []
       }
+      volume1_access: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           context: string | null
@@ -82,7 +106,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      redeem_volume1_code: { Args: { input_code: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
