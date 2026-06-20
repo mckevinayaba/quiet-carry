@@ -6,7 +6,7 @@ import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
-import { notes, volumeOneSelarUrl } from "@/lib/note-data";
+import { volumeOneSelarUrl } from "@/lib/note-data";
 import type { VolumeChapter } from "@/lib/note-data";
 
 const CHAPTERS: {
@@ -15,25 +15,25 @@ const CHAPTERS: {
   exclusiveNote?: string;
 }[] = [
   {
-    name: "Unsaid Grief",
-    description: "Loss, words that stayed, grief in habits, what was never said.",
-  },
-  {
-    name: "Quiet Anger",
-    description: "Distance, people who watched you bleed, apologies that never came.",
-    exclusiveNote: "Three new exclusive notes — written for Volume 1 only.",
-  },
-  {
     name: "Survival",
     description: "Money, body, exhaustion, staying.",
   },
   {
-    name: "Starting Over",
-    description: "Job loss, distance, what comes after.",
+    name: "Unsaid Grief",
+    description: "The losses that never received a funeral.",
   },
   {
     name: "Becoming Visible",
-    description: "Dreams, recognition, identity, remembering who you are.",
+    description: "The parts of yourself you buried to survive.",
+  },
+  {
+    name: "Starting Over",
+    description: "The life that ended before the next one began.",
+  },
+  {
+    name: "Quiet Anger",
+    description: "The chapter nobody wants to admit they need.",
+    exclusiveNote: "Five exclusive notes — written only for Volume 1. Not available anywhere on the free platform.",
   },
 ];
 
@@ -160,33 +160,23 @@ function VolumeOneContent() {
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CHAPTERS.map((chapter, idx) => {
-            const includedNotes = notes.filter(
-              (n) => n.volumeChapter === chapter.name && n.volumeOneStatus === "included",
-            );
-            return (
-              <div key={chapter.name} className="paper-panel space-y-3 p-5">
-                <div className="flex items-center justify-between">
-                  <span className="font-label text-2xl text-muted-foreground">0{idx + 1}</span>
-                  <Heart className="heart-mark size-4" aria-hidden />
-                </div>
-                <h3 className="font-display text-2xl leading-tight text-foreground">
-                  {chapter.name}
-                </h3>
-                <p className="text-sm leading-6 text-muted-foreground">{chapter.description}</p>
-                {chapter.exclusiveNote ? (
-                  <p className="text-xs leading-5 text-muted-foreground/70 italic">
-                    {chapter.exclusiveNote}
-                  </p>
-                ) : null}
-                {includedNotes.length > 0 ? (
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {includedNotes.length} note{includedNotes.length !== 1 ? "s" : ""} included
-                  </p>
-                ) : null}
+          {CHAPTERS.map((chapter, idx) => (
+            <div key={chapter.name} className="paper-panel space-y-3 p-5">
+              <div className="flex items-center justify-between">
+                <span className="font-label text-2xl text-muted-foreground">0{idx + 1}</span>
+                <Heart className="heart-mark size-4" aria-hidden />
               </div>
-            );
-          })}
+              <h3 className="font-display text-2xl leading-tight text-foreground">
+                {chapter.name}
+              </h3>
+              <p className="text-sm leading-6 text-muted-foreground">{chapter.description}</p>
+              {chapter.exclusiveNote ? (
+                <p className="text-xs leading-5 text-muted-foreground/70 italic">
+                  {chapter.exclusiveNote}
+                </p>
+              ) : null}
+            </div>
+          ))}
         </div>
       </section>
 
