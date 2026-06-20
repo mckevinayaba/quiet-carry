@@ -1214,3 +1214,32 @@ export const CHAPTER_COUNT = volume1Chapters.length;
 export function getChapter(number: number): Volume1Chapter | undefined {
   return volume1Chapters.find((c) => c.number === number);
 }
+
+// ---------------------------------------------------------------------------
+// MARGIN NOTES FROM MAD
+// Spread across the manuscript. Attached to specific notes by noteId.
+// ---------------------------------------------------------------------------
+
+export interface Volume1MarginNote {
+  noteId: string;
+  text: string;
+}
+
+export const marginNotes: Volume1MarginNote[] = [
+  { noteId: "money-that-never-stretched",    text: "Survival is expensive." },
+  { noteId: "body-is-tired",                 text: "Your body was not exaggerating." },
+  { noteId: "when-staying-feels-hard",       text: "Staying is also a form of courage." },
+  { noteId: "love-that-left",                text: "Grief does not always come with a ceremony." },
+  { noteId: "marriage-that-became-a-memory", text: "Some goodbyes happen slowly, without a word." },
+  { noteId: "loneliness-no-one-sees",        text: "Being surrounded and still alone is its own kind of invisible." },
+  { noteId: "im-fine-but-not-really",        text: "Saying fine is not lying.\nIt is protecting yourself\nin a room that is not yet safe." },
+  { noteId: "job-that-ended",                text: "The alarm still went off.\nYou got up anyway." },
+  { noteId: "family-that-hurt",              text: "You did not imagine it." },
+  { noteId: "ch5-note-11",                   text: "Being needed is not\nthe same as being loved." },
+  { noteId: "ch5-note-13",                   text: "You are allowed to heal\nwithout their participation." },
+  { noteId: "ch5-note-15",                   text: "Interrupted. Not cancelled." },
+];
+
+export function getMarginNote(noteId: string): Volume1MarginNote | undefined {
+  return marginNotes.find((n) => n.noteId === noteId);
+}

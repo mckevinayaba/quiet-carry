@@ -274,3 +274,36 @@
   background: color-mix(in oklab, var(--secondary) 88%, white);
   color: var(--color-foreground);
 }
+
+/* -------------------------------------------------------------------------
+   Volume 1 reading experience
+   ------------------------------------------------------------------------- */
+
+@keyframes vol-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vol-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%       { transform: translateY(6px); opacity: 1; }
+}
+
+/* Like paper-panel but without overflow:hidden so margin notes can bleed out */
+@utility vol-note-card {
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--paper-gradient);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: linear-gradient(180deg, transparent, color-mix(in oklab, var(--secondary) 18%, transparent));
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}

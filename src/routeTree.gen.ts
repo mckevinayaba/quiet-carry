@@ -23,6 +23,7 @@ import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Volume1IndexRouteImport } from './routes/volume-1.index'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
 import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
@@ -98,6 +99,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Volume1IndexRoute = Volume1IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => Volume1Route,
+} as any)
 const WriteCategorySlugRoute = WriteCategorySlugRouteImport.update({
   id: '/write/$categorySlug',
   path: '/write/$categorySlug',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1/': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRoutesByTo {
@@ -153,10 +160,10 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRoutesById {
@@ -178,6 +185,7 @@ export interface FileRoutesById {
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
+  '/volume-1/': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
 }
 export interface FileRouteTypes {
@@ -200,6 +208,7 @@ export interface FileRouteTypes {
     | '/note/$categorySlug'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1/'
     | '/volume-1/read/$chapter'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -216,10 +225,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
-    | '/volume-1'
     | '/note/$categorySlug'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1'
     | '/volume-1/read/$chapter'
   id:
     | '__root__'
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/note/$categorySlug'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
+    | '/volume-1/'
     | '/volume-1/read/$chapter'
   fileRoutesById: FileRoutesById
 }
@@ -362,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volume-1/': {
+      id: '/volume-1/'
+      path: '/'
+      fullPath: '/volume-1/'
+      preLoaderRoute: typeof Volume1IndexRouteImport
+      parentRoute: typeof Volume1Route
+    }
     '/write/$categorySlug': {
       id: '/write/$categorySlug'
       path: '/write/$categorySlug'
@@ -395,11 +412,13 @@ declare module '@tanstack/react-router' {
 
 interface Volume1RouteChildren {
   Volume1UnlockRoute: typeof Volume1UnlockRoute
+  Volume1IndexRoute: typeof Volume1IndexRoute
   Volume1ReadChapterRoute: typeof Volume1ReadChapterRoute
 }
 
 const Volume1RouteChildren: Volume1RouteChildren = {
   Volume1UnlockRoute: Volume1UnlockRoute,
+  Volume1IndexRoute: Volume1IndexRoute,
   Volume1ReadChapterRoute: Volume1ReadChapterRoute,
 }
 
@@ -427,3 +446,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
