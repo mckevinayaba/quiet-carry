@@ -94,7 +94,7 @@ export async function saveWaitlistEntry(
   return { ok: true };
 }
 
-export async function saveFeedbackEntry(text: string): Promise<SaveResult> {
+export async function saveFeedbackEntry(text: string, wishedSentence?: string): Promise<SaveResult> {
   const trimmed = text.trim();
   if (!trimmed) return { ok: false, error: "empty" };
   if (trimmed.length > 1000) return { ok: false, error: "too_long" };
@@ -103,9 +103,12 @@ export async function saveFeedbackEntry(text: string): Promise<SaveResult> {
     return { ok: false, error: "throttled" };
   }
 
+  const eventContext = wishedSentence ? { wished_sentence: wishedSentence } : undefined;
+
   const { error } = await supabase.from("feedback").insert({
     message: trimmed,
     source: "app",
+    ...(eventContext ? { event_context: eventContext } : {}),
     ...browserContext(),
   });
 

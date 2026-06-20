@@ -169,12 +169,14 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
 
 function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [text, setText] = useState("");
+  const [wish, setWish] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
       setText("");
+      setWish("");
       setSubmitted(false);
       setError(null);
     }
@@ -198,7 +200,7 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
           </div>
         ) : (
           <form
-            className="space-y-3"
+            className="space-y-4"
             onSubmit={async (event) => {
               event.preventDefault();
               if (!text.trim()) return;
@@ -206,7 +208,7 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
                 setError("Please keep your feedback under 1000 characters.");
                 return;
               }
-              const res = await saveFeedbackEntry(text);
+              const res = await saveFeedbackEntry(text, wish.trim() || undefined);
               if (!res.ok) {
                 setError(
                   res.error === "throttled"
@@ -219,21 +221,36 @@ function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void 
               setSubmitted(true);
             }}
           >
-            <label className="sr-only" htmlFor="feedback-text">Your feedback</label>
-            <Textarea
-              id="feedback-text"
-              className="min-h-40"
-              placeholder="Write your feedback here"
-              maxLength={1000}
-              value={text}
-              onChange={(event) => {
-                setText(event.target.value);
-                if (error) setError(null);
-              }}
-            />
-            <p className="text-right text-xs text-muted-foreground" aria-live="polite">
-              {text.length}/1000
-            </p>
+            <div className="space-y-1.5">
+              <label className="sr-only" htmlFor="feedback-text">Your feedback</label>
+              <Textarea
+                id="feedback-text"
+                className="min-h-32"
+                placeholder="Write your feedback here"
+                maxLength={1000}
+                value={text}
+                onChange={(event) => {
+                  setText(event.target.value);
+                  if (error) setError(null);
+                }}
+              />
+              <p className="text-right text-xs text-muted-foreground" aria-live="polite">
+                {text.length}/1000
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground" htmlFor="feedback-wish">
+                What is a sentence you wish someone had written for you?
+              </label>
+              <Textarea
+                id="feedback-wish"
+                className="min-h-20"
+                placeholder="Optional — one sentence is enough"
+                maxLength={400}
+                value={wish}
+                onChange={(event) => setWish(event.target.value)}
+              />
+            </div>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <DialogFooter>
               <Button type="button" variant="paper" onClick={onClose}>

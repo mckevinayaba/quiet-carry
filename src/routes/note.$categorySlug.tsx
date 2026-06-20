@@ -227,6 +227,16 @@ function NotePage() {
             <Link to="/support">Find support now</Link>
           </Button>
         </div>
+      ) : note.needsSafetyCue ? (
+        <div className="paper-panel space-y-2 border-l-4 border-l-border">
+          <p className="text-sm leading-6 text-muted-foreground">
+            {note.safetyCueText ??
+              "If this brought up something heavy, please pause. You do not have to carry it alone. Visit Safety & Support or reach out to someone you trust."}
+          </p>
+          <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
+            <Link to="/support">Safety &amp; Support</Link>
+          </Button>
+        </div>
       ) : null}
 
       <ShareNoteModal

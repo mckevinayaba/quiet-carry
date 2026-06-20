@@ -127,16 +127,19 @@ export function truncateAtBoundary(text: string, maxChars: number): string {
   return (cut > 0 ? candidate.slice(0, cut + 1) : candidate).trimEnd() + "…";
 }
 
+function getBestExcerpt(note: NoteEntry): string {
+  return note.shareExcerpt || note.socialExcerpt || note.mainText;
+}
+
 export function getBestVisualText(note: NoteEntry, maxChars: number, preferFull = false): string {
-  if (!preferFull && note.socialExcerpt) {
-    if (note.socialExcerpt.length <= maxChars) return note.socialExcerpt;
-    return truncateAtBoundary(note.socialExcerpt, maxChars);
-  }
-  return truncateAtBoundary(note.mainText ?? "", maxChars);
+  if (preferFull) return truncateAtBoundary(note.mainText ?? "", maxChars);
+  const excerpt = getBestExcerpt(note);
+  if (excerpt.length <= maxChars) return excerpt;
+  return truncateAtBoundary(excerpt, maxChars);
 }
 
 function resolveContentMode(note: NoteEntry, preset: PresetDefinition): ContentMode {
-  const sourceLen = (note.socialExcerpt ?? note.mainText).length;
+  const sourceLen = getBestExcerpt(note).length;
   if (sourceLen <= preset.maxChars) return "full";
   if (sourceLen > preset.carouselThreshold) return "carousel_required";
   return "excerpt";
@@ -167,11 +170,11 @@ export function buildRenderPlan(note: NoteEntry, presetId: PresetId): RenderPlan
   const warnings: string[] = [];
   if (contentMode === "carousel_required") {
     warnings.push(
-      `Note is ${(note.socialExcerpt ?? note.mainText).length} chars — exceeds carousel threshold (${preset.carouselThreshold}). Showing best excerpt; carousel recommended.`,
+      `Note is ${getBestExcerpt(note).length} chars — exceeds carousel threshold (${preset.carouselThreshold}). Showing best excerpt; carousel recommended.`,
     );
   } else if (contentMode === "excerpt") {
     warnings.push(
-      `Excerpt mode: ${(note.socialExcerpt ?? note.mainText).length} chars > ${preset.maxChars} limit.`,
+      `Excerpt mode: ${getBestExcerpt(note).length} chars > ${preset.maxChars} limit.`,
     );
   }
 
