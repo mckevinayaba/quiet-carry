@@ -32,23 +32,42 @@ function SupportPage() {
         <h1 className="font-display text-5xl leading-none">Before you go further</h1>
       </section>
 
+      {/* Immediate action block */}
+      <section className="space-y-4 rounded-md border border-border bg-card p-6">
+        <p className="text-base font-medium leading-7 text-foreground">
+          Right now, please do one real-world thing before you continue.
+        </p>
+        <ul className="space-y-2 text-base leading-7 text-foreground">
+          <li className="flex items-start gap-3">
+            <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
+            Contact emergency services in your country.
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
+            Call a local crisis line.
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
+            Message someone you trust and say: "I am not safe being alone right now."
+          </li>
+        </ul>
+        <p className="text-base leading-7 text-muted-foreground">
+          If you can, move away from anything you could use to hurt yourself and go where another
+          human being can see you.
+        </p>
+        <p className="text-sm leading-6 text-muted-foreground">
+          This page is not a replacement for live support. It is only a bridge toward it.
+        </p>
+      </section>
+
+      {/* Disclaimer */}
       <section className="paper-panel space-y-4">
         <p className="text-base leading-7 text-muted-foreground">
           The Note You Needed Today is not therapy, diagnosis, or medical advice. It offers
-          emotional language, reflection, and supportive words for everyday life.
+          emotional language, reflection, and supportive words for everyday life. It does not
+          replace professional help, counselling, emergency care, or crisis support.
         </p>
-        <p className="text-base leading-7 text-muted-foreground">
-          If you feel in immediate danger, feel like harming yourself, or cannot stay safe, please
-          contact emergency services, a crisis line, or someone you trust now.
-        </p>
-        <Button variant="note" disabled aria-disabled="true">
-          Find support near me (coming soon)
-        </Button>
-        <p className="text-xs leading-5 text-muted-foreground">
-          A vetted list of crisis lines is being prepared. Until then, please reach out to local
-          emergency services or someone you trust.
-        </p>
-        <Button asChild variant="paper" className="mt-2 min-h-11 self-start">
+        <Button asChild variant="paper" className="min-h-11 self-start">
           <Link to="/">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Return Home

@@ -270,7 +270,7 @@ function CategoriesPreview() {
         <div className="max-w-xl space-y-3">
           <span className="eyebrow-copy">What are you carrying today?</span>
           <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
-            Ten quiet doors.
+            Choose the door that knows your name today.
           </h2>
           <p className="text-base leading-7 text-foreground">
             Choose what you are feeling. Read the note. Keep it, send it, or share it when the
@@ -388,7 +388,7 @@ function TodaysNote() {
           One note. Written for the part of you that has been quiet.
         </h2>
         <p className="text-base leading-7 text-muted-foreground">
-          Every day, a new note arrives. Keep it for yourself. Send it softly to someone. Or write
+          Today, start with one note. Keep it for yourself. Send it softly to someone. Or write
           your own reflection from it.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
@@ -757,7 +757,7 @@ function SiteFooter() {
 
       <div className="mx-auto mt-10 flex max-w-6xl flex-col items-center justify-between gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
         <p>© {new Date().getFullYear()} The Note You Needed Today</p>
-        <p>Built slowly and carefully.</p>
+        <p>Emotional language for what people carry quietly.</p>
       </div>
     </footer>
   );

@@ -128,17 +128,36 @@ function AboutInner() {
           </h2>
         </div>
 
-        {/* Receipt visual */}
-        <div className="receipt-block space-y-0 font-mono text-sm">
+        {/* Receipt visual — four named fields */}
+        <div className="space-y-3">
           {[
-            { label: "FROM:", value: "A version of yourself. A safe place. A truth you were not allowed to say." },
-            { label: "TO:", value: "The part of you that is still counting what it cost." },
-            { label: "DATE:", value: "The moment it became too much to carry alone." },
-            { label: "TOTAL:", value: "A love you paid for with silence. A strength people kept spending without asking what it cost you." },
-          ].map(({ label, value }) => (
-            <div key={label} className="flex gap-3 border-b border-dashed border-border py-3 last:border-0">
-              <span className="w-16 shrink-0 font-bold text-foreground">{label}</span>
-              <span className="text-muted-foreground">{value}</span>
+            {
+              label: "FROM",
+              description: "Where the wound, pressure, silence, loss, or emotional debt came from.",
+              example: "A version of yourself. A safe place. A truth you were not allowed to say.",
+            },
+            {
+              label: "TO",
+              description: "The part of you that needed the note.",
+              example: "The part of you that is still counting what it cost.",
+            },
+            {
+              label: "DATE",
+              description: "The emotional moment when something became clear, heavy, honest, or ready to be released.",
+              example: "The moment it became too much to carry alone.",
+            },
+            {
+              label: "TOTAL",
+              description: "The truth strong enough to screenshot.",
+              example: "A love you paid for with silence. A strength people kept spending without asking what it cost you.",
+            },
+          ].map(({ label, description, example }) => (
+            <div key={label} className="receipt-block space-y-2 p-4">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                <span className="font-label text-xs font-bold tracking-widest text-foreground">{label}</span>
+                <span className="text-sm leading-6 text-muted-foreground">{description}</span>
+              </div>
+              <p className="font-mono text-sm leading-6 text-foreground">{example}</p>
             </div>
           ))}
         </div>
