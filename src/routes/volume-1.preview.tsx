@@ -1,7 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
+import {
+  CopyLinkButton,
+  TwitterShareButton,
+  WhatsAppShareButton,
+} from "@/components/share-buttons";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { volumeOneSelarUrl } from "@/lib/note-data";
+
+const PREVIEW_URL = "https://thenoteyouneeded.today/volume-1/preview";
 
 export const Route = createFileRoute("/volume-1/preview")({
   errorComponent: RouteErrorBoundary,
@@ -21,9 +29,32 @@ export const Route = createFileRoute("/volume-1/preview")({
 
 function Volume1PreviewPage() {
   const selarUrl = volumeOneSelarUrl;
+  const [sharedFrom, setSharedFrom] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setSharedFrom(params.has("ref") || params.has("from"));
+  }, []);
 
   return (
     <div style={{ background: "#FAF6F1", minHeight: "100vh", fontFamily: "Georgia, serif" }}>
+      {sharedFrom && (
+        <p
+          style={{
+            textAlign: "center",
+            fontFamily: "Georgia, serif",
+            fontStyle: "italic",
+            fontSize: "13px",
+            color: "#8B7355",
+            background: "#F5EFE6",
+            margin: 0,
+            padding: "10px 16px",
+          }}
+        >
+          Someone shared this with you. Read it slowly.
+        </p>
+      )}
+
       {/* Minimal top bar */}
       <div
         style={{
@@ -369,6 +400,29 @@ function Volume1PreviewPage() {
           >
             — End of free preview —
           </span>
+        </div>
+
+        {/* Share row */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "40px",
+          }}
+        >
+          <WhatsAppShareButton
+            text={`This note found me today: ${PREVIEW_URL}`}
+            source="preview_page"
+          />
+          <CopyLinkButton url={PREVIEW_URL} source="preview_page" />
+          <TwitterShareButton
+            text="This note found me today"
+            url={PREVIEW_URL}
+            source="preview_page"
+          />
         </div>
 
         {/* CTA block */}

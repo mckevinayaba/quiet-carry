@@ -140,6 +140,8 @@ export function Volume1FeaturedCard() {
       <div className="flex flex-col sm:flex-row" style={{ gap: "12px", marginTop: "24px" }}>
         <a
           href={volumeOneSelarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={() => trackEvent("volume1_purchase_clicked", { source: "collections_card" })}
           style={{
             display: "inline-flex",

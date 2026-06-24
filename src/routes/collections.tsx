@@ -176,6 +176,8 @@ function CollectionsInner() {
         >
           <a
             href={volumeOneSelarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() =>
               trackEvent("volume1_purchase_clicked", { source: "collections_sticky_bar" })
             }

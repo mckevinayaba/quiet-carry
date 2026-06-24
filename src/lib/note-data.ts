@@ -69,13 +69,13 @@ export interface CollectionEntry {
   detailHref?: string;
 }
 
+// Hardcoded fallback so every purchase button works even when
+// VITE_SELAR_VOLUME1_URL is not configured in the deployment environment.
+const SELAR_VOLUME1_FALLBACK_URL = "https://selar.com/9114v4su35";
+
 const selarVolume1Url = import.meta.env.VITE_SELAR_VOLUME1_URL as string | undefined;
 
-if (!selarVolume1Url) {
-  console.warn("[Volume 1] Selar URL not configured. Set VITE_SELAR_VOLUME1_URL in .env");
-}
-
-export const volumeOneSelarUrl = selarVolume1Url || "#volume-1-coming-soon";
+export const volumeOneSelarUrl = selarVolume1Url || SELAR_VOLUME1_FALLBACK_URL;
 
 export const categories: EmotionalCategory[] = [
   {
@@ -131,7 +131,8 @@ export const categories: EmotionalCategory[] = [
   {
     slug: "people-who-watched-you-bleed",
     title: "The People Who Watched You Bleed",
-    subtitle: "For the people who knew what you survived, saw what you carried, and still waited for the world to clap before they supported you.",
+    subtitle:
+      "For the people who knew what you survived, saw what you carried, and still waited for the world to clap before they supported you.",
   },
   {
     slug: "money-that-never-stretched",
@@ -186,7 +187,7 @@ export const notes: NoteEntry[] = [
     categorySlug: "im-fine-but-not-really",
     title: "The Truth Was Too Heavy",
     hookLine:
-      "This is for the person who, when someone finally asked how they really were, took a breath — and said \"I'm fine\" anyway.",
+      'This is for the person who, when someone finally asked how they really were, took a breath — and said "I\'m fine" anyway.',
     mainText: `They asked,\n"How are you?"\nand this time,\nthey really meant it.\n\nThey looked at you\nlike they had space\nfor the truth.\n\nBut you still smiled.\nYou still said,\n"I'm fine."\n\nNot because\nthey did not care.\nNot because\nthey would not stay.\n\nBecause the truth\nwas too heavy\nto carry out loud.\n\nI hope you\nheal from\nthe fear\nof being honest\nwith people\nwho are safe enough\nto hear you.`,
     shareExcerpt: `They asked, "How are you?"\nand this time, they really meant it.\n\nBut you still smiled.\nYou still said, "I'm fine."\n\nBecause the truth\nwas too heavy\nto carry out loud.\n\nI hope you find one safe place\nwhere you do not have to edit your pain.`,
     storySpine: {
@@ -199,8 +200,7 @@ export const notes: NoteEntry[] = [
     volumeOneStatus: "included",
     receiptFrom:
       "Every time the truth climbed your throat and you swallowed it back down. every question you dodged with a smile. every night you cried alone because no one asked when you were ready to answer.",
-    receiptTo:
-      "One safe place. one person. one moment where you do not have to edit your pain.",
+    receiptTo: "One safe place. one person. one moment where you do not have to edit your pain.",
     receiptDate: "The first time someone asks and you do not flinch.",
     receiptTotal:
       "The tears you saved for the dark. they are not shame. they are just waiting for permission.",
@@ -298,7 +298,8 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you\nheal from\nthe unknown number\nthat makes\nyour stomach drop\nbefore you even answer.\n\nSome debts\nlive in the body,\nnot the bank.\n\nSome fear\narrives as a ringtone.`,
     shareExcerpt: `I hope you heal from the unknown number\nthat makes your stomach drop\nbefore you even answer.\n\nSome debts live in the body, not the bank.\nSome fear arrives as a ringtone.\n\nI hope your days become safe enough to breathe through.`,
     storySpine: {
-      wound: "Financial fear learned to live in the body as a ringtone, a balance check, a held breath",
+      wound:
+        "Financial fear learned to live in the body as a ringtone, a balance check, a held breath",
       witness: "You carried dread in your body that never showed on your face",
       way: "One month at a time, the body can learn a different response",
     },
@@ -431,7 +432,7 @@ export const notes: NoteEntry[] = [
     receiptFrom:
       "The nights you cried when no one was watching. the days you smiled through pain. the times you started over with nothing but hope.",
     receiptTo: "A single moment of peace without someone wishing you would fail.",
-    receiptDate: "The day someone says \"I see your struggle\" instead of \"you do not belong.\"",
+    receiptDate: 'The day someone says "I see your struggle" instead of "you do not belong."',
     receiptTotal:
       "Every step you took when the ground was shaking beneath you. you cannot judge what you have not carried.",
     journalPrompt: "What part of your journey do people judge because they never had to carry it?",
@@ -447,7 +448,8 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you heal from\nthe people who knew your story\nbut still waited for strangers to clap\nbefore they supported you.\n\nThey knew what you survived.\n\nThey knew what you carried.\n\nThey knew the pit you crawled out of.\n\nAnd still, they waited.\n\nThey waited until money validated you.\n\nThey waited until the world\nstarted calling you successful.\n\nThey waited until it became safe\nto say they always believed in you.\n\nDo it anyway.\n\nStop expecting recognition\nfrom people who watched you bleed\nand still chose silence.\n\nBecome your own witness.\n\nYour own proof.\n\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\n\nIt was given to you.`,
     shareExcerpt: `Do it anyway.\n\nStop expecting recognition\nfrom people who watched you bleed\nand still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.`,
     storySpine: {
-      wound: "The people who knew your story most still waited for the crowd to confirm it before believing you",
+      wound:
+        "The people who knew your story most still waited for the crowd to confirm it before believing you",
       witness: "You kept building in rooms where your closest people stayed silent",
       way: "Become your own witness. The dream was never given to the crowd.",
     },
@@ -462,7 +464,8 @@ export const notes: NoteEntry[] = [
     receiptTo: "The day you stop needing witnesses before you believe yourself.",
     receiptDate: "The moment you choose the dream without waiting for applause.",
     receiptTotal: "Your proof was never their permission. Keep going.",
-    journalPrompt: "Where have you been waiting for recognition from people who already saw enough to support you?",
+    journalPrompt:
+      "Where have you been waiting for recognition from people who already saw enough to support you?",
     sendableText:
       "Do it anyway.\n\nStop expecting recognition from people who watched you bleed and still chose silence.\n\nBecome your own witness.\nYour own proof.\nYour own reason to keep going.\n\nBecause the dream was never given to the crowd.\nIt was given to you.",
   },
@@ -475,7 +478,8 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you heal from the shame of counting money that was never enough.\n\nFrom checking your balance before buying bread.\n\nFrom knowing exactly how much is in your account because your peace has been living inside numbers.\n\nFrom pretending you are managing when you are really deciding which problem can wait until next week.\n\nPeople say money is not everything.\n\nBut they do not always understand that sometimes money is sleep.\n\nMoney is dignity.\n\nMoney is answering your phone without fear.\n\nMoney is not rehearsing an apology before someone asks for what you owe.\n\nMoney is walking into a shop without doing mathematics in your chest.\n\nYou have made small money perform miracles.\n\nYou have stretched what was already thin.\n\nYou have gone without and still looked normal.\n\nYou have smiled in rooms while calculating whether you can afford to get home.\n\nAnd the cruelest part is that people may still call it irresponsibility when they never saw how many times you chose survival over comfort.\n\nI hope you heal from blaming yourself for a life that kept asking you to carry more than the money could hold.\n\nI hope one day money stops feeling like proof of your worth.\n\nI hope one day your body no longer tightens when you hear the word "due."\n\nI hope one day you have enough to breathe.`,
     shareExcerpt: `You have smiled in rooms while calculating whether you can afford to get home.\n\nYou have made small money perform miracles.\nYou have gone without and still looked normal.\n\nYou were not careless.\nYou were carrying more than the money could hold.`,
     storySpine: {
-      wound: "Financial pressure lived in the body as mathematics in the chest and silence at the dinner table",
+      wound:
+        "Financial pressure lived in the body as mathematics in the chest and silence at the dinner table",
       witness: "You made small money perform miracles and still looked like everything was fine",
       way: "This was not carelessness. This was carrying more than money could hold.",
     },
@@ -489,8 +493,10 @@ export const notes: NoteEntry[] = [
     shortReceiptFrom: "Every month that asked you to become a miracle worker.",
     shortReceiptTo: "The part of you that felt ashamed for not having enough.",
     shortReceiptTotal: "You were not careless. You were carrying more than the money could hold.",
-    journalPrompt: "Where have you been blaming yourself for financial pressure that was bigger than your choices?",
-    sendableText: "I found this and thought of you.\n\nYou were not careless. You were carrying more than the money could hold.",
+    journalPrompt:
+      "Where have you been blaming yourself for financial pressure that was bigger than your choices?",
+    sendableText:
+      "I found this and thought of you.\n\nYou were not careless. You were carrying more than the money could hold.",
     socialExcerpt: "You were not careless. You were carrying more than the money could hold.",
     publicHook: "For the month that asked you to become a miracle worker.",
   },
@@ -532,7 +538,8 @@ export const notes: NoteEntry[] = [
     shareExcerpt: `When it breaks, you do not only lose the person.\n\nYou lose the future you had already rehearsed.\nThe house you imagined.\nThe old age you thought you would reach together.\n\nIt ended, but it was not nothing.`,
     storySpine: {
       wound: "You lost not just a person but the entire future you had already rehearsed together",
-      witness: "You are grieving a covenant, a rhythm, a room, a name — while people ask about the paperwork",
+      witness:
+        "You are grieving a covenant, a rhythm, a room, a name — while people ask about the paperwork",
       way: "A marriage becoming a memory does not mean your heart became a mistake.",
     },
     emotionalIntensity: "heavy",
@@ -559,8 +566,10 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you heal from the love that left before your heart knew how to let go.\n\nBecause some people do not only leave your life.\n\nThey leave your mornings different.\n\nYour phone quieter.\n\nYour plans unfinished.\n\nYour chest waiting for a message that is not coming.\n\nYour body checking places where they used to be.\n\nAnd the hardest part is not always that they left.\n\nSometimes the hardest part is that love stayed longer than they did.\n\nYou still remember their voice.\n\nTheir smell.\n\nTheir face when they were soft with you.\n\nThe small things nobody else knows how to replace.\n\nAnd now people expect you to move on as if love is a switch.\n\nAs if attachment obeys instructions.\n\nAs if the heart can forget just because the relationship ended.\n\nBut healing does not begin by pretending you no longer miss them.\n\nSometimes healing begins by admitting that you do.\n\nYou miss them.\n\nYou miss who you were with them.\n\nYou miss what you thought the two of you were becoming.\n\nThat does not mean you should go back.\n\nIt means you are human.\n\nI hope you heal from confusing missing them with needing them back.\n\nI hope memory becomes softer.\n\nI hope one day their name no longer feels like a door reopening inside you.`,
     shareExcerpt: `Some people do not only leave your life.\n\nThey leave your mornings different.\nYour phone quieter.\nYour chest waiting for a message that is not coming.\n\nMissing them is not the same as needing them back.\nThat does not mean you should go back.\nIt means you are human.`,
     storySpine: {
-      wound: "Love stayed in the body long after the relationship ended and people expected you to move on",
-      witness: "You miss who you were with them, not just who they were — and that is its own grief",
+      wound:
+        "Love stayed in the body long after the relationship ended and people expected you to move on",
+      witness:
+        "You miss who you were with them, not just who they were — and that is its own grief",
       way: "Missing them is not the same as needing them back. That distinction is the first space of healing.",
     },
     emotionalIntensity: "medium",
@@ -574,7 +583,8 @@ export const notes: NoteEntry[] = [
     shortReceiptTo: "The part of you still checking for what is no longer coming.",
     shortReceiptTotal: "Missing them is not the same as needing them back.",
     journalPrompt: "What do you still miss that you are afraid to admit?",
-    sendableText: "I found this and thought of you.\n\nMissing them is not the same as needing them back.",
+    sendableText:
+      "I found this and thought of you.\n\nMissing them is not the same as needing them back.",
     socialExcerpt: "Missing them is not the same as needing them back.",
     publicHook: "For the love that left but stayed in your body.",
   },
@@ -605,7 +615,8 @@ export const notes: NoteEntry[] = [
     shortReceiptTo: "The child in you who still wonders why love felt unsafe.",
     shortReceiptTotal: "Family can explain the wound, but it does not excuse it.",
     journalPrompt: "What family pain have you minimized because you were told to understand?",
-    sendableText: "I found this and thought of you.\n\nHonoring family should not require abandoning yourself.",
+    sendableText:
+      "I found this and thought of you.\n\nHonoring family should not require abandoning yourself.",
     socialExcerpt: "Honoring family should not require abandoning yourself.",
     publicHook: "For the family wound people told you not to name.",
   },
@@ -618,8 +629,10 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you heal from the loneliness people cannot see because you still know how to function.\n\nBecause the hardest loneliness is not always an empty room.\n\nSometimes it is being surrounded by people who do not really know where you are inside yourself.\n\nPeople see you reply.\n\nThey see you laugh.\n\nThey see you show up.\n\nThey see you post.\n\nThey see you answer messages.\n\nThey see you keep moving.\n\nSo they assume you are fine.\n\nThey do not see the silence after the conversation ends.\n\nThey do not see how long you stare at your phone.\n\nThey do not see the part of you that wants someone to ask again, but differently.\n\nThey do not see how tired you are of being reachable but not really reached.\n\nYou are not lonely because nobody knows your name.\n\nYou are lonely because too few people know your weight.\n\nThe things you carry.\n\nThe things you avoid saying.\n\nThe truth behind your "I am okay."\n\nThe version of you that exists after everyone leaves.\n\nI hope you heal from having to collapse before people believe you needed someone.\n\nI hope one day you are known without performing pain.\n\nI hope someone sits beside your silence and does not rush to leave it.`,
     shareExcerpt: `I hope you heal from the loneliness people cannot see\nbecause you still know how to function.\n\nYou are not lonely because nobody knows your name.\nYou are lonely because too few people know your weight.\n\nYou were not hard to love.\nYou were hard to see from the surface.`,
     storySpine: {
-      wound: "You are lonely not because nobody knows your name but because too few people know your weight",
-      witness: "People see you functioning and assume you are fine. They do not see you after everyone leaves.",
+      wound:
+        "You are lonely not because nobody knows your name but because too few people know your weight",
+      witness:
+        "People see you functioning and assume you are fine. They do not see you after everyone leaves.",
       way: "You were not hard to love. You were hard to see from the surface.",
     },
     emotionalIntensity: "heavy",
@@ -636,7 +649,8 @@ export const notes: NoteEntry[] = [
     shortReceiptTo: "The part of you waiting to be known without performing pain.",
     shortReceiptTotal: "You were not hard to love. You were hard to see from the surface.",
     journalPrompt: "Where in your life do you feel surrounded but still unseen?",
-    sendableText: "I found this and thought of you.\n\nYou were not hard to love. You were hard to see from the surface.",
+    sendableText:
+      "I found this and thought of you.\n\nYou were not hard to love. You were hard to see from the surface.",
     socialExcerpt: "You were not hard to love. You were hard to see from the surface.",
     publicHook: "For the loneliness people cannot see from the outside.",
   },
@@ -649,7 +663,8 @@ export const notes: NoteEntry[] = [
     mainText: `I hope you heal from the shame of still waiting for something you have worked so hard to become.\n\nBecause you are not always grieving failure.\n\nSometimes you are grieving delay.\n\nAnd delay has its own kind of heartbreak.\n\nYou can still believe in the dream and still be tired of waiting for it.\n\nYou can still know it is possible and still feel embarrassed that it has taken this long.\n\nYou can still be working hard and still feel like life is moving faster for everyone else.\n\nNobody tells you how heavy it is to carry a dream that keeps asking for more patience.\n\nMore faith.\n\nMore sacrifice.\n\nMore time.\n\nMore money.\n\nMore strength you are not sure you still have.\n\nAnd the hardest part is that people only celebrate dreams when they start looking successful.\n\nThey do not always see the years when the dream is still expensive.\n\nStill confusing.\n\nStill lonely.\n\nStill making you look foolish in rooms where results matter more than belief.\n\nBut delay is not always denial.\n\nSometimes delay is the place where the dream becomes honest.\n\nWhere you learn what part of it was ego.\n\nWhat part was calling.\n\nWhat part was pressure.\n\nWhat part was purpose.\n\nI hope you heal from measuring your calling only by speed.\n\nI hope you do not bury the dream just because it is late.\n\nBut I also hope you stop pretending the waiting has not hurt.`,
     shareExcerpt: `You can still believe in the dream\nand still be tired of waiting for it.\n\nNobody tells you how heavy it is\nto carry a dream that keeps asking for more patience.\n\nBut delay is not always denial.\nLate is not always lost.`,
     storySpine: {
-      wound: "The dream kept asking for more patience, more time, more sacrifice than anyone warned you about",
+      wound:
+        "The dream kept asking for more patience, more time, more sacrifice than anyone warned you about",
       witness: "You kept going in rooms where results mattered more than belief",
       way: "Delay is not denial. Late is not always lost. Do not bury the dream just because it is late.",
     },
@@ -723,8 +738,10 @@ export const notes: NoteEntry[] = [
     shortReceiptFrom: "The hour that felt too heavy to survive alone.",
     shortReceiptTo: "The part of you that needs support, not shame.",
     shortReceiptTotal: "You do not have to do this alone.",
-    journalPrompt: "Who is one safe person or support place you can reach before the night gets heavier?",
-    sendableText: "I found this and thought of you.\n\nYou do not have to do this alone.\n\nPlease stay near help. Message someone. Call someone. Let one safe person know you are not okay.",
+    journalPrompt:
+      "Who is one safe person or support place you can reach before the night gets heavier?",
+    sendableText:
+      "I found this and thought of you.\n\nYou do not have to do this alone.\n\nPlease stay near help. Message someone. Call someone. Let one safe person know you are not okay.",
     socialExcerpt: "You do not have to do this alone.",
     publicHook: "For the hour that feels too heavy to carry alone.",
   },
@@ -748,8 +765,9 @@ export const collections: CollectionEntry[] = [
       "Closing receipt page",
     ],
     price: "R149 · $7–$9",
-    ctaLabel: "Join the quiet list for first access",
-    comingSoon: true,
+    ctaLabel: "Get Volume 1 — R149",
+    ctaHref: volumeOneSelarUrl,
+    comingSoon: false,
     detailHref: "/volume-1",
   },
   {

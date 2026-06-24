@@ -50,7 +50,10 @@ export type AnalyticsEventName =
   | "share_caption_copied"
   | "share_download_clicked"
   | "share_image_downloaded"
-  | "share_image_download_failed";
+  | "share_image_download_failed"
+  | "note_share_clicked"
+  | "gift_page_viewed"
+  | "gift_purchase_clicked";
 
 // ---------------------------------------------------------------------------
 // Payload sanitisation

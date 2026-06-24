@@ -265,6 +265,8 @@ function VolumeOneContent() {
             <Button asChild variant="note" className="min-h-12">
               <a
                 href={volumeOneSelarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => trackEvent("volume1_purchase_clicked", { source: "volume1_page" })}
               >
                 Get Volume 1 — R149
@@ -307,6 +309,8 @@ function VolumeOneContent() {
       >
         <a
           href={volumeOneSelarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={() => trackEvent("volume1_purchase_clicked", { source: "volume1_sticky_bar" })}
           style={{
             display: "flex",

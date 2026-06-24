@@ -19,6 +19,7 @@ import { Route as SafetySupportRouteImport } from './routes/safety-support'
 import { Route as ReflectRouteImport } from './routes/reflect'
 import { Route as PostcardPreviewRouteImport } from './routes/postcard-preview'
 import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
+import { Route as GiftRouteImport } from './routes/gift'
 import { Route as FeelingsRouteImport } from './routes/feelings'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as AccountRouteImport } from './routes/account'
@@ -79,6 +80,11 @@ const PostcardPreviewRoute = PostcardPreviewRouteImport.update({
 const NoteFramePreviewRoute = NoteFramePreviewRouteImport.update({
   id: '/note-frame-preview',
   path: '/note-frame-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftRoute = GiftRouteImport.update({
+  id: '/gift',
+  path: '/gift',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeelingsRoute = FeelingsRouteImport.update({
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/gift': typeof GiftRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
   '/reflect': typeof ReflectRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/gift': typeof GiftRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
   '/reflect': typeof ReflectRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/collections': typeof CollectionsRoute
   '/feelings': typeof FeelingsRoute
+  '/gift': typeof GiftRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
   '/reflect': typeof ReflectRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/gift'
     | '/note-frame-preview'
     | '/postcard-preview'
     | '/reflect'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/gift'
     | '/note-frame-preview'
     | '/postcard-preview'
     | '/reflect'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/collections'
     | '/feelings'
+    | '/gift'
     | '/note-frame-preview'
     | '/postcard-preview'
     | '/reflect'
@@ -283,6 +295,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   CollectionsRoute: typeof CollectionsRoute
   FeelingsRoute: typeof FeelingsRoute
+  GiftRoute: typeof GiftRoute
   NoteFramePreviewRoute: typeof NoteFramePreviewRoute
   PostcardPreviewRoute: typeof PostcardPreviewRoute
   ReflectRoute: typeof ReflectRoute
@@ -367,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/note-frame-preview'
       fullPath: '/note-frame-preview'
       preLoaderRoute: typeof NoteFramePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift': {
+      id: '/gift'
+      path: '/gift'
+      fullPath: '/gift'
+      preLoaderRoute: typeof GiftRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feelings': {
@@ -472,6 +492,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   CollectionsRoute: CollectionsRoute,
   FeelingsRoute: FeelingsRoute,
+  GiftRoute: GiftRoute,
   NoteFramePreviewRoute: NoteFramePreviewRoute,
   PostcardPreviewRoute: PostcardPreviewRoute,
   ReflectRoute: ReflectRoute,
@@ -488,3 +509,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

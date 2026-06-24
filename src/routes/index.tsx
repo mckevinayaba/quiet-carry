@@ -39,9 +39,7 @@ import volumeCollage from "@/assets/volume-one-collage.jpg";
 export const Route = createFileRoute("/")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
-    links: [
-      { rel: "canonical", href: "https://thenoteyouneeded.today/" },
-    ],
+    links: [{ rel: "canonical", href: "https://thenoteyouneeded.today/" }],
     meta: [
       { title: "The Note You Needed Today — Find words for what you carry quietly" },
       {
@@ -109,7 +107,8 @@ function Hero() {
 
           <div className="space-y-5">
             <h1 className="text-balance font-display text-[3.25rem] leading-[0.98] text-foreground sm:text-7xl lg:text-[5.25rem]">
-              The Note You<br />
+              The Note You
+              <br />
               Needed Today
             </h1>
             <p className="max-w-xl font-display text-2xl leading-snug text-foreground sm:text-3xl">
@@ -214,7 +213,9 @@ function NotSocialMedia() {
         </h2>
         <ul className="space-y-3 text-xl leading-9 sm:text-2xl">
           {lines.map((line) => (
-            <li key={line} className="opacity-90">{line}</li>
+            <li key={line} className="opacity-90">
+              {line}
+            </li>
           ))}
         </ul>
       </div>
@@ -254,9 +255,7 @@ function HowItWorks() {
         {steps.map(({ icon: Icon, title, copy }, idx) => (
           <div key={title} className="paper-panel relative space-y-3 p-6">
             <div className="flex items-center justify-between">
-              <span className="font-label text-3xl text-muted-foreground">
-                0{idx + 1}
-              </span>
+              <span className="font-label text-3xl text-muted-foreground">0{idx + 1}</span>
               <Icon className="size-5 text-muted-foreground" aria-hidden />
             </div>
             <h3 className="font-display text-2xl leading-tight text-foreground">{title}</h3>
@@ -280,8 +279,8 @@ function CategoriesPreview() {
             Choose the door that knows your name today.
           </h2>
           <p className="text-base leading-7 text-foreground">
-            Choose what you are feeling. Read the note. Keep it, send it, or share it when the
-            words are too heavy to find alone.
+            Choose what you are feeling. Read the note. Keep it, send it, or share it when the words
+            are too heavy to find alone.
           </p>
           <p className="text-sm leading-6 text-muted-foreground">
             Every feeling has a room. Choose the one that knows your name today.
@@ -307,7 +306,10 @@ function CategoriesPreview() {
               <h3 className="text-balance font-display text-2xl leading-[1.1] text-foreground">
                 {c.title}
               </h3>
-              <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+              <ArrowRight
+                className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </div>
             <p className="text-sm leading-6 text-muted-foreground">{c.subtitle}</p>
           </Link>
@@ -395,8 +397,8 @@ function TodaysNote() {
           One note. Written for the part of you that has been quiet.
         </h2>
         <p className="text-base leading-7 text-muted-foreground">
-          Today, start with one note. Keep it for yourself. Send it softly to someone. Or write
-          your own reflection from it.
+          Today, start with one note. Keep it for yourself. Send it softly to someone. Or write your
+          own reflection from it.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
           <Button asChild variant="note" className="min-h-11">
@@ -468,7 +470,9 @@ function TodaysNote() {
             asChild
             variant="paper"
             className="min-h-14 items-start justify-start px-4 py-3 text-left"
-            onClick={() => trackEvent("reflection_started", { noteId: featuredNote.id, source: "landing" })}
+            onClick={() =>
+              trackEvent("reflection_started", { noteId: featuredNote.id, source: "landing" })
+            }
           >
             <Link to="/write/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
               <NotebookPen aria-hidden />
@@ -532,59 +536,35 @@ function PrivateByDesign() {
 /* -------------------------- Volume 1 -------------------------- */
 
 function VolumeOne() {
-  const { openWaitlist } = useAppModals();
-  const inside = [
-    "15 designed notes",
-    "15 mobile wallpapers",
-    "15 captions",
-    "15 journal prompts",
-    "5 private letters",
-  ];
   return (
     <section className="paper-panel relative overflow-hidden p-6 sm:p-10">
       <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-2">
             <div className="stitched-label">Volume 1</div>
-            <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-              Coming soon
-            </span>
           </div>
           <div className="space-y-2">
             <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
-              The Note You Needed Today, Volume 1
+              Volume 1 is here.
             </h2>
-            <p className="font-display text-2xl leading-snug text-muted-foreground sm:text-3xl">
-              The Things We Do Not Say Out Loud
+            <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+              15 notes. 5 chapters. Written for the weight you carry quietly.
             </p>
           </div>
-          <p className="max-w-xl text-base leading-7 text-muted-foreground">
-            A digital collection of emotional notes, mobile wallpapers, captions, journal prompts,
-            and private letters for people healing quietly, starting over, grieving privately,
-            feeling unseen, or carrying things they do not always know how to say.
-          </p>
-          <ul className="grid gap-1.5 text-sm text-foreground sm:grid-cols-2">
-            {inside.map((item) => (
-              <li key={item} className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-primary" aria-hidden />
-                {item}
-              </li>
-            ))}
-          </ul>
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            {volumeOneSelarUrl === "#volume-1-coming-soon" ? (
-              <Button variant="note" className="min-h-12" onClick={() => openWaitlist("volume")}>
-                Join the quiet list for first access
-              </Button>
-            ) : (
-              <Button asChild variant="note" className="min-h-12">
-                <a href={volumeOneSelarUrl}>Get Volume 1</a>
-              </Button>
-            )}
             <Button asChild variant="paper" className="min-h-12">
-              <Link to="/volume-1">Explore Volume 1</Link>
+              <Link to="/volume-1/preview">Read a free note →</Link>
             </Button>
-            <span className="font-label text-base text-foreground">R149 · $7–$9</span>
+            <Button asChild variant="note" className="min-h-12">
+              <a
+                href={volumeOneSelarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent("volume1_purchase_clicked", { source: "homepage" })}
+              >
+                Get Volume 1 — R149 →
+              </a>
+            </Button>
           </div>
         </div>
         <div className="relative overflow-hidden rounded-[24px] border border-border shadow-[0_30px_60px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)] rotate-[1deg]">
@@ -609,7 +589,8 @@ function FounderManifesto() {
     <section className="mx-auto max-w-3xl space-y-6 text-center">
       <span className="eyebrow-copy">Why this exists</span>
       <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
-        The internet gave people more ways to be seen,<br className="hidden sm:block" />
+        The internet gave people more ways to be seen,
+        <br className="hidden sm:block" />
         but fewer safe ways to be understood.
       </h2>
       <p className="mx-auto max-w-2xl text-lg leading-8 text-muted-foreground">
@@ -651,19 +632,25 @@ function Waitlist() {
   };
 
   return (
-    <section id="waitlist" className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-24">
+    <section
+      id="waitlist"
+      className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-24"
+    >
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--accent)_18%,transparent),transparent_60%)]" />
       <div className="mx-auto max-w-2xl space-y-6 text-center">
-        <span className="eyebrow-copy">Be first for Volume 1</span>
+        <span className="eyebrow-copy">Volume 2 is coming</span>
         <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-6xl">
-          Join the quiet list.<br />Get early access to Volume 1.
+          Get the next note before anyone else.
         </h2>
         <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-          One quiet email when Volume 1 is ready. No spam. No noise.
+          One email when Volume 2 drops. Nothing else.
         </p>
 
         {submitted ? (
-          <div className="paper-panel mx-auto max-w-md text-base leading-7 text-foreground" role="status">
+          <div
+            className="paper-panel mx-auto max-w-md text-base leading-7 text-foreground"
+            role="status"
+          >
             <p>You are on the list. We will write to you when it is ready.</p>
           </div>
         ) : (
@@ -672,7 +659,9 @@ function Waitlist() {
             onSubmit={onSubmit}
             className="paper-panel mx-auto flex max-w-xl flex-col gap-3 p-4 sm:flex-row sm:items-stretch"
           >
-            <label htmlFor="hero-email" className="sr-only">Email address</label>
+            <label htmlFor="hero-email" className="sr-only">
+              Email address
+            </label>
             <Input
               id="hero-email"
               type="email"
@@ -688,7 +677,7 @@ function Waitlist() {
               }}
             />
             <Button type="submit" variant="note" size="lg" className="min-h-12">
-              Join the waitlist
+              I want to be first →
             </Button>
           </form>
         )}
@@ -712,7 +701,8 @@ function FeedbackBlock() {
         <div>
           <h3 className="font-display text-2xl leading-tight">Help us shape this carefully.</h3>
           <p className="text-sm leading-6 text-muted-foreground">
-            Tell us what felt right, what felt confusing, or what note you needed but could not find.
+            Tell us what felt right, what felt confusing, or what note you needed but could not
+            find.
           </p>
         </div>
       </div>
@@ -751,6 +741,7 @@ function SiteFooter() {
 
         <FooterCol title="Care">
           <FooterLink to="/volume-1">Volume 1</FooterLink>
+          <FooterLink to="/gift">Gift Volume 1</FooterLink>
           <FooterLink to="/support">Safety &amp; Support</FooterLink>
           <button
             type="button"

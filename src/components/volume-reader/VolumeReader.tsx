@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import {
+  CopyLinkButton,
+  TwitterShareButton,
+  WhatsAppShareButton,
+} from "@/components/share-buttons";
 import { Button } from "@/components/ui/button";
 import {
   closingReceipt,
@@ -11,6 +16,8 @@ import {
   CHAPTER_COUNT,
 } from "@/data/volume1";
 import type { Volume1Chapter, Volume1Note } from "@/data/volume1";
+
+const PREVIEW_URL = "https://thenoteyouneeded.today/volume-1/preview";
 
 interface VolumeReaderProps {
   chapter: Volume1Chapter;
@@ -72,6 +79,8 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
             gap: "40px",
           }}
         >
+          {isFirstChapter && <ReferralBanner />}
+
           <ChapterIntroCard
             chapter={chapter}
             chapterNumber={chapterNumber}
@@ -85,13 +94,15 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
           {chapter.notes.map((note, idx) => {
             const marginNote = getMarginNote(note.id);
             return (
-              <NoteEnvelope
-                key={note.id}
-                note={note}
-                index={idx + 1}
-                isQuietAnger={isQuietAnger}
-                marginText={marginNote?.text}
-              />
+              <div key={note.id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <NoteEnvelope
+                  note={note}
+                  index={idx + 1}
+                  isQuietAnger={isQuietAnger}
+                  marginText={marginNote?.text}
+                />
+                <ShareNoteRow />
+              </div>
             );
           })}
 
@@ -103,8 +114,111 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
           {isLastChapter && <ClosingEnvelope />}
 
           <ChapterPrevNext currentChapter={chapterNumber} />
+
+          <GiftLink />
         </div>
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Share row — bottom of every note
+// ---------------------------------------------------------------------------
+
+function ShareNoteRow() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: "10px",
+        padding: "0 4px",
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "'Lora', Georgia, serif",
+          fontSize: "13px",
+          fontStyle: "italic",
+          color: "#8B7355",
+        }}
+      >
+        This one stayed with me. →
+      </span>
+      <CopyLinkButton url={PREVIEW_URL} source="reader_note" />
+      <WhatsAppShareButton text={`This note found me today: ${PREVIEW_URL}`} source="reader_note" />
+      <TwitterShareButton text="This note found me today" url={PREVIEW_URL} source="reader_note" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Gift link — end of every chapter
+// ---------------------------------------------------------------------------
+
+function GiftLink() {
+  return (
+    <div style={{ textAlign: "center" }}>
+      <Link
+        to="/gift"
+        style={{
+          fontFamily: "'Lora', Georgia, serif",
+          fontSize: "13px",
+          fontStyle: "italic",
+          color: "#8B7355",
+          textDecoration: "underline",
+        }}
+      >
+        Buying for someone else? Gift Volume 1 →
+      </Link>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Referral banner — shown once after a successful unlock
+// ---------------------------------------------------------------------------
+
+function ReferralBanner() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("volume1_referral_shown") !== "true") {
+      setVisible(true);
+      localStorage.setItem("volume1_referral_shown", "true");
+    }
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      style={{
+        background: T.parchment,
+        borderRadius: "8px",
+        padding: "20px 24px",
+        textAlign: "center",
+      }}
+    >
+      <p
+        style={{
+          fontFamily: "'Lora', Georgia, serif",
+          fontSize: "14px",
+          color: T.ink,
+          margin: "0 0 12px 0",
+        }}
+      >
+        You are in. If someone else needs this, your link is:
+        <br />
+        {PREVIEW_URL}
+      </p>
+      <CopyLinkButton
+        url={PREVIEW_URL}
+        source="referral_banner"
+        style={{ background: "#FFFFFF" }}
+      />
     </div>
   );
 }
