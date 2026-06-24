@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 
 import { AppLayout } from "@/components/app-layout";
+import { DailyLetterSignup } from "@/components/daily-letter-signup";
+import { MomentBanner } from "@/components/moment-banner";
 import { ReceiptBlock } from "@/components/receipt-block";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
@@ -69,11 +71,13 @@ function HomePage() {
 function Landing() {
   return (
     <>
+      <MomentBanner />
       <Hero />
       <NotSocialMedia />
       <HowItWorks />
       <CategoriesPreview />
       <TodaysNote />
+      <DailyLetterSignup />
       <PrivateByDesign />
       <VolumeOne />
       <FounderManifesto />

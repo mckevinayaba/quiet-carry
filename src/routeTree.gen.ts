@@ -16,6 +16,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShelfRouteImport } from './routes/shelf'
 import { Route as SharePreviewRouteImport } from './routes/share-preview'
 import { Route as SafetySupportRouteImport } from './routes/safety-support'
+import { Route as ReflectRouteImport } from './routes/reflect'
 import { Route as PostcardPreviewRouteImport } from './routes/postcard-preview'
 import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
 import { Route as FeelingsRouteImport } from './routes/feelings'
@@ -62,6 +63,11 @@ const SharePreviewRoute = SharePreviewRouteImport.update({
 const SafetySupportRoute = SafetySupportRouteImport.update({
   id: '/safety-support',
   path: '/safety-support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReflectRoute = ReflectRouteImport.update({
+  id: '/reflect',
+  path: '/reflect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostcardPreviewRoute = PostcardPreviewRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
+  '/reflect': typeof ReflectRoute
   '/safety-support': typeof SafetySupportRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
+  '/reflect': typeof ReflectRoute
   '/safety-support': typeof SafetySupportRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/feelings': typeof FeelingsRoute
   '/note-frame-preview': typeof NoteFramePreviewRoute
   '/postcard-preview': typeof PostcardPreviewRoute
+  '/reflect': typeof ReflectRoute
   '/safety-support': typeof SafetySupportRoute
   '/share-preview': typeof SharePreviewRoute
   '/shelf': typeof ShelfRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/feelings'
     | '/note-frame-preview'
     | '/postcard-preview'
+    | '/reflect'
     | '/safety-support'
     | '/share-preview'
     | '/shelf'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/feelings'
     | '/note-frame-preview'
     | '/postcard-preview'
+    | '/reflect'
     | '/safety-support'
     | '/share-preview'
     | '/shelf'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/feelings'
     | '/note-frame-preview'
     | '/postcard-preview'
+    | '/reflect'
     | '/safety-support'
     | '/share-preview'
     | '/shelf'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   FeelingsRoute: typeof FeelingsRoute
   NoteFramePreviewRoute: typeof NoteFramePreviewRoute
   PostcardPreviewRoute: typeof PostcardPreviewRoute
+  ReflectRoute: typeof ReflectRoute
   SafetySupportRoute: typeof SafetySupportRoute
   SharePreviewRoute: typeof SharePreviewRoute
   ShelfRoute: typeof ShelfRoute
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/safety-support'
       fullPath: '/safety-support'
       preLoaderRoute: typeof SafetySupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reflect': {
+      id: '/reflect'
+      path: '/reflect'
+      fullPath: '/reflect'
+      preLoaderRoute: typeof ReflectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/postcard-preview': {
@@ -433,6 +453,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeelingsRoute: FeelingsRoute,
   NoteFramePreviewRoute: NoteFramePreviewRoute,
   PostcardPreviewRoute: PostcardPreviewRoute,
+  ReflectRoute: ReflectRoute,
   SafetySupportRoute: SafetySupportRoute,
   SharePreviewRoute: SharePreviewRoute,
   ShelfRoute: ShelfRoute,

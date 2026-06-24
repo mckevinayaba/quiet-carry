@@ -28,6 +28,7 @@ const desktopNavLinks = [
   { to: "/feelings", label: "Feelings" },
   { to: "/today", label: "Today" },
   { to: "/shelf", label: "Shelf" },
+  { to: "/reflect", label: "Reflect" },
   { to: "/collections", label: "Collections" },
   { to: "/about", label: "About" },
   { to: "/support", label: "Safety & Support" },
