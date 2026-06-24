@@ -14,11 +14,12 @@ import { cn } from "@/lib/utils";
 import { AppModalsProvider, useAppModals } from "@/components/app-modals";
 
 // Bottom nav — 5 daily-use items. Account lives in the header.
+// Shelf access lives inside /reflect as a secondary link.
 const bottomNavItems = [
   { to: "/", label: "Home", icon: House },
   { to: "/feelings", label: "Feelings", icon: BookHeart },
   { to: "/today", label: "Today", icon: Sun },
-  { to: "/shelf", label: "Shelf", icon: NotebookPen },
+  { to: "/reflect", label: "Reflect", icon: NotebookPen },
   { to: "/collections", label: "Collections", icon: Layers2 },
 ] as const;
 

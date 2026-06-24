@@ -67,8 +67,14 @@ function ReflectPage() {
 
   return (
     <AppLayout className="space-y-6 pb-8">
-      <section className="space-y-1 py-2">
+      <section className="flex items-center justify-between gap-3 py-2">
         <div className="stitched-label">Reflect</div>
+        <Link
+          to="/shelf"
+          className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          View your Shelf →
+        </Link>
       </section>
 
       {mode === "writing" ? (
