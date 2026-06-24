@@ -47,9 +47,11 @@ function UnlockPage() {
           "This code was not found or has already been used. If you believe this is an error, contact hello@thenoteyouneededtoday.com",
         );
       }
-    } catch {
+    } catch (err) {
+      console.error("redeem_volume1_code failed:", err);
+      const msg = err instanceof Error ? err.message : String(err);
       setError(
-        "Something went wrong. Please try again. If the issue continues, contact hello@thenoteyouneededtoday.com",
+        `Something went wrong: ${msg}. If the issue continues, contact hello@thenoteyouneededtoday.com`,
       );
     } finally {
       setLoading(false);
