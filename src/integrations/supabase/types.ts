@@ -49,23 +49,29 @@ export type Database = {
       }
       volume1_access: {
         Row: {
+          buyer_email: string | null
           code: string
           created_at: string
           id: string
+          order_ref: string | null
           redeemed_at: string | null
           redeemed_by: string | null
         }
         Insert: {
+          buyer_email?: string | null
           code: string
           created_at?: string
           id?: string
+          order_ref?: string | null
           redeemed_at?: string | null
           redeemed_by?: string | null
         }
         Update: {
+          buyer_email?: string | null
           code?: string
           created_at?: string
           id?: string
+          order_ref?: string | null
           redeemed_at?: string | null
           redeemed_by?: string | null
         }
