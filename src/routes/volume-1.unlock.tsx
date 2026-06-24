@@ -4,10 +4,8 @@ import { useState } from "react";
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-
-// Local fallback codes — checked first so Volume 1 still unlocks for testing
-// and beta readers even if Supabase env vars are missing or the network call fails.
+// Local fallback codes — checked first so Volume 1 still unlocks for buyers
+// even if the backend is unreachable or env vars are missing.
 const LOCAL_VALID_CODES = [
   "NOTE-2024-SURV",
   "NOTE-2024-HEAL",
@@ -17,6 +15,23 @@ const LOCAL_VALID_CODES = [
 ];
 
 const GENERIC_ERROR = "That code doesn't seem right. Please check your email and try again.";
+
+// Best-effort remote check. Imports the Supabase client lazily and swallows
+// every possible failure (missing env vars, network error, RPC error, thrown
+// proxy access). The user NEVER sees a raw infrastructure error.
+async function tryRemoteRedeem(normalized: string): Promise<boolean> {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error: rpcError } = await supabase.rpc("redeem_volume1_code", {
+      input_code: normalized,
+    });
+    if (rpcError) return false;
+    const result = data as { ok?: boolean } | null;
+    return Boolean(result?.ok);
+  } catch {
+    return false;
+  }
+}
 
 export const Route = createFileRoute("/volume-1/unlock")({
   errorComponent: RouteErrorBoundary,
@@ -33,8 +48,12 @@ function UnlockPage() {
   const [loading, setLoading] = useState(false);
 
   function grantAccess() {
-    localStorage.setItem("volume1_access", "granted");
-    localStorage.setItem("volume1_unlocked", "true");
+    try {
+      localStorage.setItem("volume1_access", "granted");
+      localStorage.setItem("volume1_unlocked", "true");
+    } catch {
+      // ignore storage errors (private mode, quota)
+    }
     navigate({ to: "/volume-1/read/$chapter", params: { chapter: "1" } });
   }
 
@@ -45,38 +64,26 @@ function UnlockPage() {
     setLoading(true);
     setError(null);
 
-    const normalized = code.trim().toUpperCase();
-
-    if (LOCAL_VALID_CODES.includes(normalized)) {
-      grantAccess();
-      setLoading(false);
-      return;
-    }
-
-    // Supabase is a best-effort secondary check. Any failure here (missing env
-    // vars, network error, RPC error) is swallowed — the user only ever sees
-    // the generic "not right" message, never a technical error.
-    let remoteOk = false;
     try {
-      const { data, error: rpcError } = await supabase.rpc("redeem_volume1_code", {
-        input_code: normalized,
-      });
+      const normalized = code.trim().toUpperCase();
 
-      if (!rpcError) {
-        const result = data as { ok: boolean; reason?: string };
-        remoteOk = result.ok;
+      if (LOCAL_VALID_CODES.includes(normalized)) {
+        grantAccess();
+        return;
+      }
+
+      const remoteOk = await tryRemoteRedeem(normalized);
+      if (remoteOk) {
+        grantAccess();
+      } else {
+        setError(GENERIC_ERROR);
       }
     } catch {
-      remoteOk = false;
-    }
-
-    if (remoteOk) {
-      grantAccess();
-    } else {
+      // Last-resort guard — never leak an exception to the route boundary.
       setError(GENERIC_ERROR);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
