@@ -27,6 +27,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as Volume1IndexRouteImport } from './routes/volume-1.index'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
 import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
+import { Route as Volume1PreviewRouteImport } from './routes/volume-1.preview'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
 
@@ -120,6 +121,11 @@ const Volume1UnlockRoute = Volume1UnlockRouteImport.update({
   path: '/unlock',
   getParentRoute: () => Volume1Route,
 } as any)
+const Volume1PreviewRoute = Volume1PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => Volume1Route,
+} as any)
 const NoteCategorySlugRoute = NoteCategorySlugRouteImport.update({
   id: '/note/$categorySlug',
   path: '/note/$categorySlug',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/today': typeof TodayRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/preview': typeof Volume1PreviewRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/preview': typeof Volume1PreviewRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1': typeof Volume1IndexRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/today': typeof TodayRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
+  '/volume-1/preview': typeof Volume1PreviewRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/today'
     | '/volume-1'
     | '/note/$categorySlug'
+    | '/volume-1/preview'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1/'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/today'
     | '/note/$categorySlug'
+    | '/volume-1/preview'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/today'
     | '/volume-1'
     | '/note/$categorySlug'
+    | '/volume-1/preview'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1/'
@@ -413,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Volume1UnlockRouteImport
       parentRoute: typeof Volume1Route
     }
+    '/volume-1/preview': {
+      id: '/volume-1/preview'
+      path: '/preview'
+      fullPath: '/volume-1/preview'
+      preLoaderRoute: typeof Volume1PreviewRouteImport
+      parentRoute: typeof Volume1Route
+    }
     '/note/$categorySlug': {
       id: '/note/$categorySlug'
       path: '/note/$categorySlug'
@@ -431,12 +450,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface Volume1RouteChildren {
+  Volume1PreviewRoute: typeof Volume1PreviewRoute
   Volume1UnlockRoute: typeof Volume1UnlockRoute
   Volume1IndexRoute: typeof Volume1IndexRoute
   Volume1ReadChapterRoute: typeof Volume1ReadChapterRoute
 }
 
 const Volume1RouteChildren: Volume1RouteChildren = {
+  Volume1PreviewRoute: Volume1PreviewRoute,
   Volume1UnlockRoute: Volume1UnlockRoute,
   Volume1IndexRoute: Volume1IndexRoute,
   Volume1ReadChapterRoute: Volume1ReadChapterRoute,

@@ -158,7 +158,7 @@ export function Volume1FeaturedCard() {
           Get Volume 1 →
         </a>
         <Link
-          to="/volume-1"
+          to="/volume-1/preview"
           style={{
             display: "inline-flex",
             alignItems: "center",
