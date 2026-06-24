@@ -1,11 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
-  volume1Chapters,
   closingReceipt,
   getMarginNote,
   openingLetter,
@@ -13,9 +11,6 @@ import {
   CHAPTER_COUNT,
 } from "@/data/volume1";
 import type { Volume1Chapter, Volume1Note } from "@/data/volume1";
-import { ChapterArtifact } from "./ChapterArtifact";
-import type { ChapterTitle } from "./ChapterArtifact";
-import { PremiumReceipt } from "./PremiumReceipt";
 
 interface VolumeReaderProps {
   chapter: Volume1Chapter;
@@ -23,20 +18,22 @@ interface VolumeReaderProps {
 }
 
 // ---------------------------------------------------------------------------
-// Scoped design tokens — restyle only this reading surface, not the site theme.
+// Envelope-letter design tokens — scoped to this reading surface only.
 // ---------------------------------------------------------------------------
 
-const vrVars: React.CSSProperties = {
-  "--vr-bg": "#FAF6F1",
-  "--vr-bg-cover": "#2C2420",
-  "--vr-bg-letter": "#F5EFE6",
-  "--vr-text": "#3D2B1F",
-  "--vr-muted": "#9C8478",
-  "--vr-accent": "#C4A882",
-  "--vr-divider": "#E8DDD4",
-  "--vr-display": "'Playfair Display', serif",
-  "--vr-body": "'Lora', Georgia, serif",
-} as React.CSSProperties;
+const T = {
+  outerBg: "#1C1208",
+  kraft: "#C4903A",
+  kraftBorder: "#8B6914",
+  receiptBg: "#D4A84B",
+  letterBg: "#FAF6EE",
+  parchment: "#F5F0E8",
+  ink: "#1a1208",
+  muted: "#8B6914",
+  redHeart: "#CC2200",
+};
+
+const courier = "'Courier New', Courier, monospace";
 
 // ---------------------------------------------------------------------------
 // Main reader
@@ -56,27 +53,39 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
   }, []);
 
   return (
-    <div style={{ ...vrVars, background: "var(--vr-bg)", minHeight: "100vh" }}>
-      <TopBar chapterTitle={chapter.title} />
+    <div style={{ background: T.outerBg, minHeight: "100vh" }}>
+      <TopBar chapterTitle={chapter.title} currentChapter={chapterNumber} />
 
-      {/* Chapter cover — full-screen opening moment */}
-      <ChapterCover chapter={chapter} chapterNumber={chapterNumber} isQuietAnger={isQuietAnger} />
-
-      {/* Reading column */}
       <div
-        className="mx-auto px-6 md:px-16"
-        style={{ maxWidth: "680px", padding: "56px 24px 80px" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "40px 16px",
+        }}
       >
-        {isFirstChapter && <OpeningLetter />}
+        <div
+          style={{
+            maxWidth: "600px",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: "40px",
+          }}
+        >
+          <ChapterIntroCard
+            chapter={chapter}
+            chapterNumber={chapterNumber}
+            isQuietAnger={isQuietAnger}
+          />
 
-        <ChapterIntroLetter introLetter={chapter.introLetter} />
+          {isFirstChapter && <PlainLetterCard text={openingLetter} />}
 
-        {/* Notes */}
-        <div style={{ marginTop: "64px", display: "flex", flexDirection: "column" }}>
+          <PlainLetterCard text={chapter.introLetter} firstParagraphEmphasis />
+
           {chapter.notes.map((note, idx) => {
             const marginNote = getMarginNote(note.id);
             return (
-              <NoteArticle
+              <NoteEnvelope
                 key={note.id}
                 note={note}
                 index={idx + 1}
@@ -85,32 +94,26 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
               />
             );
           })}
+
+          <PlainLetterCard text={chapter.privateLetter} dearReader />
+
+          <ReceiptDivider chapterNumber={chapterNumber} />
+
+          {isLastChapter && <PlainLetterCard text={safetyAndCareNote} />}
+          {isLastChapter && <ClosingEnvelope />}
+
+          <ChapterPrevNext currentChapter={chapterNumber} />
         </div>
-
-        {/* Private letter */}
-        <PrivateLetterSection text={chapter.privateLetter} />
-
-        {/* Receipt divider — between chapters */}
-        <ReceiptDivider chapterNumber={chapterNumber} />
-
-        {/* Closing receipt — Chapter 5 only */}
-        {isLastChapter && <SafetyCareNote />}
-        {isLastChapter && <ClosingReceiptDestination />}
-
-        {/* Chapter prev / next */}
-        <ChapterPrevNext currentChapter={chapterNumber} />
       </div>
-
-      <FloatingChapterIndex currentChapter={chapterNumber} />
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Minimal top bar — replaces all site nav for this route
+// Minimal top bar — unchanged behavior, only the back link + chapter label
 // ---------------------------------------------------------------------------
 
-function TopBar({ chapterTitle }: { chapterTitle: string }) {
+function TopBar({ chapterTitle }: { chapterTitle: string; currentChapter: number }) {
   return (
     <div
       style={{
@@ -122,17 +125,17 @@ function TopBar({ chapterTitle }: { chapterTitle: string }) {
         justifyContent: "space-between",
         gap: "12px",
         padding: "16px 24px",
-        background: "color-mix(in oklab, var(--vr-bg) 92%, transparent)",
+        background: "color-mix(in oklab, #FAF6F1 92%, transparent)",
         backdropFilter: "blur(6px)",
-        borderBottom: "1px solid var(--vr-divider)",
+        borderBottom: "1px solid #E8DDD4",
       }}
     >
       <Link
         to="/volume-1"
         style={{
-          fontFamily: "var(--vr-body)",
+          fontFamily: "'Lora', Georgia, serif",
           fontSize: "13px",
-          color: "var(--vr-muted)",
+          color: "#9C8478",
           textDecoration: "none",
           display: "flex",
           alignItems: "center",
@@ -145,11 +148,11 @@ function TopBar({ chapterTitle }: { chapterTitle: string }) {
 
       <span
         style={{
-          fontFamily: "var(--vr-body)",
+          fontFamily: "'Lora', Georgia, serif",
           fontSize: "12px",
           fontVariant: "small-caps",
           letterSpacing: "0.08em",
-          color: "var(--vr-muted)",
+          color: "#9C8478",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -163,10 +166,10 @@ function TopBar({ chapterTitle }: { chapterTitle: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Chapter cover — full-screen, dark, ghost number
+// Chapter intro — parchment block with an outlined chapter number
 // ---------------------------------------------------------------------------
 
-function ChapterCover({
+function ChapterIntroCard({
   chapter,
   chapterNumber,
   isQuietAnger,
@@ -178,86 +181,60 @@ function ChapterCover({
   return (
     <div
       style={{
-        minHeight: "100svh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        padding: "80px 24px",
-        background: "var(--vr-bg-cover)",
+        background: T.parchment,
+        borderRadius: "8px",
+        padding: "56px 24px",
         textAlign: "center",
       }}
     >
-      {/* Ghost chapter number */}
       <span
         aria-hidden
         style={{
-          fontFamily: "var(--vr-display)",
-          fontWeight: 100,
-          fontSize: "clamp(60px, 15vw, 120px)",
-          color: "transparent",
-          WebkitTextStroke: "1px var(--vr-accent)",
-          letterSpacing: "-0.02em",
-          lineHeight: 1,
-          userSelect: "none",
           display: "block",
-          marginBottom: "20px",
+          fontFamily: courier,
+          fontWeight: 100,
+          fontSize: "clamp(48px, 12vw, 80px)",
+          color: T.kraft,
+          lineHeight: 1,
+          marginBottom: "8px",
         }}
       >
         {String(chapterNumber).padStart(2, "0")}
       </span>
 
-      {/* Chapter title */}
       <h1
         style={{
-          fontFamily: "var(--vr-display)",
-          fontSize: "clamp(2rem, 5vw, 3.2rem)",
-          fontWeight: 500,
-          color: "#FAF6F1",
-          letterSpacing: "-0.01em",
-          lineHeight: 1.1,
-          marginBottom: "12px",
+          fontFamily: "Georgia, serif",
+          fontSize: "32px",
+          fontWeight: 400,
+          color: T.ink,
+          margin: "0 0 8px 0",
         }}
       >
         {chapter.title}
       </h1>
 
-      {/* Chapter tagline */}
       <p
         style={{
-          fontFamily: "var(--vr-body)",
-          fontSize: "1rem",
+          fontFamily: courier,
           fontStyle: "italic",
-          color: "var(--vr-accent)",
-          marginBottom: "56px",
+          fontSize: "14px",
+          color: T.muted,
+          margin: 0,
         }}
       >
         {chapter.tagline}
       </p>
 
-      {/* Chapter artifact — recolored for the dark cover */}
-      <div
-        style={
-          {
-            display: "flex",
-            justifyContent: "center",
-            "--foreground": "var(--vr-accent)",
-          } as React.CSSProperties
-        }
-      >
-        <ChapterArtifact chapter={chapter.title as ChapterTitle} isQuietAnger={isQuietAnger} />
-      </div>
-
       {isQuietAnger && (
         <p
           style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: "11px",
-            color: "var(--vr-accent)",
-            opacity: 0.7,
-            marginTop: "32px",
-            letterSpacing: "0.04em",
+            fontFamily: courier,
+            fontStyle: "italic",
+            fontSize: "12px",
+            color: T.muted,
+            opacity: 0.8,
+            marginTop: "20px",
           }}
         >
           Five exclusive notes — written only for Volume 1.
@@ -268,73 +245,72 @@ function ChapterCover({
 }
 
 // ---------------------------------------------------------------------------
-// Opening letter from MAD — shown once, before Chapter 1
+// Plain letter card — opening letter, chapter prose, "Dear reader," letter,
+// and the safety & care note. Same parchment paper, lighter weight than the
+// note envelopes since these run longer.
 // ---------------------------------------------------------------------------
 
-function OpeningLetter() {
-  const paragraphs = openingLetter.split("\n\n").filter(Boolean);
+function PlainLetterCard({
+  text,
+  dearReader,
+  firstParagraphEmphasis,
+}: {
+  text: string;
+  dearReader?: boolean;
+  firstParagraphEmphasis?: boolean;
+}) {
+  const paragraphs = text.split("\n\n").filter(Boolean);
 
   return (
-    <section
+    <div
       style={{
-        marginBottom: "56px",
-        paddingBottom: "40px",
-        borderBottom: "1px solid var(--vr-divider)",
+        background: T.letterBg,
+        borderRadius: "4px",
+        padding: "32px 28px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
       }}
     >
+      {dearReader && (
+        <p
+          style={{
+            fontFamily: courier,
+            fontStyle: "italic",
+            fontSize: "15px",
+            color: T.muted,
+            marginTop: 0,
+            marginBottom: "20px",
+          }}
+        >
+          Dear reader,
+        </p>
+      )}
+
       {paragraphs.map((para, i) => (
         <p
           key={i}
           style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: i === paragraphs.length - 1 ? "16px" : "17px",
-            fontStyle: i === paragraphs.length - 1 ? "italic" : undefined,
-            lineHeight: 1.85,
-            color: "var(--vr-text)",
-            marginBottom: i < paragraphs.length - 1 ? "20px" : 0,
+            fontFamily: courier,
+            fontSize: firstParagraphEmphasis && i === 0 ? "17px" : "15px",
+            fontWeight: firstParagraphEmphasis && i === 0 ? 700 : 400,
+            lineHeight: 1.7,
+            color: T.ink,
             whiteSpace: "pre-line",
+            marginTop: 0,
+            marginBottom: i < paragraphs.length - 1 ? "18px" : 0,
           }}
         >
           {para}
         </p>
       ))}
-    </section>
+    </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Chapter intro letter — opening prose of the chapter
+// Note envelope — kraft shell, parchment letter, dashed kraft receipt
 // ---------------------------------------------------------------------------
 
-function ChapterIntroLetter({ introLetter }: { introLetter: string }) {
-  const paragraphs = introLetter.split("\n\n").filter(Boolean);
-
-  return (
-    <section style={{ marginTop: "8px" }}>
-      {paragraphs.map((para, i) => (
-        <p
-          key={i}
-          style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: i === 0 ? "1.15rem" : "1.05rem",
-            lineHeight: 1.85,
-            color: "var(--vr-text)",
-            marginBottom: i < paragraphs.length - 1 ? "22px" : 0,
-            whiteSpace: "pre-line",
-          }}
-        >
-          {para}
-        </p>
-      ))}
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Note article — full-width parchment section with margin annotation
-// ---------------------------------------------------------------------------
-
-function NoteArticle({
+function NoteEnvelope({
   note,
   index,
   isQuietAnger,
@@ -345,60 +321,80 @@ function NoteArticle({
   isQuietAnger: boolean;
   marginText?: string;
 }) {
+  const paragraphs = note.body.split("\n\n").filter(Boolean);
+
   return (
-    <article
+    <div
       style={{
-        padding: "48px 0 56px",
-        borderTop: "1px solid var(--vr-divider)",
-        background: isQuietAnger
-          ? "color-mix(in oklab, var(--vr-accent) 6%, var(--vr-bg))"
-          : "var(--vr-bg)",
+        background: T.kraft,
+        borderRadius: "8px",
+        border: `4px solid ${T.kraftBorder}`,
+        outline: `2px dashed ${T.kraftBorder}`,
+        outlineOffset: "-10px",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
       }}
     >
-      {/* Note header */}
-      <header style={{ marginBottom: "20px" }}>
-        <span
+      {/* Letter card */}
+      <div
+        style={{
+          background: T.letterBg,
+          margin: "0 20px",
+          padding: "32px 28px 56px",
+          borderRadius: "4px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+          position: "relative",
+          zIndex: 2,
+          top: "20px",
+        }}
+      >
+        <p
           style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: "11px",
-            letterSpacing: "0.1em",
-            color: "var(--vr-muted)",
-            display: "block",
-            marginBottom: "6px",
+            fontFamily: courier,
+            fontSize: "12px",
+            letterSpacing: "0.2em",
+            textAlign: "center",
+            color: T.ink,
+            marginTop: 0,
+            marginBottom: "24px",
           }}
         >
-          {String(index).padStart(2, "0")}
-        </span>
-        <h2
-          style={{
-            fontFamily: "var(--vr-display)",
-            fontSize: "clamp(1.5rem, 4vw, 2rem)",
-            fontWeight: 500,
-            lineHeight: 1.15,
-            color: "var(--vr-text)",
-            margin: 0,
-          }}
-        >
-          {note.title}
-        </h2>
-      </header>
+          ♡ THE NOTE YOU NEEDED TODAY ♡
+        </p>
 
-      {/* Safety cue */}
-      {note.safetyNote && (
-        <div
-          style={{
-            borderLeft: "2px solid var(--vr-accent)",
-            paddingLeft: "14px",
-            marginBottom: "20px",
-          }}
-        >
+        <NoteTitleTag text={note.title} index={index} />
+
+        {paragraphs.map((para, i) => {
+          const isHope = /^i hope/i.test(para.trim());
+          return (
+            <p
+              key={i}
+              style={{
+                fontFamily: courier,
+                fontSize: "20px",
+                fontWeight: 700,
+                fontStyle: isHope ? "italic" : "normal",
+                color: T.ink,
+                lineHeight: 1.7,
+                whiteSpace: "pre-line",
+                marginTop: 0,
+                marginBottom: "20px",
+              }}
+            >
+              {para}
+            </p>
+          );
+        })}
+
+        {note.safetyNote && (
           <p
             style={{
-              fontFamily: "var(--vr-body)",
-              fontSize: "12px",
-              lineHeight: 1.7,
-              color: "var(--vr-muted)",
-              margin: 0,
+              fontFamily: courier,
+              fontSize: "13px",
+              lineHeight: 1.6,
+              color: T.muted,
+              borderLeft: `2px solid ${T.kraftBorder}`,
+              paddingLeft: "12px",
+              marginBottom: "20px",
             }}
           >
             This note touches on dark moments. If you are not safe right now, please move toward
@@ -407,113 +403,197 @@ function NoteArticle({
               Safety &amp; Support
             </Link>
           </p>
-        </div>
-      )}
+        )}
 
-      {/* Note body */}
-      <div
-        style={{
-          fontFamily: "var(--vr-body)",
-          fontSize: "19px",
-          lineHeight: 1.85,
-          color: "var(--vr-text)",
-          whiteSpace: "pre-line",
-          marginBottom: "24px",
-        }}
-      >
-        {note.body}
-      </div>
-
-      {/* Margin annotation — signed */}
-      {marginText && (
-        <p
-          style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: "13px",
-            fontStyle: "italic",
-            lineHeight: 1.6,
-            color: "var(--vr-muted)",
-            whiteSpace: "pre-line",
-            marginBottom: "28px",
-          }}
-        >
-          {marginText}
-          <br />— MAD
-        </p>
-      )}
-
-      {/* Premium receipt */}
-      <PremiumReceipt
-        from={note.from}
-        to={note.to}
-        date={note.date}
-        total={note.total}
-        isQuietAnger={isQuietAnger}
-      />
-
-      {isQuietAnger && (
-        <div style={{ paddingTop: "12px", textAlign: "right" }}>
-          <span
+        {marginText && (
+          <p
             style={{
-              fontFamily: "var(--vr-body)",
-              fontSize: "11px",
+              fontFamily: courier,
               fontStyle: "italic",
-              color: "var(--vr-muted)",
-              letterSpacing: "0.03em",
+              fontSize: "13px",
+              color: T.muted,
+              whiteSpace: "pre-line",
+              marginBottom: 0,
+            }}
+          >
+            {marginText}
+          </p>
+        )}
+
+        {isQuietAnger && (
+          <p
+            style={{
+              fontFamily: courier,
+              fontStyle: "italic",
+              fontSize: "11px",
+              color: T.muted,
+              textAlign: "right",
+              marginTop: "12px",
+              marginBottom: 0,
             }}
           >
             Exclusive to Volume 1
-          </span>
-        </div>
-      )}
-    </article>
+          </p>
+        )}
+
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: "14px",
+            right: "20px",
+            fontSize: "22px",
+            color: T.ink,
+          }}
+        >
+          ♡
+        </span>
+      </div>
+
+      {/* Receipt */}
+      <ReceiptSection from={note.from} to={note.to} date={note.date} total={note.total} />
+    </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Private letter section — end of chapter
+// Title tag — small denim-style label, echoes the postcard "DO IT ANYWAY" tag
 // ---------------------------------------------------------------------------
 
-function PrivateLetterSection({ text }: { text: string }) {
-  const paragraphs = text.split("\n\n").filter(Boolean);
-
+function NoteTitleTag({ text, index }: { text: string; index: number }) {
   return (
-    <section
-      className="ml-4 md:ml-8"
+    <div
       style={{
-        marginTop: "64px",
-        padding: "40px 28px",
-        background: "var(--vr-bg-letter)",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        background: "#1a2a50",
+        padding: "8px 14px",
+        borderRadius: "3px",
+        marginBottom: "24px",
+        position: "relative",
+        boxShadow: "2px 2px 8px rgba(0,0,0,0.35)",
       }}
     >
-      <p
+      <span
+        aria-hidden
         style={{
-          fontFamily: "var(--vr-body)",
-          fontSize: "16px",
-          fontStyle: "italic",
-          color: "var(--vr-muted)",
-          marginBottom: "20px",
+          position: "absolute",
+          inset: "3px",
+          border: "1px dashed rgba(200,190,170,0.4)",
+          borderRadius: "2px",
+          pointerEvents: "none",
+        }}
+      />
+      <span
+        style={{
+          fontFamily: courier,
+          fontSize: "11px",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: "#e8ddd0",
+          position: "relative",
         }}
       >
-        Dear reader,
-      </p>
+        {String(index).padStart(2, "0")} · {text}
+      </span>
+      <span aria-hidden style={{ color: T.redHeart, fontSize: "12px", position: "relative" }}>
+        ♥
+      </span>
+    </div>
+  );
+}
 
-      {paragraphs.map((para, i) => (
-        <p
-          key={i}
+// ---------------------------------------------------------------------------
+// Receipt section — FROM / TO / DATE / TOTAL rows + MAD signature
+// ---------------------------------------------------------------------------
+
+function ReceiptSection({
+  from,
+  to,
+  date,
+  total,
+}: {
+  from: string;
+  to: string;
+  date: string;
+  total: string;
+}) {
+  const rows: [string, string][] = [
+    ["FROM", from],
+    ["TO", to],
+    ["DATE", date],
+    ["TOTAL", total],
+  ];
+
+  return (
+    <div
+      style={{
+        background: T.receiptBg,
+        padding: "24px 28px 76px",
+        borderTop: `3px dashed ${T.kraftBorder}`,
+        position: "relative",
+      }}
+    >
+      {rows.map(([label, value], i) => (
+        <div
+          key={label}
           style={{
-            fontFamily: "var(--vr-body)",
-            fontSize: "16px",
-            lineHeight: 1.85,
-            color: "var(--vr-text)",
-            marginBottom: i < paragraphs.length - 1 ? "18px" : 0,
-            whiteSpace: "pre-line",
+            display: "flex",
+            gap: "10px",
+            alignItems: "baseline",
+            paddingBottom: "10px",
+            marginBottom: "10px",
+            borderBottom: i < rows.length - 1 ? `1px dashed ${T.kraftBorder}` : undefined,
           }}
         >
-          {para}
-        </p>
+          <span
+            style={{
+              fontFamily: courier,
+              fontSize: "15px",
+              fontWeight: 900,
+              color: T.ink,
+              minWidth: "56px",
+              flexShrink: 0,
+            }}
+          >
+            {label}:
+          </span>
+          <span style={{ fontFamily: courier, fontSize: "13px", lineHeight: 1.5, color: T.ink }}>
+            {value}
+          </span>
+        </div>
       ))}
-    </section>
+
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "44px",
+          right: "26px",
+          fontSize: "24px",
+          color: T.redHeart,
+        }}
+      >
+        ♥
+      </span>
+
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "4px",
+          right: "20px",
+          fontFamily: "'Arial Black', Impact, sans-serif",
+          fontSize: "40px",
+          fontWeight: 900,
+          color: T.ink,
+          transform: "rotate(-3deg)",
+        }}
+      >
+        MAD
+      </span>
+    </div>
   );
 }
 
@@ -525,20 +605,19 @@ function ReceiptDivider({ chapterNumber }: { chapterNumber: number }) {
   return (
     <div
       style={{
-        marginTop: "56px",
         padding: "20px 0",
-        borderTop: "1px dotted var(--vr-divider)",
-        borderBottom: "1px dotted var(--vr-divider)",
+        borderTop: "1px dotted #6B5230",
+        borderBottom: "1px dotted #6B5230",
         textAlign: "center",
       }}
     >
       <p
         style={{
-          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
+          fontFamily: courier,
           fontSize: "12px",
-          fontVariant: "small-caps",
           letterSpacing: "0.08em",
-          color: "var(--vr-muted)",
+          textTransform: "uppercase",
+          color: "#C4A882",
           margin: 0,
         }}
       >
@@ -546,9 +625,9 @@ function ReceiptDivider({ chapterNumber }: { chapterNumber: number }) {
       </p>
       <p
         style={{
-          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
+          fontFamily: courier,
           fontSize: "12px",
-          color: "var(--vr-muted)",
+          color: "#C4A882",
           margin: "4px 0 0",
         }}
       >
@@ -559,128 +638,104 @@ function ReceiptDivider({ chapterNumber }: { chapterNumber: number }) {
 }
 
 // ---------------------------------------------------------------------------
-// Safety & care note — shown between Chapter 5 and the closing receipt
+// Closing envelope — final destination after Chapter 5
 // ---------------------------------------------------------------------------
 
-function SafetyCareNote() {
-  const paragraphs = safetyAndCareNote.split("\n\n").filter(Boolean);
-
-  return (
-    <section
-      style={{
-        marginTop: "64px",
-        maxWidth: "480px",
-        marginLeft: "auto",
-        marginRight: "auto",
-        padding: "48px 32px",
-        background: "var(--vr-bg-letter)",
-        textAlign: "center",
-      }}
-    >
-      {paragraphs.map((para, i) => (
-        <p
-          key={i}
-          style={{
-            fontFamily: i === 0 ? "var(--vr-display)" : "var(--vr-body)",
-            fontSize: i === 0 ? "13px" : "15px",
-            letterSpacing: i === 0 ? "0.1em" : undefined,
-            lineHeight: 1.8,
-            color: i === paragraphs.length - 1 ? "var(--vr-muted)" : "var(--vr-text)",
-            fontStyle: i === paragraphs.length - 1 ? "italic" : undefined,
-            marginBottom: i < paragraphs.length - 1 ? "16px" : 0,
-            whiteSpace: "pre-line",
-          }}
-        >
-          {para}
-        </p>
-      ))}
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Closing receipt — final destination after Chapter 5
-// ---------------------------------------------------------------------------
-
-function ClosingReceiptDestination() {
+function ClosingEnvelope() {
   const paragraphs = closingReceipt.closing.split("\n\n").filter(Boolean);
 
   return (
-    <section
+    <div
       id="closing-receipt"
       style={{
-        marginTop: "64px",
-        maxWidth: "480px",
-        marginLeft: "auto",
-        marginRight: "auto",
-        padding: "64px 32px",
-        background: "var(--vr-bg)",
-        borderTop: "2px dashed var(--vr-accent)",
-        borderBottom: "2px dashed var(--vr-accent)",
-        textAlign: "center",
+        background: T.kraft,
+        borderRadius: "8px",
+        border: `4px solid ${T.kraftBorder}`,
+        outline: `2px dashed ${T.kraftBorder}`,
+        outlineOffset: "-10px",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
       }}
     >
-      <p
+      <div
         style={{
-          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
-          fontSize: "12px",
-          letterSpacing: "0.06em",
-          color: "var(--vr-muted)",
-          marginBottom: "20px",
+          background: T.letterBg,
+          margin: "0 20px",
+          padding: "32px 28px 56px",
+          borderRadius: "4px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+          position: "relative",
+          top: "20px",
+          textAlign: "center",
         }}
       >
-        THE NOTE YOU NEEDED TODAY
-        <br />
-        Volume 1 — The Things We Do Not Say Out Loud
-      </p>
+        <p
+          style={{
+            fontFamily: courier,
+            fontSize: "12px",
+            letterSpacing: "0.2em",
+            color: T.ink,
+            marginTop: 0,
+            marginBottom: "24px",
+          }}
+        >
+          ♡ THE NOTE YOU NEEDED TODAY ♡
+        </p>
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", textAlign: "left" }}>
-        <PremiumReceipt
-          from={closingReceipt.from}
-          to={closingReceipt.to}
-          date={closingReceipt.date}
-          total={closingReceipt.total}
-          keepText="This is yours."
-          isClosing
-        />
-      </div>
-
-      <div
-        style={{ marginTop: "40px", maxWidth: "460px", marginLeft: "auto", marginRight: "auto" }}
-      >
         {paragraphs.map((para, i) => (
           <p
             key={i}
             style={{
-              fontFamily: "var(--vr-body)",
-              fontSize: "15px",
-              fontStyle: "italic",
-              lineHeight: 1.8,
-              color: "var(--vr-muted)",
-              marginBottom: i < paragraphs.length - 1 ? "14px" : 0,
+              fontFamily: courier,
+              fontSize: "17px",
+              fontWeight: 700,
+              fontStyle: /^with love/i.test(para.trim()) ? "italic" : "normal",
+              color: T.ink,
+              lineHeight: 1.7,
               whiteSpace: "pre-line",
+              marginTop: 0,
+              marginBottom: i < paragraphs.length - 1 ? "20px" : 0,
             }}
           >
             {para}
           </p>
         ))}
 
-        <p style={{ marginTop: "28px" }}>
+        <p style={{ marginTop: "20px", marginBottom: 0 }}>
           <Link
             to="/support"
             style={{
-              fontFamily: "var(--vr-body)",
+              fontFamily: courier,
               fontSize: "13px",
               fontStyle: "italic",
-              color: "var(--vr-muted)",
+              color: T.muted,
               textDecoration: "underline",
             }}
           >
             If you need someone to speak to, visit our Safety &amp; Support page.
           </Link>
         </p>
+
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: "14px",
+            right: "20px",
+            fontSize: "22px",
+            color: T.ink,
+          }}
+        >
+          ♡
+        </span>
       </div>
-    </section>
+
+      <ReceiptSection
+        from={closingReceipt.from}
+        to={closingReceipt.to}
+        date={closingReceipt.date}
+        total={closingReceipt.total}
+      />
+    </div>
   );
 }
 
@@ -695,9 +750,7 @@ function ChapterPrevNext({ currentChapter }: { currentChapter: number }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginTop: "56px",
-        paddingTop: "32px",
-        borderTop: "1px solid var(--vr-divider)",
+        padding: "20px 4px 0",
       }}
     >
       {currentChapter > 1 ? (
@@ -722,109 +775,5 @@ function ChapterPrevNext({ currentChapter }: { currentChapter: number }) {
         <span />
       )}
     </nav>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Floating chapter index — fixed bottom-right, opens a drawer
-// ---------------------------------------------------------------------------
-
-function FloatingChapterIndex({ currentChapter }: { currentChapter: number }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <button
-          type="button"
-          aria-label="Open chapter index"
-          style={{
-            position: "fixed",
-            bottom: "24px",
-            right: "16px",
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            background: "var(--vr-bg-cover, #2C2420)",
-            color: "#FAF6F1",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "none",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-            zIndex: 30,
-          }}
-        >
-          <BookOpen size={18} aria-hidden />
-        </button>
-      </SheetTrigger>
-      <SheetContent
-        side="right"
-        style={{
-          background: "#FAF6F1",
-          fontFamily: "'Lora', Georgia, serif",
-        }}
-      >
-        <SheetHeader>
-          <SheetTitle style={{ fontFamily: "'Playfair Display', serif", color: "#3D2B1F" }}>
-            Volume 1
-          </SheetTitle>
-        </SheetHeader>
-
-        <nav style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "4px" }}>
-          <Link
-            to="/volume-1"
-            onClick={() => setOpen(false)}
-            style={{
-              padding: "10px 4px",
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "1rem",
-              color: "#3D2B1F",
-              textDecoration: "none",
-              borderBottom: "1px solid #E8DDD4",
-            }}
-          >
-            Opening
-          </Link>
-
-          {volume1Chapters.map((ch) => (
-            <Link
-              key={ch.number}
-              to="/volume-1/read/$chapter"
-              params={{ chapter: String(ch.number) }}
-              onClick={() => setOpen(false)}
-              style={{
-                padding: "10px 4px",
-                fontFamily: "'Playfair Display', serif",
-                fontSize: "1rem",
-                color: ch.number === currentChapter ? "#3D2B1F" : "#9C8478",
-                fontWeight: ch.number === currentChapter ? 600 : 400,
-                textDecoration: "none",
-                borderBottom: "1px solid #E8DDD4",
-              }}
-            >
-              {String(ch.number).padStart(2, "0")} — {ch.title}
-            </Link>
-          ))}
-
-          <Link
-            to="/volume-1/read/$chapter"
-            params={{ chapter: String(CHAPTER_COUNT) }}
-            hash="closing-receipt"
-            onClick={() => setOpen(false)}
-            style={{
-              padding: "10px 4px",
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: "italic",
-              fontSize: "1rem",
-              color: "#9C8478",
-              textDecoration: "none",
-            }}
-          >
-            Closing Receipt
-          </Link>
-        </nav>
-      </SheetContent>
-    </Sheet>
   );
 }
