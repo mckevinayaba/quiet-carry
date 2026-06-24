@@ -6,6 +6,18 @@ import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
+// Local fallback codes — checked first so Volume 1 still unlocks for testing
+// and beta readers even if Supabase env vars are missing or the network call fails.
+const LOCAL_VALID_CODES = [
+  "NOTE-2024-SURV",
+  "NOTE-2024-HEAL",
+  "NOTE-2024-BETA",
+  "NOTE-TEST-0001",
+  "NOTE-TEST-0002",
+];
+
+const GENERIC_ERROR = "That code doesn't seem right. Please check your email and try again.";
+
 export const Route = createFileRoute("/volume-1/unlock")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
@@ -20,6 +32,12 @@ function UnlockPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  function grantAccess() {
+    localStorage.setItem("volume1_access", "granted");
+    localStorage.setItem("volume1_unlocked", "true");
+    navigate({ to: "/volume-1/read/$chapter", params: { chapter: "1" } });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!code.trim()) return;
@@ -27,35 +45,38 @@ function UnlockPage() {
     setLoading(true);
     setError(null);
 
+    const normalized = code.trim().toUpperCase();
+
+    if (LOCAL_VALID_CODES.includes(normalized)) {
+      grantAccess();
+      setLoading(false);
+      return;
+    }
+
+    // Supabase is a best-effort secondary check. Any failure here (missing env
+    // vars, network error, RPC error) is swallowed — the user only ever sees
+    // the generic "not right" message, never a technical error.
+    let remoteOk = false;
     try {
-      // Live DB uses exact match — normalize to uppercase before sending.
-      const normalized = code.trim().toUpperCase();
       const { data, error: rpcError } = await supabase.rpc("redeem_volume1_code", {
         input_code: normalized,
       });
 
-      if (rpcError) throw rpcError;
-
-      const result = data as { ok: boolean; reason?: string };
-
-      if (result.ok) {
-        localStorage.setItem("volume1_unlocked", "true");
-        navigate({ to: "/volume-1/read/$chapter", params: { chapter: "1" } });
-      } else {
-        // reason is "not_found" or "already_redeemed" from the live RPC.
-        setError(
-          "This code was not found or has already been used. If you believe this is an error, contact hello@thenoteyouneededtoday.com",
-        );
+      if (!rpcError) {
+        const result = data as { ok: boolean; reason?: string };
+        remoteOk = result.ok;
       }
-    } catch (err) {
-      console.error("redeem_volume1_code failed:", err);
-      const msg = err instanceof Error ? err.message : String(err);
-      setError(
-        `Something went wrong: ${msg}. If the issue continues, contact hello@thenoteyouneededtoday.com`,
-      );
-    } finally {
-      setLoading(false);
+    } catch {
+      remoteOk = false;
     }
+
+    if (remoteOk) {
+      grantAccess();
+    } else {
+      setError(GENERIC_ERROR);
+    }
+
+    setLoading(false);
   }
 
   return (
@@ -89,9 +110,7 @@ function UnlockPage() {
             />
           </div>
 
-          {error ? (
-            <p className="text-sm leading-6 text-destructive">{error}</p>
-          ) : null}
+          {error ? <p className="text-sm leading-6 text-destructive">{error}</p> : null}
 
           <Button
             type="submit"
