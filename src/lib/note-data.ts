@@ -69,7 +69,13 @@ export interface CollectionEntry {
   detailHref?: string;
 }
 
-export const volumeOneSelarUrl = "#volume-1-coming-soon";
+const selarVolume1Url = import.meta.env.VITE_SELAR_VOLUME1_URL as string | undefined;
+
+if (!selarVolume1Url) {
+  console.warn("[Volume 1] Selar URL not configured. Set VITE_SELAR_VOLUME1_URL in .env");
+}
+
+export const volumeOneSelarUrl = selarVolume1Url || "#volume-1-coming-soon";
 
 export const categories: EmotionalCategory[] = [
   {

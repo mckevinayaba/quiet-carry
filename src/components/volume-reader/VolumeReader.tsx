@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { volume1Chapters, closingReceipt, getMarginNote, CHAPTER_COUNT } from "@/data/volume1";
+import {
+  volume1Chapters,
+  closingReceipt,
+  getMarginNote,
+  openingLetter,
+  safetyAndCareNote,
+  CHAPTER_COUNT,
+} from "@/data/volume1";
 import type { Volume1Chapter, Volume1Note } from "@/data/volume1";
 import { ChapterArtifact } from "./ChapterArtifact";
 import type { ChapterTitle } from "./ChapterArtifact";
@@ -37,6 +44,7 @@ const vrVars: React.CSSProperties = {
 
 export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
   const isLastChapter = chapterNumber === CHAPTER_COUNT;
+  const isFirstChapter = chapterNumber === 1;
   const isQuietAnger = !!chapter.isExclusive;
 
   // Scroll to an in-page anchor (e.g. the closing receipt) when arriving via hash.
@@ -59,6 +67,8 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
         className="mx-auto px-6 md:px-16"
         style={{ maxWidth: "680px", padding: "56px 24px 80px" }}
       >
+        {isFirstChapter && <OpeningLetter />}
+
         <ChapterIntroLetter introLetter={chapter.introLetter} />
 
         {/* Notes */}
@@ -84,6 +94,7 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
         <ReceiptDivider chapterNumber={chapterNumber} />
 
         {/* Closing receipt — Chapter 5 only */}
+        {isLastChapter && <SafetyCareNote />}
         {isLastChapter && <ClosingReceiptDestination />}
 
         {/* Chapter prev / next */}
@@ -253,6 +264,41 @@ function ChapterCover({
         </p>
       )}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Opening letter from MAD — shown once, before Chapter 1
+// ---------------------------------------------------------------------------
+
+function OpeningLetter() {
+  const paragraphs = openingLetter.split("\n\n").filter(Boolean);
+
+  return (
+    <section
+      style={{
+        marginBottom: "56px",
+        paddingBottom: "40px",
+        borderBottom: "1px solid var(--vr-divider)",
+      }}
+    >
+      {paragraphs.map((para, i) => (
+        <p
+          key={i}
+          style={{
+            fontFamily: "var(--vr-body)",
+            fontSize: i === paragraphs.length - 1 ? "16px" : "17px",
+            fontStyle: i === paragraphs.length - 1 ? "italic" : undefined,
+            lineHeight: 1.85,
+            color: "var(--vr-text)",
+            marginBottom: i < paragraphs.length - 1 ? "20px" : 0,
+            whiteSpace: "pre-line",
+          }}
+        >
+          {para}
+        </p>
+      ))}
+    </section>
   );
 }
 
@@ -513,6 +559,46 @@ function ReceiptDivider({ chapterNumber }: { chapterNumber: number }) {
 }
 
 // ---------------------------------------------------------------------------
+// Safety & care note — shown between Chapter 5 and the closing receipt
+// ---------------------------------------------------------------------------
+
+function SafetyCareNote() {
+  const paragraphs = safetyAndCareNote.split("\n\n").filter(Boolean);
+
+  return (
+    <section
+      style={{
+        marginTop: "64px",
+        maxWidth: "480px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        padding: "48px 32px",
+        background: "var(--vr-bg-letter)",
+        textAlign: "center",
+      }}
+    >
+      {paragraphs.map((para, i) => (
+        <p
+          key={i}
+          style={{
+            fontFamily: i === 0 ? "var(--vr-display)" : "var(--vr-body)",
+            fontSize: i === 0 ? "13px" : "15px",
+            letterSpacing: i === 0 ? "0.1em" : undefined,
+            lineHeight: 1.8,
+            color: i === paragraphs.length - 1 ? "var(--vr-muted)" : "var(--vr-text)",
+            fontStyle: i === paragraphs.length - 1 ? "italic" : undefined,
+            marginBottom: i < paragraphs.length - 1 ? "16px" : 0,
+            whiteSpace: "pre-line",
+          }}
+        >
+          {para}
+        </p>
+      ))}
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Closing receipt — final destination after Chapter 5
 // ---------------------------------------------------------------------------
 
@@ -524,9 +610,13 @@ function ClosingReceiptDestination() {
       id="closing-receipt"
       style={{
         marginTop: "64px",
-        padding: "48px 28px",
-        borderTop: "1px dashed var(--vr-accent)",
-        borderBottom: "1px dashed var(--vr-accent)",
+        maxWidth: "480px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        padding: "64px 32px",
+        background: "var(--vr-bg)",
+        borderTop: "2px dashed var(--vr-accent)",
+        borderBottom: "2px dashed var(--vr-accent)",
         textAlign: "center",
       }}
     >

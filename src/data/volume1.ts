@@ -33,6 +33,24 @@ export interface Volume1ClosingReceipt {
 }
 
 // ---------------------------------------------------------------------------
+// OPENING LETTER FROM MAD
+// ---------------------------------------------------------------------------
+
+export const openingLetter = `This was not written to fix you.
+
+It was written because you have been carrying something for so long that you forgot it had a name.
+
+These words are not advice. They are not a plan. They are not a hotline or a strategy.
+
+They are just — recognition.
+
+Someone sat down and thought about the exact weight of what you are holding. And wrote it down. So you would know: you are not alone in carrying it.
+
+Take your time. There is no rush inside these pages.
+
+— MAD`;
+
+// ---------------------------------------------------------------------------
 // CHAPTER ONE — SURVIVAL
 // ---------------------------------------------------------------------------
 
@@ -1184,6 +1202,25 @@ With love,
 MAD
 The Note You Needed Today`,
 };
+
+// ---------------------------------------------------------------------------
+// SAFETY & CARE NOTE — shown between Chapter 5 and the closing receipt
+// ---------------------------------------------------------------------------
+
+export const safetyAndCareNote = `BEFORE YOU CLOSE THIS PAGE
+
+This collection was written for weight — not crisis. But if something here opened a door that felt too heavy —
+
+Please reach out.
+
+South Africa: SADAG 0800 21 22 23
+International: findahelpline.com
+
+Or simply: tell someone you trust, today.
+
+You are allowed to ask for more than words can give.
+
+— with care, MAD`;
 
 // ---------------------------------------------------------------------------
 // CLOSING RECEIPT
