@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { VolumeReader } from "@/components/volume-reader/VolumeReader";
 import { getChapter } from "@/data/volume1";
@@ -42,9 +41,5 @@ function ChapterPage() {
   // Show nothing during SSR / gate check to prevent flash.
   if (!unlocked || !chapter) return null;
 
-  return (
-    <AppLayout className="pb-0">
-      <VolumeReader chapter={chapter} chapterNumber={chapterNumber} />
-    </AppLayout>
-  );
+  return <VolumeReader chapter={chapter} chapterNumber={chapterNumber} />;
 }

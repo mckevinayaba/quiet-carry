@@ -1,13 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  volume1Chapters,
-  closingReceipt,
-  getMarginNote,
-  CHAPTER_COUNT,
-} from "@/data/volume1";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { volume1Chapters, closingReceipt, getMarginNote, CHAPTER_COUNT } from "@/data/volume1";
 import type { Volume1Chapter, Volume1Note } from "@/data/volume1";
 import { ChapterArtifact } from "./ChapterArtifact";
 import type { ChapterTitle } from "./ChapterArtifact";
@@ -19,6 +16,22 @@ interface VolumeReaderProps {
 }
 
 // ---------------------------------------------------------------------------
+// Scoped design tokens — restyle only this reading surface, not the site theme.
+// ---------------------------------------------------------------------------
+
+const vrVars: React.CSSProperties = {
+  "--vr-bg": "#FAF6F1",
+  "--vr-bg-cover": "#2C2420",
+  "--vr-bg-letter": "#F5EFE6",
+  "--vr-text": "#3D2B1F",
+  "--vr-muted": "#9C8478",
+  "--vr-accent": "#C4A882",
+  "--vr-divider": "#E8DDD4",
+  "--vr-display": "'Playfair Display', serif",
+  "--vr-body": "'Lora', Georgia, serif",
+} as React.CSSProperties;
+
+// ---------------------------------------------------------------------------
 // Main reader
 // ---------------------------------------------------------------------------
 
@@ -26,264 +39,120 @@ export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
   const isLastChapter = chapterNumber === CHAPTER_COUNT;
   const isQuietAnger = !!chapter.isExclusive;
 
+  // Scroll to an in-page anchor (e.g. the closing receipt) when arriving via hash.
+  useEffect(() => {
+    if (window.location.hash) {
+      const el = document.getElementById(window.location.hash.slice(1));
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   return (
-    <div>
-      {/* Mobile: chapter indicator bar + back link */}
-      <MobileChapterNav currentChapter={chapterNumber} />
+    <div style={{ ...vrVars, background: "var(--vr-bg)", minHeight: "100vh" }}>
+      <TopBar chapterTitle={chapter.title} />
 
       {/* Chapter cover — full-screen opening moment */}
       <ChapterCover chapter={chapter} chapterNumber={chapterNumber} isQuietAnger={isQuietAnger} />
 
-      {/* Reading body: desktop sidebar + content column */}
-      <div className="flex">
-        {/* Desktop sidebar — sticky, xl+ only */}
-        <aside className="hidden xl:block shrink-0" style={{ width: "160px", paddingTop: "72px" }}>
-          <div className="sticky top-8 pr-4">
-            <DesktopChapterNav currentChapter={chapterNumber} />
-          </div>
-        </aside>
+      {/* Reading column */}
+      <div
+        className="mx-auto px-6 md:px-16"
+        style={{ maxWidth: "680px", padding: "56px 24px 80px" }}
+      >
+        <ChapterIntroLetter introLetter={chapter.introLetter} />
 
-        {/* Reading column */}
-        <div
-          className="flex-1 min-w-0 mx-auto xl:mx-0"
-          style={{ maxWidth: "680px", padding: "72px 24px 80px" }}
-        >
-          <ChapterIntroLetter introLetter={chapter.introLetter} />
-
-          {/* Notes */}
-          <div style={{ marginTop: "80px", display: "flex", flexDirection: "column", gap: "64px" }}>
-            {chapter.notes.map((note, idx) => {
-              const marginNote = getMarginNote(note.id);
-              return (
-                <div key={note.id} style={{ position: "relative" }}>
-                  <NoteArticle note={note} index={idx + 1} isQuietAnger={isQuietAnger} />
-
-                  {marginNote && (
-                    <>
-                      {/* Desktop: float in right margin */}
-                      <div
-                        className="hidden xl:block"
-                        style={{
-                          position: "absolute",
-                          top: "2rem",
-                          left: "calc(100% + 2.5rem)",
-                          width: "136px",
-                        }}
-                      >
-                        <MarginNoteEl text={marginNote.text} />
-                      </div>
-                      {/* Mobile: inline below note body */}
-                      <div
-                        className="xl:hidden"
-                        style={{
-                          marginTop: "16px",
-                          paddingLeft: "18px",
-                          borderLeft: "1.5px solid color-mix(in oklab, var(--border) 55%, transparent)",
-                        }}
-                      >
-                        <MarginNoteEl text={marginNote.text} />
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Private letter */}
-          <PrivateLetterSection text={chapter.privateLetter} />
-
-          {/* Closing receipt — Chapter 5 only */}
-          {isLastChapter && <ClosingReceiptDestination />}
-
-          {/* Chapter prev / next */}
-          <ChapterPrevNext currentChapter={chapterNumber} />
+        {/* Notes */}
+        <div style={{ marginTop: "64px", display: "flex", flexDirection: "column" }}>
+          {chapter.notes.map((note, idx) => {
+            const marginNote = getMarginNote(note.id);
+            return (
+              <NoteArticle
+                key={note.id}
+                note={note}
+                index={idx + 1}
+                isQuietAnger={isQuietAnger}
+                marginText={marginNote?.text}
+              />
+            );
+          })}
         </div>
+
+        {/* Private letter */}
+        <PrivateLetterSection text={chapter.privateLetter} />
+
+        {/* Receipt divider — between chapters */}
+        <ReceiptDivider chapterNumber={chapterNumber} />
+
+        {/* Closing receipt — Chapter 5 only */}
+        {isLastChapter && <ClosingReceiptDestination />}
+
+        {/* Chapter prev / next */}
+        <ChapterPrevNext currentChapter={chapterNumber} />
       </div>
+
+      <FloatingChapterIndex currentChapter={chapterNumber} />
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Mobile chapter navigation bar
+// Minimal top bar — replaces all site nav for this route
 // ---------------------------------------------------------------------------
 
-function MobileChapterNav({ currentChapter }: { currentChapter: number }) {
-  const chapter = volume1Chapters.find((c) => c.number === currentChapter);
-
+function TopBar({ chapterTitle }: { chapterTitle: string }) {
   return (
     <div
-      className="xl:hidden"
       style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 20,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "12px 0",
-        borderBottom: "1px solid var(--color-border)",
         gap: "12px",
+        padding: "16px 24px",
+        background: "color-mix(in oklab, var(--vr-bg) 92%, transparent)",
+        backdropFilter: "blur(6px)",
+        borderBottom: "1px solid var(--vr-divider)",
       }}
     >
       <Link
         to="/volume-1"
         style={{
-          fontFamily: "var(--font-label)",
-          fontSize: "11px",
-          color: "var(--color-muted-foreground)",
+          fontFamily: "var(--vr-body)",
+          fontSize: "13px",
+          color: "var(--vr-muted)",
           textDecoration: "none",
           display: "flex",
           alignItems: "center",
-          gap: "4px",
+          gap: "6px",
           flexShrink: 0,
         }}
       >
-        <ArrowLeft size={12} aria-hidden /> Vol. 1
+        <ArrowLeft size={13} aria-hidden /> Volume 1
       </Link>
 
       <span
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "13px",
-          color: "var(--color-foreground)",
+          fontFamily: "var(--vr-body)",
+          fontSize: "12px",
+          fontVariant: "small-caps",
+          letterSpacing: "0.08em",
+          color: "var(--vr-muted)",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
-          flex: 1,
           textAlign: "center",
         }}
       >
-        {String(currentChapter).padStart(2, "0")} — {chapter?.title}
+        {chapterTitle}
       </span>
-
-      <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-        {currentChapter > 1 && (
-          <Link
-            to="/volume-1/read/$chapter"
-            params={{ chapter: String(currentChapter - 1) }}
-            style={{
-              fontFamily: "var(--font-label)",
-              fontSize: "11px",
-              color: "var(--color-muted-foreground)",
-              textDecoration: "none",
-              padding: "4px 6px",
-            }}
-            aria-label="Previous chapter"
-          >
-            <ArrowLeft size={12} aria-hidden />
-          </Link>
-        )}
-        {currentChapter < CHAPTER_COUNT && (
-          <Link
-            to="/volume-1/read/$chapter"
-            params={{ chapter: String(currentChapter + 1) }}
-            style={{
-              fontFamily: "var(--font-label)",
-              fontSize: "11px",
-              color: "var(--color-muted-foreground)",
-              textDecoration: "none",
-              padding: "4px 6px",
-            }}
-            aria-label="Next chapter"
-          >
-            <ArrowRight size={12} aria-hidden />
-          </Link>
-        )}
-      </div>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Desktop sidebar — vertical chapter index
-// ---------------------------------------------------------------------------
-
-function DesktopChapterNav({ currentChapter }: { currentChapter: number }) {
-  return (
-    <nav aria-label="Chapter index">
-      <Link
-        to="/volume-1"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-          fontFamily: "var(--font-label)",
-          fontSize: "10px",
-          color: "var(--color-muted-foreground)",
-          textDecoration: "none",
-          marginBottom: "28px",
-          opacity: 0.7,
-        }}
-      >
-        <ArrowLeft size={11} aria-hidden /> Volume 1
-      </Link>
-
-      <div
-        style={{
-          fontFamily: "var(--font-label)",
-          fontSize: "8px",
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
-          color: "var(--color-muted-foreground)",
-          opacity: 0.45,
-          marginBottom: "14px",
-        }}
-      >
-        Contents
-      </div>
-
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "2px" }}>
-        {volume1Chapters.map((ch) => {
-          const isActive = ch.number === currentChapter;
-          return (
-            <li key={ch.number}>
-              <Link
-                to="/volume-1/read/$chapter"
-                params={{ chapter: String(ch.number) }}
-                style={{
-                  display: "block",
-                  padding: "7px 10px",
-                  paddingLeft: isActive ? "12px" : "10px",
-                  textDecoration: "none",
-                  borderLeft: isActive
-                    ? "2px solid var(--primary)"
-                    : "2px solid transparent",
-                  transition: "border-color 300ms, padding-left 300ms",
-                }}
-              >
-                <span
-                  style={{
-                    display: "block",
-                    fontFamily: "var(--font-label)",
-                    fontSize: "9px",
-                    color: "var(--color-muted-foreground)",
-                    opacity: 0.55,
-                    marginBottom: "2px",
-                  }}
-                >
-                  {String(ch.number).padStart(2, "0")}
-                </span>
-                <span
-                  style={{
-                    display: "block",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.88rem",
-                    lineHeight: 1.3,
-                    color: isActive ? "var(--color-foreground)" : "var(--color-muted-foreground)",
-                    fontWeight: isActive ? 500 : 400,
-                  }}
-                >
-                  {ch.title}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Chapter cover — full-screen opening moment
+// Chapter cover — full-screen, dark, ghost number
 // ---------------------------------------------------------------------------
 
 function ChapterCover({
@@ -295,12 +164,8 @@ function ChapterCover({
   chapterNumber: number;
   isQuietAnger: boolean;
 }) {
-  const entryLines = ["Read slowly.", "Take your time.", "Enter when ready.", "Read slowly."];
-  const entryPrompt = entryLines[(chapterNumber - 1) % entryLines.length];
-
   return (
     <div
-      className="-mx-4 sm:-mx-6"
       style={{
         minHeight: "100svh",
         display: "flex",
@@ -308,26 +173,24 @@ function ChapterCover({
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        padding: "80px 32px 80px",
-        background: isQuietAnger
-          ? "color-mix(in oklab, var(--paper-deep) 55%, var(--background))"
-          : undefined,
-        animation: "vol-fade-up 0.9s ease forwards",
+        padding: "80px 24px",
+        background: "var(--vr-bg-cover)",
+        textAlign: "center",
       }}
     >
       {/* Ghost chapter number */}
       <span
         aria-hidden
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(6.5rem, 22vw, 15rem)",
+          fontFamily: "var(--vr-display)",
+          fontWeight: 100,
+          fontSize: "clamp(60px, 15vw, 120px)",
           color: "transparent",
-          WebkitTextStroke: "1px color-mix(in oklab, var(--foreground) 11%, transparent)",
-          letterSpacing: "-0.03em",
+          WebkitTextStroke: "1px var(--vr-accent)",
+          letterSpacing: "-0.02em",
           lineHeight: 1,
           userSelect: "none",
           display: "block",
-          textAlign: "center",
           marginBottom: "20px",
         }}
       >
@@ -337,16 +200,13 @@ function ChapterCover({
       {/* Chapter title */}
       <h1
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(2.4rem, 6vw, 4rem)",
-          fontWeight: 400,
-          color: "var(--color-foreground)",
-          textAlign: "center",
+          fontFamily: "var(--vr-display)",
+          fontSize: "clamp(2rem, 5vw, 3.2rem)",
+          fontWeight: 500,
+          color: "#FAF6F1",
           letterSpacing: "-0.01em",
-          lineHeight: 1.05,
-          marginBottom: "14px",
-          animation: "vol-fade-up 0.9s ease 0.15s forwards",
-          opacity: 0,
+          lineHeight: 1.1,
+          marginBottom: "12px",
         }}
       >
         {chapter.title}
@@ -355,109 +215,64 @@ function ChapterCover({
       {/* Chapter tagline */}
       <p
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "1.15rem",
+          fontFamily: "var(--vr-body)",
+          fontSize: "1rem",
           fontStyle: "italic",
-          color: "var(--color-muted-foreground)",
-          textAlign: "center",
-          marginBottom: "64px",
-          animation: "vol-fade-up 0.9s ease 0.28s forwards",
-          opacity: 0,
+          color: "var(--vr-accent)",
+          marginBottom: "56px",
         }}
       >
         {chapter.tagline}
       </p>
 
-      {/* Chapter artifact */}
+      {/* Chapter artifact — recolored for the dark cover */}
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          color: "var(--color-muted-foreground)",
-          animation: "vol-fade-up 0.9s ease 0.42s forwards",
-          opacity: 0,
-        }}
+        style={
+          {
+            display: "flex",
+            justifyContent: "center",
+            "--foreground": "var(--vr-accent)",
+          } as React.CSSProperties
+        }
       >
         <ChapterArtifact chapter={chapter.title as ChapterTitle} isQuietAnger={isQuietAnger} />
       </div>
 
-      {/* Quiet Anger exclusive note */}
       {isQuietAnger && (
         <p
           style={{
-            fontFamily: "var(--font-label)",
-            fontSize: "10px",
-            color: "var(--color-muted-foreground)",
-            opacity: 0.5,
+            fontFamily: "var(--vr-body)",
+            fontSize: "11px",
+            color: "var(--vr-accent)",
+            opacity: 0.7,
             marginTop: "32px",
-            textAlign: "center",
-            letterSpacing: "0.05em",
-            animation: "vol-fade-up 0.9s ease 0.5s forwards",
+            letterSpacing: "0.04em",
           }}
         >
           Five exclusive notes — written only for Volume 1.
         </p>
       )}
-
-      {/* Scroll indicator */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "40px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "6px",
-          animation: "vol-fade-up 0.9s ease 0.65s forwards",
-          opacity: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "12px",
-            fontStyle: "italic",
-            color: "var(--color-muted-foreground)",
-            opacity: 0.65,
-            letterSpacing: "0.06em",
-          }}
-        >
-          {entryPrompt}
-        </span>
-        <ChevronDown
-          size={15}
-          aria-hidden
-          style={{
-            color: "var(--color-muted-foreground)",
-            opacity: 0.45,
-            animation: "vol-bounce 2.2s ease-in-out infinite",
-          }}
-        />
-      </div>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Chapter intro letter — literary, no label, first paragraph slightly larger
+// Chapter intro letter — opening prose of the chapter
 // ---------------------------------------------------------------------------
 
 function ChapterIntroLetter({ introLetter }: { introLetter: string }) {
   const paragraphs = introLetter.split("\n\n").filter(Boolean);
 
   return (
-    <section style={{ maxWidth: "600px", marginTop: "8px" }}>
+    <section style={{ marginTop: "8px" }}>
       {paragraphs.map((para, i) => (
         <p
           key={i}
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: i === 0 ? "1.2rem" : "1.08rem",
-            fontWeight: i === 0 ? 500 : 400,
-            lineHeight: 1.9,
-            color: `color-mix(in oklab, var(--foreground) ${i === 0 ? "95%" : "88%"}, transparent)`,
+            fontFamily: "var(--vr-body)",
+            fontSize: i === 0 ? "1.15rem" : "1.05rem",
+            lineHeight: 1.85,
+            color: "var(--vr-text)",
             marginBottom: i < paragraphs.length - 1 ? "22px" : 0,
             whiteSpace: "pre-line",
           }}
@@ -465,84 +280,43 @@ function ChapterIntroLetter({ introLetter }: { introLetter: string }) {
           {para}
         </p>
       ))}
-
-      {/* MAD seal after letter */}
-      <div style={{ marginTop: "48px", display: "flex", alignItems: "center", gap: "14px" }}>
-        <span
-          aria-hidden
-          style={{
-            display: "inline-flex",
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            background: "var(--primary)",
-            opacity: 0.22,
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "13px",
-              fontStyle: "italic",
-              color: "var(--color-foreground)",
-              lineHeight: 1,
-            }}
-          >
-            M
-          </span>
-        </span>
-        <span
-          style={{
-            fontFamily: "var(--font-label)",
-            fontSize: "9px",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "var(--color-muted-foreground)",
-            opacity: 0.45,
-          }}
-        >
-          MAD
-        </span>
-      </div>
     </section>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Note article — reads like manuscript, receipt as premium object
+// Note article — full-width parchment section with margin annotation
 // ---------------------------------------------------------------------------
 
 function NoteArticle({
   note,
   index,
   isQuietAnger,
+  marginText,
 }: {
   note: Volume1Note;
   index: number;
   isQuietAnger: boolean;
+  marginText?: string;
 }) {
   return (
     <article
-      className="vol-note-card"
       style={{
-        padding: "28px 28px 0",
+        padding: "48px 0 56px",
+        borderTop: "1px solid var(--vr-divider)",
         background: isQuietAnger
-          ? "color-mix(in oklab, var(--paper-deep) 70%, var(--card))"
-          : undefined,
+          ? "color-mix(in oklab, var(--vr-accent) 6%, var(--vr-bg))"
+          : "var(--vr-bg)",
       }}
     >
       {/* Note header */}
       <header style={{ marginBottom: "20px" }}>
         <span
           style={{
-            fontFamily: "var(--font-label)",
-            fontSize: "10px",
-            letterSpacing: "0.12em",
-            color: "var(--color-muted-foreground)",
-            opacity: 0.55,
+            fontFamily: "var(--vr-body)",
+            fontSize: "11px",
+            letterSpacing: "0.1em",
+            color: "var(--vr-muted)",
             display: "block",
             marginBottom: "6px",
           }}
@@ -551,11 +325,11 @@ function NoteArticle({
         </span>
         <h2
           style={{
-            fontFamily: "var(--font-display)",
+            fontFamily: "var(--vr-display)",
             fontSize: "clamp(1.5rem, 4vw, 2rem)",
-            fontWeight: 400,
-            lineHeight: 1.1,
-            color: "var(--color-foreground)",
+            fontWeight: 500,
+            lineHeight: 1.15,
+            color: "var(--vr-text)",
             margin: 0,
           }}
         >
@@ -567,23 +341,23 @@ function NoteArticle({
       {note.safetyNote && (
         <div
           style={{
-            borderLeft: "2px solid var(--color-border)",
+            borderLeft: "2px solid var(--vr-accent)",
             paddingLeft: "14px",
             marginBottom: "20px",
           }}
         >
           <p
             style={{
-              fontFamily: "var(--font-label)",
-              fontSize: "11px",
+              fontFamily: "var(--vr-body)",
+              fontSize: "12px",
               lineHeight: 1.7,
-              color: "var(--color-muted-foreground)",
+              color: "var(--vr-muted)",
               margin: 0,
             }}
           >
             This note touches on dark moments. If you are not safe right now, please move toward
             someone who can help.{" "}
-            <Link to="/support" style={{ color: "inherit", opacity: 0.8 }}>
+            <Link to="/support" style={{ color: "inherit", textDecoration: "underline" }}>
               Safety &amp; Support
             </Link>
           </p>
@@ -593,44 +367,53 @@ function NoteArticle({
       {/* Note body */}
       <div
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "1.08rem",
-          lineHeight: 1.88,
-          color: `color-mix(in oklab, var(--foreground) 90%, transparent)`,
+          fontFamily: "var(--vr-body)",
+          fontSize: "19px",
+          lineHeight: 1.85,
+          color: "var(--vr-text)",
           whiteSpace: "pre-line",
-          marginBottom: "28px",
+          marginBottom: "24px",
         }}
       >
         {note.body}
       </div>
 
-      {/* Premium receipt */}
-      <div style={{ margin: "0 -28px" }}>
-        <PremiumReceipt
-          from={note.from}
-          to={note.to}
-          date={note.date}
-          total={note.total}
-          isQuietAnger={isQuietAnger}
-        />
-      </div>
-
-      {/* Quiet Anger exclusive label */}
-      {isQuietAnger && (
-        <div
+      {/* Margin annotation — signed */}
+      {marginText && (
+        <p
           style={{
-            padding: "10px 28px 14px",
-            textAlign: "right",
+            fontFamily: "var(--vr-body)",
+            fontSize: "13px",
+            fontStyle: "italic",
+            lineHeight: 1.6,
+            color: "var(--vr-muted)",
+            whiteSpace: "pre-line",
+            marginBottom: "28px",
           }}
         >
+          {marginText}
+          <br />— MAD
+        </p>
+      )}
+
+      {/* Premium receipt */}
+      <PremiumReceipt
+        from={note.from}
+        to={note.to}
+        date={note.date}
+        total={note.total}
+        isQuietAnger={isQuietAnger}
+      />
+
+      {isQuietAnger && (
+        <div style={{ paddingTop: "12px", textAlign: "right" }}>
           <span
             style={{
-              fontFamily: "var(--font-label)",
-              fontSize: "9px",
+              fontFamily: "var(--vr-body)",
+              fontSize: "11px",
               fontStyle: "italic",
-              color: "var(--color-muted-foreground)",
-              opacity: 0.45,
-              letterSpacing: "0.05em",
+              color: "var(--vr-muted)",
+              letterSpacing: "0.03em",
             }}
           >
             Exclusive to Volume 1
@@ -642,31 +425,7 @@ function NoteArticle({
 }
 
 // ---------------------------------------------------------------------------
-// Margin note — discovered, not announced
-// ---------------------------------------------------------------------------
-
-function MarginNoteEl({ text }: { text: string }) {
-  return (
-    <p
-      style={{
-        fontFamily: "var(--font-display)",
-        fontSize: "0.78rem",
-        fontStyle: "italic",
-        lineHeight: 1.7,
-        color: "color-mix(in oklab, var(--color-muted-foreground) 75%, var(--accent))",
-        transform: "rotate(2deg)",
-        transformOrigin: "top left",
-        whiteSpace: "pre-line",
-        margin: 0,
-      }}
-    >
-      {text}
-    </p>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Private letter section
+// Private letter section — end of chapter
 // ---------------------------------------------------------------------------
 
 function PrivateLetterSection({ text }: { text: string }) {
@@ -674,70 +433,34 @@ function PrivateLetterSection({ text }: { text: string }) {
 
   return (
     <section
+      className="ml-4 md:ml-8"
       style={{
-        marginTop: "96px",
-        paddingTop: "48px",
-        borderTop: "1px solid var(--color-border)",
-        maxWidth: "600px",
+        marginTop: "64px",
+        padding: "40px 28px",
+        background: "var(--vr-bg-letter)",
       }}
     >
-      <div
+      <p
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          marginBottom: "40px",
+          fontFamily: "var(--vr-body)",
+          fontSize: "16px",
+          fontStyle: "italic",
+          color: "var(--vr-muted)",
+          marginBottom: "20px",
         }}
       >
-        <span
-          aria-hidden
-          style={{
-            display: "inline-flex",
-            width: "28px",
-            height: "28px",
-            borderRadius: "50%",
-            background: "var(--primary)",
-            opacity: 0.2,
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "11px",
-              fontStyle: "italic",
-              color: "var(--color-foreground)",
-              lineHeight: 1,
-            }}
-          >
-            M
-          </span>
-        </span>
-        <span
-          style={{
-            fontFamily: "var(--font-label)",
-            fontSize: "9px",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: "var(--color-muted-foreground)",
-            opacity: 0.5,
-          }}
-        >
-          A private letter
-        </span>
-      </div>
+        Dear reader,
+      </p>
 
       {paragraphs.map((para, i) => (
         <p
           key={i}
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "1.1rem",
-            lineHeight: 1.9,
-            color: `color-mix(in oklab, var(--foreground) ${i === 0 ? "92%" : "85%"}, transparent)`,
-            marginBottom: i < paragraphs.length - 1 ? "20px" : 0,
+            fontFamily: "var(--vr-body)",
+            fontSize: "16px",
+            lineHeight: 1.85,
+            color: "var(--vr-text)",
+            marginBottom: i < paragraphs.length - 1 ? "18px" : 0,
             whiteSpace: "pre-line",
           }}
         >
@@ -745,6 +468,47 @@ function PrivateLetterSection({ text }: { text: string }) {
         </p>
       ))}
     </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Receipt divider — between chapters
+// ---------------------------------------------------------------------------
+
+function ReceiptDivider({ chapterNumber }: { chapterNumber: number }) {
+  return (
+    <div
+      style={{
+        marginTop: "56px",
+        padding: "20px 0",
+        borderTop: "1px dotted var(--vr-divider)",
+        borderBottom: "1px dotted var(--vr-divider)",
+        textAlign: "center",
+      }}
+    >
+      <p
+        style={{
+          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
+          fontSize: "12px",
+          fontVariant: "small-caps",
+          letterSpacing: "0.08em",
+          color: "var(--vr-muted)",
+          margin: 0,
+        }}
+      >
+        — Chapter {chapterNumber} of {CHAPTER_COUNT} —
+      </p>
+      <p
+        style={{
+          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
+          fontSize: "12px",
+          color: "var(--vr-muted)",
+          margin: "4px 0 0",
+        }}
+      >
+        Received. Kept.
+      </p>
+    </div>
   );
 }
 
@@ -757,28 +521,30 @@ function ClosingReceiptDestination() {
 
   return (
     <section
+      id="closing-receipt"
       style={{
-        marginTop: "96px",
-        paddingTop: "96px",
-        borderTop: "1px solid var(--color-border)",
+        marginTop: "64px",
+        padding: "48px 28px",
+        borderTop: "1px dashed var(--vr-accent)",
+        borderBottom: "1px dashed var(--vr-accent)",
         textAlign: "center",
       }}
     >
       <p
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "1rem",
-          fontStyle: "italic",
-          color: "var(--color-muted-foreground)",
-          opacity: 0.65,
-          marginBottom: "48px",
-          letterSpacing: "0.02em",
+          fontFamily: "ui-monospace, 'Lora', Georgia, serif",
+          fontSize: "12px",
+          letterSpacing: "0.06em",
+          color: "var(--vr-muted)",
+          marginBottom: "20px",
         }}
       >
-        You made it through.
+        THE NOTE YOU NEEDED TODAY
+        <br />
+        Volume 1 — The Things We Do Not Say Out Loud
       </p>
 
-      <div style={{ maxWidth: "520px", margin: "0 auto", textAlign: "left" }}>
+      <div style={{ maxWidth: "480px", margin: "0 auto", textAlign: "left" }}>
         <PremiumReceipt
           from={closingReceipt.from}
           to={closingReceipt.to}
@@ -789,19 +555,19 @@ function ClosingReceiptDestination() {
         />
       </div>
 
-      {/* Closing text + MAD sign-off */}
-      <div style={{ marginTop: "56px", maxWidth: "480px", margin: "56px auto 0" }}>
+      <div
+        style={{ marginTop: "40px", maxWidth: "460px", marginLeft: "auto", marginRight: "auto" }}
+      >
         {paragraphs.map((para, i) => (
           <p
             key={i}
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "0.98rem",
+              fontFamily: "var(--vr-body)",
+              fontSize: "15px",
               fontStyle: "italic",
-              lineHeight: 1.85,
-              color: "var(--color-muted-foreground)",
-              opacity: 0.75,
-              marginBottom: i < paragraphs.length - 1 ? "16px" : 0,
+              lineHeight: 1.8,
+              color: "var(--vr-muted)",
+              marginBottom: i < paragraphs.length - 1 ? "14px" : 0,
               whiteSpace: "pre-line",
             }}
           >
@@ -809,34 +575,20 @@ function ClosingReceiptDestination() {
           </p>
         ))}
 
-        {/* MAD monogram */}
-        <div style={{ marginTop: "40px", display: "flex", justifyContent: "center" }}>
-          <span
-            aria-hidden
+        <p style={{ marginTop: "28px" }}>
+          <Link
+            to="/support"
             style={{
-              display: "inline-flex",
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              background: "var(--primary)",
-              opacity: 0.22,
-              alignItems: "center",
-              justifyContent: "center",
+              fontFamily: "var(--vr-body)",
+              fontSize: "13px",
+              fontStyle: "italic",
+              color: "var(--vr-muted)",
+              textDecoration: "underline",
             }}
           >
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "18px",
-                fontStyle: "italic",
-                color: "var(--color-foreground)",
-                lineHeight: 1,
-              }}
-            >
-              M
-            </span>
-          </span>
-        </div>
+            If you need someone to speak to, visit our Safety &amp; Support page.
+          </Link>
+        </p>
       </div>
     </section>
   );
@@ -853,17 +605,14 @@ function ChapterPrevNext({ currentChapter }: { currentChapter: number }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginTop: "80px",
-        paddingTop: "40px",
-        borderTop: "1px solid var(--color-border)",
+        marginTop: "56px",
+        paddingTop: "32px",
+        borderTop: "1px solid var(--vr-divider)",
       }}
     >
       {currentChapter > 1 ? (
         <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
-          <Link
-            to="/volume-1/read/$chapter"
-            params={{ chapter: String(currentChapter - 1) }}
-          >
+          <Link to="/volume-1/read/$chapter" params={{ chapter: String(currentChapter - 1) }}>
             <ArrowLeft className="size-3.5" aria-hidden />
             Chapter {currentChapter - 1}
           </Link>
@@ -874,10 +623,7 @@ function ChapterPrevNext({ currentChapter }: { currentChapter: number }) {
 
       {currentChapter < CHAPTER_COUNT ? (
         <Button asChild variant="note" size="sm" className="min-h-9 text-sm">
-          <Link
-            to="/volume-1/read/$chapter"
-            params={{ chapter: String(currentChapter + 1) }}
-          >
+          <Link to="/volume-1/read/$chapter" params={{ chapter: String(currentChapter + 1) }}>
             Chapter {currentChapter + 1}
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
@@ -886,5 +632,109 @@ function ChapterPrevNext({ currentChapter }: { currentChapter: number }) {
         <span />
       )}
     </nav>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Floating chapter index — fixed bottom-right, opens a drawer
+// ---------------------------------------------------------------------------
+
+function FloatingChapterIndex({ currentChapter }: { currentChapter: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Open chapter index"
+          style={{
+            position: "fixed",
+            bottom: "24px",
+            right: "16px",
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            background: "var(--vr-bg-cover, #2C2420)",
+            color: "#FAF6F1",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "none",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+            zIndex: 30,
+          }}
+        >
+          <BookOpen size={18} aria-hidden />
+        </button>
+      </SheetTrigger>
+      <SheetContent
+        side="right"
+        style={{
+          background: "#FAF6F1",
+          fontFamily: "'Lora', Georgia, serif",
+        }}
+      >
+        <SheetHeader>
+          <SheetTitle style={{ fontFamily: "'Playfair Display', serif", color: "#3D2B1F" }}>
+            Volume 1
+          </SheetTitle>
+        </SheetHeader>
+
+        <nav style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "4px" }}>
+          <Link
+            to="/volume-1"
+            onClick={() => setOpen(false)}
+            style={{
+              padding: "10px 4px",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "1rem",
+              color: "#3D2B1F",
+              textDecoration: "none",
+              borderBottom: "1px solid #E8DDD4",
+            }}
+          >
+            Opening
+          </Link>
+
+          {volume1Chapters.map((ch) => (
+            <Link
+              key={ch.number}
+              to="/volume-1/read/$chapter"
+              params={{ chapter: String(ch.number) }}
+              onClick={() => setOpen(false)}
+              style={{
+                padding: "10px 4px",
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "1rem",
+                color: ch.number === currentChapter ? "#3D2B1F" : "#9C8478",
+                fontWeight: ch.number === currentChapter ? 600 : 400,
+                textDecoration: "none",
+                borderBottom: "1px solid #E8DDD4",
+              }}
+            >
+              {String(ch.number).padStart(2, "0")} — {ch.title}
+            </Link>
+          ))}
+
+          <Link
+            to="/volume-1/read/$chapter"
+            params={{ chapter: String(CHAPTER_COUNT) }}
+            hash="closing-receipt"
+            onClick={() => setOpen(false)}
+            style={{
+              padding: "10px 4px",
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: "1rem",
+              color: "#9C8478",
+              textDecoration: "none",
+            }}
+          >
+            Closing Receipt
+          </Link>
+        </nav>
+      </SheetContent>
+    </Sheet>
   );
 }
