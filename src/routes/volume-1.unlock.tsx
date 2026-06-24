@@ -16,17 +16,29 @@ const LOCAL_VALID_CODES = [
 
 const GENERIC_ERROR = "That code doesn't seem right. Please check your email and try again.";
 
-// Best-effort remote check. Imports the Supabase client lazily and swallows
-// every possible failure (missing env vars, network error, RPC error, thrown
-// proxy access). The user NEVER sees a raw infrastructure error.
+// Hardcoded public endpoint — avoids dependence on env vars baked into the
+// bundle. The publishable (anon) key is safe to ship to the browser; RLS and
+// the SECURITY DEFINER RPC enforce all real access rules.
+const SUPABASE_URL = "https://nlmmmiyekpdjckvaotvm.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sbW1taXlla3BkamNrdmFvdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzgxMjcsImV4cCI6MjA5NzIxNDEyN30.hswzl9f-1OSJUPa0UTF8tSNttuOVKIFWGDrZFloAYhk";
+
+// Best-effort remote check via direct fetch. Swallows every possible failure
+// (network error, RPC error, parse error). The user NEVER sees a raw
+// infrastructure error.
 async function tryRemoteRedeem(normalized: string): Promise<boolean> {
   try {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data, error: rpcError } = await supabase.rpc("redeem_volume1_code", {
-      input_code: normalized,
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_volume1_code`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ input_code: normalized }),
     });
-    if (rpcError) return false;
-    const result = data as { ok?: boolean } | null;
+    if (!res.ok) return false;
+    const result = (await res.json()) as { ok?: boolean } | null;
     return Boolean(result?.ok);
   } catch {
     return false;
