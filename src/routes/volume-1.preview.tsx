@@ -1,11 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import {
-  EnvelopeLetterFrame,
-  EnvelopeMasthead,
-  EnvelopeSignature,
-} from "@/components/envelope-letter";
-import { PostcardReceipt } from "@/components/postcard-canvas";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { volumeOneSelarUrl } from "@/lib/note-data";
 
@@ -136,106 +130,223 @@ function Volume1PreviewPage() {
           }}
         />
 
-        {/* Envelope card — the note itself, pulled out of the kraft envelope */}
-        <div style={{ marginBottom: "64px" }}>
-          <EnvelopeLetterFrame>
-            <div className="px-6 py-8 sm:px-9 sm:py-10">
-              <EnvelopeMasthead style={{ marginBottom: "24px" }} />
+        {/* Envelope — outer kraft shell with decorative top/bottom flaps */}
+        <div
+          style={{
+            background: "#C4A464",
+            borderRadius: "12px",
+            padding: 0,
+            maxWidth: "600px",
+            margin: "0 auto 64px",
+            position: "relative",
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(44,36,32,0.18)",
+          }}
+        >
+          {/* Top flap */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "80px",
+              background: "#B8943A",
+              clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+              borderRadius: "12px 12px 0 0",
+            }}
+          />
 
-              {/* Note title */}
-              <h3
-                style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "clamp(20px, 4vw, 24px)",
-                  fontWeight: 400,
-                  color: "#2C2420",
-                  lineHeight: "1.4",
-                  margin: "0 0 32px 0",
-                }}
-              >
-                You are not just tired. You are tired from holding everything together for people
-                who never once asked if you were okay.
-              </h3>
+          {/* Inner letter card */}
+          <div
+            style={{
+              background: "#FDFAF5",
+              borderRadius: "6px",
+              position: "relative",
+              boxShadow: "0 2px 8px rgba(44,36,32,0.08)",
+            }}
+            className="mx-6 mt-[90px] mb-8 px-6 py-9 sm:px-8 sm:py-10"
+          >
+            {/* Brand header */}
+            <p
+              style={{
+                textAlign: "center",
+                fontFamily: "Georgia, serif",
+                fontSize: "11px",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#9C8478",
+                marginBottom: "28px",
+                marginTop: 0,
+              }}
+            >
+              ♥ The Note You Needed Today ♥
+            </p>
 
-              {/* Note body */}
-              <div
-                style={{
-                  fontFamily: "Georgia, serif",
-                  fontSize: "18px",
-                  lineHeight: "1.9",
-                  color: "#3D2B1F",
-                }}
-              >
-                <p>
-                  Most mornings, you are already exhausted before the day starts. Not because you
-                  are weak. Not because something is wrong with you. But because you have been
-                  carrying things that were never supposed to be yours alone.
-                </p>
-                <p>
-                  The bills that arrive before the money does. The job you show up to even when your
-                  chest feels like concrete. The family that needs you to be strong when you have
-                  nothing left. The friendships you maintain with what little energy remains after
-                  everyone else has taken their share.
-                </p>
-                <p>
-                  You smile in meetings. You answer messages. You say you are fine. You have said
-                  you are fine so many times that you have started to believe it is the only
-                  acceptable answer.
-                </p>
-                <p>
-                  Here is what nobody talks about. Most people who are struggling right now are not
-                  struggling because they gave up. They are struggling because they kept going past
-                  the point where any reasonable person would have stopped. The World Health
-                  Organisation says 280 million people are living with depression right now. Most of
-                  them are sitting next to someone who has no idea. Most of them are the person in
-                  the room that everyone else leans on.
-                </p>
-                <p>
-                  You were never taught how to rest. You were taught to survive. And survival is
-                  exhausting in a way that no amount of sleep can fix.
-                </p>
-              </div>
+            {/* Note title */}
+            <h3
+              className="text-[20px] sm:text-[22px]"
+              style={{
+                fontFamily: "Georgia, serif",
+                fontWeight: 500,
+                color: "#2C2420",
+                lineHeight: "1.4",
+                margin: "0 0 28px 0",
+              }}
+            >
+              You are not just tired. You are tired from holding everything together for people who
+              never once asked if you were okay.
+            </h3>
 
-              {/* I hope you heal — emotional peak */}
-              <div
-                style={{
-                  fontFamily: "Georgia, serif",
-                  fontSize: "20px",
-                  lineHeight: "1.9",
-                  color: "#3D2B1F",
-                  marginTop: "40px",
-                  marginBottom: "40px",
-                }}
-              >
-                <p>
-                  I hope you heal from the version of yourself that learned to make yourself small
-                  so that other people could feel comfortable.
-                </p>
-                <p>
-                  I hope someone asks how you are this week and this time you tell them the truth.
-                </p>
-                <p>
-                  I hope you find one thing you have been carrying that was never yours to carry and
-                  you put it down.
-                </p>
-                <p>I hope you rest. Not just sleep. Actually rest.</p>
-              </div>
-
-              {/* Receipt block */}
-              <PostcardReceipt
-                from="Every single day you showed up when staying in bed felt safer."
-                to="The version of you reading this who needed to know someone sees it."
-                date="Today. Right now. This moment."
-                total="You are still here. That counts for more than you know."
-                style={{ marginTop: "8px", height: "auto" }}
-              />
-
-              {/* MAD signature */}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
-                <EnvelopeSignature />
-              </div>
+            {/* Note body */}
+            <div
+              className="text-[16px] sm:text-[17px]"
+              style={{
+                fontFamily: "'Lora', Georgia, serif",
+                lineHeight: "1.75",
+                color: "#3D2B1F",
+              }}
+            >
+              <p style={{ marginBottom: "20px" }}>
+                Most mornings you are already exhausted before the day even starts. Not because you
+                are weak. Not because something is wrong with you. But because you have been
+                carrying things that were never supposed to be yours alone.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                The bills that arrive before the money does. The job you still show up to even when
+                your chest feels like concrete. The family that needs you to be strong when you have
+                nothing left. The friendships you keep alive with whatever energy remains after
+                everyone else has taken their share.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                You smile in meetings. You answer messages. You say you are fine. You have said it
+                so many times you have started to believe it is the only acceptable answer.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                Here is what nobody says out loud. Most people who are struggling right now kept
+                going. They did not break down in public. They did not ask for help. They showed up,
+                they smiled, they made it look manageable. And then they went home and sat in the
+                quiet and felt the weight of everything they had been carrying alone.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                You were never taught how to rest. You were taught to survive. And survival is
+                exhausting in a way that no amount of sleep can fix.
+              </p>
             </div>
-          </EnvelopeLetterFrame>
+
+            {/* I hope you heal — emotional peak */}
+            <div
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: "17px",
+                fontStyle: "italic",
+                color: "#3D2B1F",
+                marginTop: "32px",
+                marginBottom: "32px",
+              }}
+            >
+              <p style={{ marginBottom: "20px" }}>
+                I hope you heal from the version of yourself that learned to make yourself small so
+                that other people could feel comfortable.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                I hope someone asks how you are this week and this time you tell them the truth.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                I hope you find one thing you have been carrying that was never yours and you put it
+                down.
+              </p>
+              <p style={{ marginBottom: 0 }}>I hope you rest. Not just sleep. Actually rest.</p>
+            </div>
+
+            {/* Receipt block */}
+            <div
+              style={{
+                fontFamily: "'Courier New', monospace",
+                fontSize: "12px",
+                background: "#F5EFE6",
+                padding: "20px",
+                borderRadius: "4px",
+                borderTop: "1px dashed #C4A882",
+                borderBottom: "1px dashed #C4A882",
+                marginTop: "28px",
+                marginBottom: "20px",
+                display: "grid",
+                gridTemplateColumns: "62px 1fr",
+                gap: "6px 10px",
+              }}
+            >
+              <span style={{ fontWeight: "bold", color: "#6B5744" }}>FROM:</span>
+              <span style={{ fontWeight: "normal", color: "#3D2B1F", lineHeight: "1.7" }}>
+                Every single day you showed up when staying in bed felt safer.
+              </span>
+
+              <span style={{ fontWeight: "bold", color: "#6B5744" }}>TO:</span>
+              <span style={{ fontWeight: "normal", color: "#3D2B1F", lineHeight: "1.7" }}>
+                The version of you reading this who needed to know someone sees it.
+              </span>
+
+              <span style={{ fontWeight: "bold", color: "#6B5744" }}>DATE:</span>
+              <span style={{ fontWeight: "normal", color: "#3D2B1F", lineHeight: "1.7" }}>
+                Today. Right now. This moment.
+              </span>
+
+              <span style={{ fontWeight: "bold", color: "#6B5744" }}>TOTAL:</span>
+              <span style={{ fontWeight: "normal", color: "#3D2B1F", lineHeight: "1.7" }}>
+                You are still here. That counts for more than you know.{" "}
+                <span style={{ color: "#8B3A2A" }}>♥</span>
+              </span>
+            </div>
+
+            {/* MAD signature */}
+            <span
+              style={{
+                fontFamily: "Georgia, serif",
+                fontStyle: "italic",
+                fontSize: "22px",
+                color: "#2C2420",
+                textAlign: "right",
+                display: "block",
+                marginTop: "20px",
+              }}
+            >
+              MAD
+            </span>
+          </div>
+
+          {/* Bottom flap */}
+          <div
+            aria-hidden
+            style={{
+              background: "#B8943A",
+              height: "60px",
+              clipPath: "polygon(0 100%, 50% 0, 100% 100%)",
+              borderRadius: "0 0 12px 12px",
+            }}
+          />
+
+          {/* Heart wax seal */}
+          <div
+            aria-hidden
+            style={{
+              width: "44px",
+              height: "44px",
+              background: "#2C3E6B",
+              border: "2px solid #1a2a50",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "-22px auto 0 auto",
+              position: "relative",
+              zIndex: 2,
+              color: "#FFFFFF",
+              fontSize: "14px",
+            }}
+          >
+            ♥
+          </div>
         </div>
 
         {/* Receipt-style end of preview divider */}
