@@ -130,86 +130,160 @@ function Volume1PreviewPage() {
           }}
         />
 
-        {/* Note heading */}
-        <h3
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(20px, 4vw, 24px)",
-            fontWeight: 400,
-            color: "#2C2420",
-            lineHeight: "1.4",
-            margin: "0 0 32px 0",
-          }}
-        >
-          You Did Not Fall Behind. The World Moved Too Fast.
-        </h3>
-
-        {/* Note body */}
+        {/* Envelope card — the note itself, pulled out of the parchment envelope */}
         <div
           style={{
-            fontFamily: "Georgia, serif",
-            fontSize: "18px",
-            lineHeight: "1.9",
-            color: "#3D2B1F",
+            background: "#FFFFFF",
+            borderRadius: "8px",
+            boxShadow: "0 4px 24px rgba(44,36,32,0.08)",
+            marginBottom: "64px",
           }}
+          className="px-6 py-8 sm:px-9 sm:py-10"
         >
-          <p>There is a particular kind of exhaustion that does not show up on any test.</p>
-          <p>
-            It is not burnout. It is not depression, exactly.
-            <br />
-            It is what happens when you have been trying to keep up
-            <br />
-            with a pace that was never designed for a human being —
-            <br />
-            and somewhere along the way,
-            <br />
-            you started believing the problem was you.
+          {/* THE NOTE YOU NEEDED TODAY */}
+          <p
+            style={{
+              textAlign: "center",
+              fontFamily: "Georgia, serif",
+              fontSize: "11px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#9C8478",
+              marginBottom: "24px",
+              marginTop: 0,
+            }}
+          >
+            The Note You Needed Today
           </p>
-          <p>
-            The bills that came faster than the money.
-            <br />
-            The body that started saying no before you were ready to listen.
-            <br />
-            The days you showed up anyway —
-            <br />
-            not because you were brave,
-            <br />
-            but because stopping felt more dangerous than continuing.
-          </p>
-          <p>
-            That is not weakness.
-            <br />
-            That is a person doing the impossible
-            <br />
-            and calling it ordinary.
-          </p>
-          <p>
-            You did not fall behind.
-            <br />
-            You were carrying something
-            <br />
-            that most people around you
-            <br />
-            had already set down.
-          </p>
-        </div>
 
-        {/* Margin annotation */}
-        <p
-          style={{
-            fontFamily: "Georgia, serif",
-            fontStyle: "italic",
-            fontSize: "13px",
-            color: "#9C8478",
-            textAlign: "right",
-            marginTop: "32px",
-            marginBottom: "48px",
-            borderTop: "1px solid #E8DDD4",
-            paddingTop: "16px",
-          }}
-        >
-          — This is what survival looks like from the inside. — MAD
-        </p>
+          {/* Note title */}
+          <h3
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: "clamp(20px, 4vw, 24px)",
+              fontWeight: 400,
+              color: "#2C2420",
+              lineHeight: "1.4",
+              margin: "0 0 32px 0",
+            }}
+          >
+            You are not just tired. You are tired from holding everything together for people who
+            never once asked if you were okay.
+          </h3>
+
+          {/* Note body */}
+          <div
+            style={{
+              fontFamily: "Georgia, serif",
+              fontSize: "18px",
+              lineHeight: "1.9",
+              color: "#3D2B1F",
+            }}
+          >
+            <p>
+              Most mornings, you are already exhausted before the day starts. Not because you are
+              weak. Not because something is wrong with you. But because you have been carrying
+              things that were never supposed to be yours alone.
+            </p>
+            <p>
+              The bills that arrive before the money does. The job you show up to even when your
+              chest feels like concrete. The family that needs you to be strong when you have
+              nothing left. The friendships you maintain with what little energy remains after
+              everyone else has taken their share.
+            </p>
+            <p>
+              You smile in meetings. You answer messages. You say you are fine. You have said you
+              are fine so many times that you have started to believe it is the only acceptable
+              answer.
+            </p>
+            <p>
+              Here is what nobody talks about. Most people who are struggling right now are not
+              struggling because they gave up. They are struggling because they kept going past the
+              point where any reasonable person would have stopped. The World Health Organisation
+              says 280 million people are living with depression right now. Most of them are sitting
+              next to someone who has no idea. Most of them are the person in the room that everyone
+              else leans on.
+            </p>
+            <p>
+              You were never taught how to rest. You were taught to survive. And survival is
+              exhausting in a way that no amount of sleep can fix.
+            </p>
+          </div>
+
+          {/* I hope you heal — emotional peak */}
+          <div
+            style={{
+              fontFamily: "Georgia, serif",
+              fontSize: "20px",
+              lineHeight: "1.9",
+              color: "#3D2B1F",
+              marginTop: "40px",
+              marginBottom: "40px",
+            }}
+          >
+            <p>
+              I hope you heal from the version of yourself that learned to make yourself small so
+              that other people could feel comfortable.
+            </p>
+            <p>I hope someone asks how you are this week and this time you tell them the truth.</p>
+            <p>
+              I hope you find one thing you have been carrying that was never yours to carry and you
+              put it down.
+            </p>
+            <p>I hope you rest. Not just sleep. Actually rest.</p>
+          </div>
+
+          {/* Receipt block */}
+          <div
+            style={{
+              fontFamily: "'Courier New', monospace",
+              background: "#F5EFE6",
+              borderRadius: "4px",
+              padding: "24px",
+              borderTop: "1px dashed #C4A882",
+              borderBottom: "1px dashed #C4A882",
+              display: "grid",
+              gridTemplateColumns: "70px 1fr",
+              gap: "6px 12px",
+            }}
+          >
+            <span style={{ fontWeight: "bold", color: "#6B5744", fontSize: "12px" }}>FROM:</span>
+            <span style={{ color: "#3D2B1F", fontSize: "12px", lineHeight: "1.8" }}>
+              Every single day you showed up when staying in bed felt safer.
+            </span>
+
+            <span style={{ fontWeight: "bold", color: "#6B5744", fontSize: "12px" }}>TO:</span>
+            <span style={{ color: "#3D2B1F", fontSize: "12px", lineHeight: "1.8" }}>
+              The version of you reading this who needed to know someone sees it.
+            </span>
+
+            <span style={{ fontWeight: "bold", color: "#6B5744", fontSize: "12px" }}>DATE:</span>
+            <span style={{ color: "#3D2B1F", fontSize: "12px", lineHeight: "1.8" }}>
+              Today. Right now. This moment.
+            </span>
+
+            <span style={{ fontWeight: "bold", color: "#6B5744", fontSize: "12px" }}>TOTAL:</span>
+            <span style={{ color: "#3D2B1F", fontSize: "12px", lineHeight: "1.8" }}>
+              You are still here. That counts for more than you know.{" "}
+              <span style={{ color: "#8B3A2A" }}>♥</span>
+            </span>
+          </div>
+
+          {/* MAD signature */}
+          <span
+            style={{
+              fontFamily: "Georgia, serif",
+              fontStyle: "italic",
+              fontSize: "24px",
+              color: "#2C2420",
+              textAlign: "right",
+              marginTop: "24px",
+              display: "block",
+            }}
+          >
+            MAD
+          </span>
+        </div>
 
         {/* Receipt-style end of preview divider */}
         <div
