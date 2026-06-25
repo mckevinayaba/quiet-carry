@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { AppModalsProvider, useAppModals } from "@/components/app-modals";
+import { useAuth } from "@/lib/auth";
 
 // Bottom nav — 5 daily-use items. Account lives in the header.
 // Shelf access lives inside /reflect as a secondary link.
@@ -51,6 +52,7 @@ export function AppLayout({ children, className }: AppLayoutProps) {
 function AppLayoutShell({ children, className }: AppLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { openFeedback } = useAppModals();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen pb-28">
@@ -88,9 +90,15 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
             <Link
               to="/account"
               aria-label="Account"
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:hidden"
+              className="relative inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:hidden"
             >
               <UserRound className="size-3.5" aria-hidden="true" />
+              {user ? (
+                <span
+                  className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-primary"
+                  aria-hidden="true"
+                />
+              ) : null}
             </Link>
           </div>
         </div>
@@ -124,14 +132,22 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
           <Link
             to="/account"
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+              "relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
               pathname.startsWith("/account")
                 ? "bg-primary/10 text-foreground"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
             aria-current={pathname.startsWith("/account") ? "page" : undefined}
           >
-            <UserRound className="size-3.5" aria-hidden="true" />
+            <span className="relative inline-flex">
+              <UserRound className="size-3.5" aria-hidden="true" />
+              {user ? (
+                <span
+                  className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-primary"
+                  aria-hidden="true"
+                />
+              ) : null}
+            </span>
             Account
           </Link>
         </nav>

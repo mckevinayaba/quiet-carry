@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_subscribers: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          id: string
+          time_preference: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          time_preference?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          time_preference?: string | null
+        }
+        Relationships: []
+      }
+      user_saved_notes: {
+        Row: {
+          id: string
+          user_id: string
+          note_id: string
+          saved_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          note_id: string
+          saved_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          note_id?: string
+          saved_at?: string
+        }
+        Relationships: []
+      }
+      user_reflections: {
+        Row: {
+          id: string
+          user_id: string
+          prompt: string | null
+          response: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          prompt?: string | null
+          response: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          prompt?: string | null
+          response?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           created_at: string

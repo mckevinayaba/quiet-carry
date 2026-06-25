@@ -8,7 +8,9 @@ import { AppLayout } from "@/components/app-layout";
 import { NoteCard } from "@/components/note-card";
 import { NoteNotFound, RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
+import { getSavedNoteIds, saveNoteForUser } from "@/lib/account-sync";
 import { trackEvent } from "@/lib/analytics";
+import { useAuth } from "@/lib/auth";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
 import {
   getKeptNotes,
@@ -61,6 +63,7 @@ interface ActionResult {
 
 function NotePage() {
   const { category, note } = Route.useLoaderData();
+  const { user } = useAuth();
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const [isKept, setIsKept] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -70,16 +73,26 @@ function NotePage() {
   useEffect(() => {
     trackEvent("note_opened", { noteId: note.id, category: category.slug });
     setActionResult(null);
-    setIsKept(getKeptNotes().some((n) => n.noteId === note.id));
-  }, [category.slug, note.id]);
+    if (user) {
+      getSavedNoteIds(user.id).then((ids) => setIsKept(ids.includes(note.id)));
+    } else {
+      setIsKept(getKeptNotes().some((n) => n.noteId === note.id));
+    }
+  }, [category.slug, note.id, user]);
 
-  const handleKeep = () => {
+  const handleKeep = async () => {
     if (isKept) {
       setActionResult({ text: "Already kept in your Shelf.", shelfLink: true });
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    keepNote(note);
+
+    if (user) {
+      await saveNoteForUser(user.id, note.id);
+    } else {
+      keepNote(note);
+    }
+
     trackEvent("note_kept", { noteId: note.id });
     setIsKept(true);
     setActionResult({
