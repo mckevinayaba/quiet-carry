@@ -2,9 +2,16 @@
 // active only when a user is signed in. Guests keep using localStorage —
 // see note-storage.ts and reflect-storage.ts.
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as typedSupabase } from "@/integrations/supabase/client";
 import { getKeptNotes } from "@/lib/note-storage";
 import { getReflectEntries } from "@/lib/reflect-storage";
+
+// user_saved_notes and user_reflections live in the DB (see
+// 20260625120000_private_accounts.sql) but the generated types snapshot in
+// src/integrations/supabase/types.ts hasn't been refreshed yet. Cast through
+// `any` for these two tables only — schema is enforced by Postgres + RLS.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase = typedSupabase as any;
 
 const MIGRATION_FLAG_PREFIX = "tnynyt-migrated-";
 
@@ -23,7 +30,7 @@ export async function getSavedNoteIds(userId: string): Promise<string[]> {
     if (import.meta.env.DEV) console.error("[account-sync] getSavedNoteIds failed", error);
     return [];
   }
-  return (data ?? []).map((row) => row.note_id);
+  return (data ?? []).map((row: { note_id: string }) => row.note_id);
 }
 
 export async function saveNoteForUser(userId: string, noteId: string) {
@@ -61,7 +68,7 @@ export async function getUserReflections(userId: string): Promise<CloudReflectio
     if (import.meta.env.DEV) console.error("[account-sync] getUserReflections failed", error);
     return [];
   }
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map((row: { id: string; prompt: string | null; response: string; created_at: string }) => ({
     id: row.id,
     prompt: row.prompt,
     response: row.response,
