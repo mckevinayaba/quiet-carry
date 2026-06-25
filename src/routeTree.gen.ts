@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Volume1RouteImport } from './routes/volume-1'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -35,6 +36,11 @@ import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$
 const Volume1Route = Volume1RouteImport.update({
   id: '/volume-1',
   path: '/volume-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TodayRoute = TodayRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/unsubscribe'
     | '/volume-1'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/unsubscribe'
     | '/note/$categorySlug'
     | '/volume-1/preview'
     | '/volume-1/unlock'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/unsubscribe'
     | '/volume-1'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TodayRoute: typeof TodayRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   Volume1Route: typeof Volume1RouteWithChildren
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/volume-1'
       fullPath: '/volume-1'
       preLoaderRoute: typeof Volume1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/today': {
@@ -502,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TodayRoute: TodayRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   Volume1Route: Volume1RouteWithChildren,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,

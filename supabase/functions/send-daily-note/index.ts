@@ -27,7 +27,7 @@ function getDailyNoteIndex(): number {
   return dayOfYear % notesSnapshot.length;
 }
 
-function buildEmailBody(note: (typeof notesSnapshot)[number]): string {
+function buildEmailBody(note: (typeof notesSnapshot)[number], unsubscribeUrl: string): string {
   return [
     note.title,
     "",
@@ -48,7 +48,7 @@ function buildEmailBody(note: (typeof notesSnapshot)[number]): string {
     "",
     "---",
     "thenoteyouneeded.today",
-    'To stop receiving these letters, reply with the word "stop."',
+    `To stop receiving these letters: ${unsubscribeUrl}`,
   ].join("\n");
 }
 
@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: subscribers, error } = await supabase
       .from("daily_subscribers")
-      .select("email")
+      .select("id, email")
       .eq("active", true);
 
     if (error) {
@@ -71,7 +71,6 @@ Deno.serve(async (req: Request) => {
 
     const note = notesSnapshot[getDailyNoteIndex()];
     const subject = SUBJECT_BY_DAY[new Date().getDay()];
-    const body = buildEmailBody(note);
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
 
     if (!resendApiKey) {
@@ -83,6 +82,9 @@ Deno.serve(async (req: Request) => {
     let failed = 0;
 
     for (const subscriber of subscribers ?? []) {
+      const unsubscribeUrl = `https://thenoteyouneeded.today/unsubscribe?id=${subscriber.id}`;
+      const body = buildEmailBody(note, unsubscribeUrl);
+
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {

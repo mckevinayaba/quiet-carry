@@ -32,18 +32,34 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { error: insertError } = await supabase
+    const { data: inserted, error: insertError } = await supabase
       .from("daily_subscribers")
-      .insert({ email: trimmed });
+      .insert({ email: trimmed })
+      .select("id")
+      .single();
 
-    // 23505 = unique violation — already subscribed. Treat as success.
-    if (insertError && insertError.code !== "23505") {
+    let subscriberId: string | null = inserted?.id ?? null;
+
+    // 23505 = unique violation — already subscribed. Look up their existing
+    // row so the confirmation email still gets a working unsubscribe link.
+    if (insertError && insertError.code === "23505") {
+      const { data: existing } = await supabase
+        .from("daily_subscribers")
+        .select("id")
+        .eq("email", trimmed)
+        .maybeSingle();
+      subscriberId = existing?.id ?? null;
+    } else if (insertError) {
       console.error("[subscribe-daily-letter] insert failed", insertError);
       return new Response(JSON.stringify({ ok: false, error: "insert_failed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const unsubscribeUrl = subscriberId
+      ? `https://thenoteyouneeded.today/unsubscribe?id=${subscriberId}`
+      : "https://thenoteyouneeded.today/unsubscribe";
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (resendApiKey) {
@@ -64,7 +80,7 @@ Deno.serve(async (req: Request) => {
             "No noise. No branding. No call to action.",
             "Just the note you needed.",
             "",
-            'If you ever want to stop, reply to any email with the word "stop" and we will remove you quietly.',
+            `If you ever want to stop, click here and it's done instantly: ${unsubscribeUrl}`,
             "",
             "With love,",
             "MAD",
