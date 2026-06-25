@@ -70,65 +70,58 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ ok: false, error: "no_selar_key" }), { status: 500 });
     }
 
-    const candidateUrls = [
-      SELAR_ORDERS_URL,
-      "https://api.selar.co/v1/merchant/orders",
-      "https://api.selar.co/v1/orders",
-      "https://api.selar.co/v2/merchant/orders",
-    ];
-
-    let ordersRes: Response | null = null;
+    // Selar's API quirk: returns HTTP 500 with body {"status":"error","message":"","data":[]}
+    // when there are simply no orders. We treat that shape as a valid empty result.
     let rawPayload: unknown = null;
-    let workingUrl: string | null = null;
-    const probeResults: Array<{ url: string; status: number; bodySnippet: string }> = [];
+    let bodyText = "";
+    let status = 0;
 
-    for (const url of candidateUrls) {
+    try {
+      const res = await fetch(SELAR_ORDERS_URL, {
+        headers: {
+          Authorization: `Bearer ${selarApiKey}`,
+          Accept: "application/json",
+        },
+      });
+      status = res.status;
+      bodyText = await res.text();
+      console.log(`[selar-poll] url=${SELAR_ORDERS_URL} status=${status} body=${bodyText.slice(0, 500)}`);
       try {
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${selarApiKey}`,
-            Accept: "application/json",
-          },
-        });
-        const bodyText = await res.text();
-        const snippet = bodyText.slice(0, 500);
-        console.log(`[selar-poll] probe url=${url} status=${res.status} body=${snippet}`);
-        probeResults.push({ url, status: res.status, bodySnippet: snippet });
-
-        if (res.ok) {
-          try {
-            rawPayload = JSON.parse(bodyText);
-            ordersRes = res;
-            workingUrl = url;
-            break;
-          } catch (parseErr) {
-            console.error(`[selar-poll] url=${url} returned 200 but not JSON:`, parseErr);
-          }
-        }
-      } catch (fetchErr) {
-        console.error(`[selar-poll] probe url=${url} threw:`, fetchErr);
-        probeResults.push({ url, status: 0, bodySnippet: String(fetchErr).slice(0, 500) });
+        rawPayload = JSON.parse(bodyText);
+      } catch {
+        rawPayload = null;
       }
+    } catch (fetchErr) {
+      console.error("[selar-poll] fetch threw:", fetchErr);
+      return new Response(JSON.stringify({ ok: false, error: "fetch_threw" }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    if (!ordersRes || !workingUrl) {
-      console.error("[selar-poll] all candidate URLs failed", JSON.stringify(probeResults));
+    const payloadObj = (rawPayload && typeof rawPayload === "object") ? rawPayload as Record<string, unknown> : null;
+    const hasEmptyDataArray = !!payloadObj && Array.isArray(payloadObj.data) && (payloadObj.data as unknown[]).length === 0;
+    const isOkStatus = status >= 200 && status < 300;
+    const isQuirkEmpty = status === 500 && hasEmptyDataArray;
+
+    if (!isOkStatus && !isQuirkEmpty) {
+      console.error(`[selar-poll] orders fetch failed status=${status}`);
       return new Response(
-        JSON.stringify({ ok: false, error: "orders_fetch_failed", probes: probeResults }),
+        JSON.stringify({ ok: false, error: "orders_fetch_failed", status, body: bodyText.slice(0, 500) }),
         { status: 502, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    console.log(`[selar-poll] using working url=${workingUrl}`);
     const orders = extractOrdersArray(rawPayload);
 
     if (orders.length === 0) {
-      console.log("[selar-poll] no orders array found in response:", JSON.stringify(rawPayload).slice(0, 500));
+      console.log("[selar-poll] no orders to process (empty data array)");
       return new Response(
-        JSON.stringify({ ok: true, processed: 0, note: "no_orders_found", workingUrl, rawPreview: JSON.stringify(rawPayload).slice(0, 500) }),
+        JSON.stringify({ ok: true, processed: 0, note: "no_orders_yet" }),
         { headers: { "Content-Type": "application/json" } },
       );
     }
+
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
