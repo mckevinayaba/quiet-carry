@@ -126,7 +126,7 @@ export async function fulfillOrder(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "The Note You Needed Today <letters@thenoteyouneeded.today>",
+      from: "The Note You Needed Today <letters@notify.thenoteyouneeded.today>",
       to: [email],
       subject: "Your access code for Volume 1",
       text: [
