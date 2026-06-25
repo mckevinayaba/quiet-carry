@@ -30,7 +30,7 @@ export async function getSavedNoteIds(userId: string): Promise<string[]> {
     if (import.meta.env.DEV) console.error("[account-sync] getSavedNoteIds failed", error);
     return [];
   }
-  return (data ?? []).map((row) => row.note_id);
+  return (data ?? []).map((row: { note_id: string }) => row.note_id);
 }
 
 export async function saveNoteForUser(userId: string, noteId: string) {
@@ -68,7 +68,7 @@ export async function getUserReflections(userId: string): Promise<CloudReflectio
     if (import.meta.env.DEV) console.error("[account-sync] getUserReflections failed", error);
     return [];
   }
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map((row: { id: string; prompt: string | null; response: string; created_at: string }) => ({
     id: row.id,
     prompt: row.prompt,
     response: row.response,
