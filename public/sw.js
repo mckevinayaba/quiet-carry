@@ -1,30 +1,32 @@
-// Kill-switch service worker for The Note You Needed Today.
-// The previous SW cached HTML/assets aggressively and left installed PWAs
-// hanging on stale chunks. This replacement wipes its own caches, takes
-// control of open clients, reloads them once, and unregisters itself.
-// Keep this file at /sw.js for at least one release cycle so returning
-// browsers actually pick it up and evict the old registration.
+// Service worker for The Note You Needed Today.
+//
+// History: an earlier version cached aggressively and left installed PWAs
+// hanging on stale chunks. A kill-switch version replaced it, evicted the
+// bad caches, and forced a reload on every activation to clear them out.
+// That eviction already shipped and ran — forcing a reload on every
+// activation from here on was itself causing hangs/reload loops on
+// installed PWAs. This version is the stable long-term worker: it takes
+// over cleanly, never caches, and never forces a reload.
 
-self.addEventListener("install", () => self.skipWaiting());
+const CACHE_PREFIX = "tnynyt-";
+
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      try {
-        const names = await caches.keys();
-        // Only delete this app's own caches (origin-scoped). Leave any
-        // third-party messaging worker caches alone.
-        const ours = names.filter((n) => n.startsWith("tnynyt-"));
-        await Promise.allSettled(ours.map((n) => caches.delete(n)));
-        await self.clients.claim();
-        const clients = await self.clients.matchAll({ type: "window" });
-        await Promise.allSettled(clients.map((c) => c.navigate(c.url)));
-      } finally {
-        await self.registration.unregister();
-      }
+      // One-time safety net: if any old cache from the original (bad)
+      // service worker still exists on a returning device, clear it.
+      const names = await caches.keys();
+      const ours = names.filter((n) => n.startsWith(CACHE_PREFIX));
+      await Promise.allSettled(ours.map((n) => caches.delete(n)));
+      await self.clients.claim();
+      // No reload, no navigate — just take over silently.
     })(),
   );
 });
 
-// Pass everything through to the network — never serve from cache.
+// Network-only. Never serve from cache, never go stale.
 self.addEventListener("fetch", () => {});
