@@ -70,26 +70,64 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ ok: false, error: "no_selar_key" }), { status: 500 });
     }
 
-    const ordersRes = await fetch(SELAR_ORDERS_URL, {
-      headers: {
-        Authorization: `Bearer ${selarApiKey}`,
-        Accept: "application/json",
-      },
-    });
+    const candidateUrls = [
+      SELAR_ORDERS_URL,
+      "https://api.selar.co/v1/merchant/orders",
+      "https://api.selar.co/v1/orders",
+      "https://api.selar.co/v2/merchant/orders",
+    ];
 
-    if (!ordersRes.ok) {
-      console.error("[selar-poll] orders fetch failed", ordersRes.status, await ordersRes.text());
-      return new Response(JSON.stringify({ ok: false, error: "orders_fetch_failed" }), { status: 502 });
+    let ordersRes: Response | null = null;
+    let rawPayload: unknown = null;
+    let workingUrl: string | null = null;
+    const probeResults: Array<{ url: string; status: number; bodySnippet: string }> = [];
+
+    for (const url of candidateUrls) {
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${selarApiKey}`,
+            Accept: "application/json",
+          },
+        });
+        const bodyText = await res.text();
+        const snippet = bodyText.slice(0, 500);
+        console.log(`[selar-poll] probe url=${url} status=${res.status} body=${snippet}`);
+        probeResults.push({ url, status: res.status, bodySnippet: snippet });
+
+        if (res.ok) {
+          try {
+            rawPayload = JSON.parse(bodyText);
+            ordersRes = res;
+            workingUrl = url;
+            break;
+          } catch (parseErr) {
+            console.error(`[selar-poll] url=${url} returned 200 but not JSON:`, parseErr);
+          }
+        }
+      } catch (fetchErr) {
+        console.error(`[selar-poll] probe url=${url} threw:`, fetchErr);
+        probeResults.push({ url, status: 0, bodySnippet: String(fetchErr).slice(0, 500) });
+      }
     }
 
-    const rawPayload = await ordersRes.json();
+    if (!ordersRes || !workingUrl) {
+      console.error("[selar-poll] all candidate URLs failed", JSON.stringify(probeResults));
+      return new Response(
+        JSON.stringify({ ok: false, error: "orders_fetch_failed", probes: probeResults }),
+        { status: 502, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    console.log(`[selar-poll] using working url=${workingUrl}`);
     const orders = extractOrdersArray(rawPayload);
 
     if (orders.length === 0) {
       console.log("[selar-poll] no orders array found in response:", JSON.stringify(rawPayload).slice(0, 500));
-      return new Response(JSON.stringify({ ok: true, processed: 0, note: "no_orders_found" }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ ok: true, processed: 0, note: "no_orders_found", workingUrl, rawPreview: JSON.stringify(rawPayload).slice(0, 500) }),
+        { headers: { "Content-Type": "application/json" } },
+      );
     }
 
     const supabase = createClient(
