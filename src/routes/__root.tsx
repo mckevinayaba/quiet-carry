@@ -137,9 +137,13 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
+    // The previous SW left installed PWAs hanging on stale chunks.
+    // /sw.js is now a kill-switch that unregisters itself on activate.
+    // Briefly register it so returning browsers pick it up and evict
+    // the old worker; do not re-register afterwards.
     if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
-        // SW registration failure is non-fatal — app works without it
+        // non-fatal
       });
     }
   }, []);
