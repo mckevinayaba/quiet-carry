@@ -1,12 +1,31 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
 import { MoodSelector } from "@/components/mood-selector";
 import { NoteCard } from "@/components/note-card";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, featuredNote } from "@/lib/note-data";
+
+// Cheapest possible retention signal: does anyone come back to /today on a
+// different calendar day. No accounts, no backend — just a localStorage
+// date stamp and an analytics event.
+const LAST_VISIT_KEY = "tnynyt-today-last-visit";
+
+function trackTodayVisit() {
+  const today = new Date().toDateString();
+  const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+
+  if (!lastVisit) {
+    trackEvent("today_first_visit");
+  } else if (lastVisit !== today) {
+    trackEvent("today_return_visit");
+  }
+
+  localStorage.setItem(LAST_VISIT_KEY, today);
+}
 
 export const Route = createFileRoute("/today")({
   errorComponent: RouteErrorBoundary,
@@ -29,6 +48,10 @@ function TodayPage() {
   const category = getCategoryBySlug(note.categorySlug);
   const [moment, setMoment] = useState<Moment | null>(null);
   const noteRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    trackTodayVisit();
+  }, []);
 
   const handleMoodSelect = (phrase: string, showSupport: boolean) => {
     setMoment({ phrase, showSupport });

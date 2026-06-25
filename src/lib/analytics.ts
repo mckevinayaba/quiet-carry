@@ -51,6 +51,8 @@ export type AnalyticsEventName =
   | "share_download_clicked"
   | "share_image_downloaded"
   | "share_image_download_failed"
+  | "today_first_visit"
+  | "today_return_visit"
   | "note_share_clicked"
   | "gift_page_viewed"
   | "gift_purchase_clicked";
