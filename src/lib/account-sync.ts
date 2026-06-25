@@ -2,9 +2,16 @@
 // active only when a user is signed in. Guests keep using localStorage —
 // see note-storage.ts and reflect-storage.ts.
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as typedSupabase } from "@/integrations/supabase/client";
 import { getKeptNotes } from "@/lib/note-storage";
 import { getReflectEntries } from "@/lib/reflect-storage";
+
+// user_saved_notes and user_reflections live in the DB (see
+// 20260625120000_private_accounts.sql) but the generated types snapshot in
+// src/integrations/supabase/types.ts hasn't been refreshed yet. Cast through
+// `any` for these two tables only — schema is enforced by Postgres + RLS.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase = typedSupabase as any;
 
 const MIGRATION_FLAG_PREFIX = "tnynyt-migrated-";
 
