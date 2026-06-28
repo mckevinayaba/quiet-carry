@@ -31,7 +31,20 @@ const LOVABLE_REPLAY_BLOCKER = `
     document.querySelectorAll('script[src*="/__l5e/"]').forEach((node) => node.remove());
   };
 
+  const guardDomInsert = (methodName) => {
+    const original = Node.prototype[methodName];
+    Node.prototype[methodName] = function(node) {
+      if (node && node.nodeType === 1 && node.tagName === "SCRIPT" && isBlocked(node.src)) {
+        return node;
+      }
+      return original.apply(this, arguments);
+    };
+  };
+
   removeBlockedScripts();
+  guardDomInsert("appendChild");
+  guardDomInsert("insertBefore");
+  guardDomInsert("replaceChild");
 
   const observer = new MutationObserver((records) => {
     for (const record of records) {
