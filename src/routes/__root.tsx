@@ -176,6 +176,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
     ],
+    scripts: [{ children: LOVABLE_REPLAY_BLOCKER }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -187,7 +188,6 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: LOVABLE_REPLAY_BLOCKER }} />
         <HeadContent />
         {PLAUSIBLE_ENABLED && PLAUSIBLE_DOMAIN ? (
           <script
