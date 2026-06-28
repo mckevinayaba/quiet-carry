@@ -34,7 +34,12 @@ self.addEventListener("activate", (event) => {
 // their scripts or event batches can pin the main thread.
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  if (url.pathname.startsWith("/__l5e/") || url.pathname.startsWith("/~api/analytics")) {
+  if (
+    url.pathname.startsWith("/__l5e/") ||
+    url.pathname === "/~flock.js" ||
+    url.pathname.startsWith("/~api/analytics") ||
+    url.hostname === "api.tinybird.co"
+  ) {
     event.respondWith(new Response("", { status: 204 }));
   }
 });
