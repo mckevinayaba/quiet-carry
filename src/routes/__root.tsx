@@ -16,6 +16,77 @@ const PLAUSIBLE_DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN as string | undef
 const PLAUSIBLE_ENABLED =
   import.meta.env.VITE_ENABLE_PLAUSIBLE === "true" && Boolean(PLAUSIBLE_DOMAIN);
 
+const LOVABLE_REPLAY_BLOCKER = `
+(() => {
+  const isBlocked = (value) => {
+    try {
+      const url = typeof value === "string" ? value : value && "url" in value ? value.url : String(value || "");
+      return url.includes("/__l5e/") || url.includes("/__l5e/events.js");
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const removeBlockedScripts = () => {
+    document.querySelectorAll('script[src*="/__l5e/"]').forEach((node) => node.remove());
+  };
+
+  removeBlockedScripts();
+
+  const observer = new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node && node.nodeType === 1) {
+          if (node.tagName === "SCRIPT" && isBlocked(node.src)) {
+            node.remove();
+          } else if (node.querySelectorAll) {
+            node.querySelectorAll('script[src*="/__l5e/"]').forEach((script) => script.remove());
+          }
+        }
+      }
+    }
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const originalFetch = window.fetch;
+  window.fetch = function(input, init) {
+    if (isBlocked(input)) {
+      return Promise.resolve(new Response(null, { status: 204 }));
+    }
+    return originalFetch.apply(this, arguments);
+  };
+
+  const originalOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {
+    this.__tnyntBlockedReplay = isBlocked(url);
+    if (this.__tnyntBlockedReplay) {
+      return originalOpen.call(this, method, "about:blank");
+    }
+    return originalOpen.apply(this, arguments);
+  };
+
+  const originalSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function() {
+    if (this.__tnyntBlockedReplay) {
+      try { this.abort(); } catch (_) {}
+      return undefined;
+    }
+    return originalSend.apply(this, arguments);
+  };
+
+  if (navigator.sendBeacon) {
+    const originalBeacon = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function(url, data) {
+      if (isBlocked(url)) return true;
+      return originalBeacon(url, data);
+    };
+  }
+
+  window.__tnyntReplayBlockerActive = true;
+})();
+`;
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -116,6 +187,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: LOVABLE_REPLAY_BLOCKER }} />
         <HeadContent />
         {PLAUSIBLE_ENABLED && PLAUSIBLE_DOMAIN ? (
           <script
