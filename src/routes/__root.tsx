@@ -18,17 +18,61 @@ const PLAUSIBLE_ENABLED =
 
 const LOVABLE_REPLAY_BLOCKER = `
 (() => {
+  const noop = () => undefined;
+  window.__nightmare = true;
+
+  try {
+    Object.defineProperty(window, "Tinybird", {
+      value: { trackEvent: noop },
+      writable: false,
+      configurable: false,
+    });
+  } catch (_) {
+    window.Tinybird = window.Tinybird || { trackEvent: noop };
+  }
+
+  const lovableEventsStub = {
+    __userAppEventsSdkVersion: "tnynt-disabled-before-platform-load",
+    track: noop,
+    flush: noop,
+    identify: noop,
+    resetIdentity: noop,
+    captureException: noop,
+    getIdentity: () => ({ anonymous_id: "disabled", app_user_id_hash_available: false }),
+    getReplay: () => ({ replay_id: null, active: false, event_count: 0 }),
+  };
+
+  try {
+    Object.defineProperty(window, "__lovableEvents", {
+      value: lovableEventsStub,
+      writable: false,
+      configurable: false,
+    });
+  } catch (_) {
+    window.__lovableEvents = window.__lovableEvents || lovableEventsStub;
+    window.__lovableEvents.__userAppEventsSdkVersion =
+      window.__lovableEvents.__userAppEventsSdkVersion || "tnynt-disabled-before-platform-load";
+  }
+
   const isBlocked = (value) => {
     try {
       const url = typeof value === "string" ? value : value && "url" in value ? value.url : String(value || "");
-      return url.includes("/__l5e/") || url.includes("/__l5e/events.js");
+      return (
+        url.includes("/__l5e/") ||
+        url.includes("/__l5e/events.js") ||
+        url.includes("/~flock.js") ||
+        url.includes("/~api/analytics") ||
+        url.includes("api.tinybird.co")
+      );
     } catch (_) {
       return false;
     }
   };
 
   const removeBlockedScripts = () => {
-    document.querySelectorAll('script[src*="/__l5e/"]').forEach((node) => node.remove());
+    document
+      .querySelectorAll('script[src*="/__l5e/"],script[src*="/~flock.js"]')
+      .forEach((node) => node.remove());
   };
 
   const guardDomInsert = (methodName) => {
@@ -53,7 +97,9 @@ const LOVABLE_REPLAY_BLOCKER = `
           if (node.tagName === "SCRIPT" && isBlocked(node.src)) {
             node.remove();
           } else if (node.querySelectorAll) {
-            node.querySelectorAll('script[src*="/__l5e/"]').forEach((script) => script.remove());
+            node
+              .querySelectorAll('script[src*="/__l5e/"],script[src*="/~flock.js"]')
+              .forEach((script) => script.remove());
           }
         }
       }
@@ -210,7 +256,7 @@ function RootShell({ children }: { children: ReactNode }) {
           />
         ) : null}
       </head>
-      <body>
+      <body data-lovable-block data-lovable-ignore data-private className="rr-block rrweb-ignore">
         {children}
         <Scripts />
       </body>
