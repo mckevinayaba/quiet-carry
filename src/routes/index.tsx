@@ -323,8 +323,8 @@ function TodaysNote() {
   }, []);
 
   return (
-    <section className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-      <div className="space-y-4">
+    <section className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+      <div className="space-y-4 lg:sticky lg:top-8">
         <span className="eyebrow-copy">Today&apos;s Note</span>
         <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
           One note. Written for the part of you that has been quiet.
