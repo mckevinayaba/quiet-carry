@@ -9,103 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AccountRouteImport } from './routes/account'
-import { Route as CollectionsRouteImport } from './routes/collections'
-import { Route as FeelingsRouteImport } from './routes/feelings'
-import { Route as GiftRouteImport } from './routes/gift'
-import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
-import { Route as PayForwardRouteImport } from './routes/pay-forward'
-import { Route as PostcardPreviewRouteImport } from './routes/postcard-preview'
-import { Route as ReflectRouteImport } from './routes/reflect'
-import { Route as SafetySupportRouteImport } from './routes/safety-support'
-import { Route as SharePreviewRouteImport } from './routes/share-preview'
-import { Route as ShelfRouteImport } from './routes/shelf'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SupportRouteImport } from './routes/support'
-import { Route as TodayRouteImport } from './routes/today'
 import { Route as Volume1RouteImport } from './routes/volume-1'
-import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
+import { Route as TodayRouteImport } from './routes/today'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShelfRouteImport } from './routes/shelf'
+import { Route as SharePreviewRouteImport } from './routes/share-preview'
+import { Route as SafetySupportRouteImport } from './routes/safety-support'
+import { Route as ReflectRouteImport } from './routes/reflect'
+import { Route as PostcardPreviewRouteImport } from './routes/postcard-preview'
+import { Route as PayForwardRouteImport } from './routes/pay-forward'
+import { Route as NoteFramePreviewRouteImport } from './routes/note-frame-preview'
+import { Route as GiftRouteImport } from './routes/gift'
+import { Route as FeelingsRouteImport } from './routes/feelings'
+import { Route as CollectionsRouteImport } from './routes/collections'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as Volume1IndexRouteImport } from './routes/volume-1.index'
-import { Route as Volume1PreviewRouteImport } from './routes/volume-1.preview'
-import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
 import { Route as WriteCategorySlugRouteImport } from './routes/write.$categorySlug'
+import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
+import { Route as Volume1PreviewRouteImport } from './routes/volume-1.preview'
+import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CollectionsRoute = CollectionsRouteImport.update({
-  id: '/collections',
-  path: '/collections',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeelingsRoute = FeelingsRouteImport.update({
-  id: '/feelings',
-  path: '/feelings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GiftRoute = GiftRouteImport.update({
-  id: '/gift',
-  path: '/gift',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NoteFramePreviewRoute = NoteFramePreviewRouteImport.update({
-  id: '/note-frame-preview',
-  path: '/note-frame-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PayForwardRoute = PayForwardRouteImport.update({
-  id: '/pay-forward',
-  path: '/pay-forward',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PostcardPreviewRoute = PostcardPreviewRouteImport.update({
-  id: '/postcard-preview',
-  path: '/postcard-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReflectRoute = ReflectRouteImport.update({
-  id: '/reflect',
-  path: '/reflect',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SafetySupportRoute = SafetySupportRouteImport.update({
-  id: '/safety-support',
-  path: '/safety-support',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SharePreviewRoute = SharePreviewRouteImport.update({
-  id: '/share-preview',
-  path: '/share-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShelfRoute = ShelfRouteImport.update({
-  id: '/shelf',
-  path: '/shelf',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportRoute = SupportRouteImport.update({
-  id: '/support',
-  path: '/support',
+const Volume1Route = Volume1RouteImport.update({
+  id: '/volume-1',
+  path: '/volume-1',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TodayRoute = TodayRouteImport.update({
@@ -113,14 +43,79 @@ const TodayRoute = TodayRouteImport.update({
   path: '/today',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Volume1Route = Volume1RouteImport.update({
-  id: '/volume-1',
-  path: '/volume-1',
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NoteCategorySlugRoute = NoteCategorySlugRouteImport.update({
-  id: '/note/$categorySlug',
-  path: '/note/$categorySlug',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShelfRoute = ShelfRouteImport.update({
+  id: '/shelf',
+  path: '/shelf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SharePreviewRoute = SharePreviewRouteImport.update({
+  id: '/share-preview',
+  path: '/share-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetySupportRoute = SafetySupportRouteImport.update({
+  id: '/safety-support',
+  path: '/safety-support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReflectRoute = ReflectRouteImport.update({
+  id: '/reflect',
+  path: '/reflect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostcardPreviewRoute = PostcardPreviewRouteImport.update({
+  id: '/postcard-preview',
+  path: '/postcard-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayForwardRoute = PayForwardRouteImport.update({
+  id: '/pay-forward',
+  path: '/pay-forward',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoteFramePreviewRoute = NoteFramePreviewRouteImport.update({
+  id: '/note-frame-preview',
+  path: '/note-frame-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftRoute = GiftRouteImport.update({
+  id: '/gift',
+  path: '/gift',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeelingsRoute = FeelingsRouteImport.update({
+  id: '/feelings',
+  path: '/feelings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsRoute = CollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Volume1IndexRoute = Volume1IndexRouteImport.update({
@@ -128,19 +123,24 @@ const Volume1IndexRoute = Volume1IndexRouteImport.update({
   path: '/',
   getParentRoute: () => Volume1Route,
 } as any)
-const Volume1PreviewRoute = Volume1PreviewRouteImport.update({
-  id: '/preview',
-  path: '/preview',
-  getParentRoute: () => Volume1Route,
+const WriteCategorySlugRoute = WriteCategorySlugRouteImport.update({
+  id: '/write/$categorySlug',
+  path: '/write/$categorySlug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const Volume1UnlockRoute = Volume1UnlockRouteImport.update({
   id: '/unlock',
   path: '/unlock',
   getParentRoute: () => Volume1Route,
 } as any)
-const WriteCategorySlugRoute = WriteCategorySlugRouteImport.update({
-  id: '/write/$categorySlug',
-  path: '/write/$categorySlug',
+const Volume1PreviewRoute = Volume1PreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => Volume1Route,
+} as any)
+const NoteCategorySlugRoute = NoteCategorySlugRouteImport.update({
+  id: '/note/$categorySlug',
+  path: '/note/$categorySlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Volume1ReadChapterRoute = Volume1ReadChapterRouteImport.update({
@@ -325,109 +325,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collections': {
-      id: '/collections'
-      path: '/collections'
-      fullPath: '/collections'
-      preLoaderRoute: typeof CollectionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feelings': {
-      id: '/feelings'
-      path: '/feelings'
-      fullPath: '/feelings'
-      preLoaderRoute: typeof FeelingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gift': {
-      id: '/gift'
-      path: '/gift'
-      fullPath: '/gift'
-      preLoaderRoute: typeof GiftRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/note-frame-preview': {
-      id: '/note-frame-preview'
-      path: '/note-frame-preview'
-      fullPath: '/note-frame-preview'
-      preLoaderRoute: typeof NoteFramePreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pay-forward': {
-      id: '/pay-forward'
-      path: '/pay-forward'
-      fullPath: '/pay-forward'
-      preLoaderRoute: typeof PayForwardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/postcard-preview': {
-      id: '/postcard-preview'
-      path: '/postcard-preview'
-      fullPath: '/postcard-preview'
-      preLoaderRoute: typeof PostcardPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reflect': {
-      id: '/reflect'
-      path: '/reflect'
-      fullPath: '/reflect'
-      preLoaderRoute: typeof ReflectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/safety-support': {
-      id: '/safety-support'
-      path: '/safety-support'
-      fullPath: '/safety-support'
-      preLoaderRoute: typeof SafetySupportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/share-preview': {
-      id: '/share-preview'
-      path: '/share-preview'
-      fullPath: '/share-preview'
-      preLoaderRoute: typeof SharePreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shelf': {
-      id: '/shelf'
-      path: '/shelf'
-      fullPath: '/shelf'
-      preLoaderRoute: typeof ShelfRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteImport
+    '/volume-1': {
+      id: '/volume-1'
+      path: '/volume-1'
+      fullPath: '/volume-1'
+      preLoaderRoute: typeof Volume1RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/today': {
@@ -437,18 +339,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodayRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/volume-1': {
-      id: '/volume-1'
-      path: '/volume-1'
-      fullPath: '/volume-1'
-      preLoaderRoute: typeof Volume1RouteImport
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/note/$categorySlug': {
-      id: '/note/$categorySlug'
-      path: '/note/$categorySlug'
-      fullPath: '/note/$categorySlug'
-      preLoaderRoute: typeof NoteCategorySlugRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shelf': {
+      id: '/shelf'
+      path: '/shelf'
+      fullPath: '/shelf'
+      preLoaderRoute: typeof ShelfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share-preview': {
+      id: '/share-preview'
+      path: '/share-preview'
+      fullPath: '/share-preview'
+      preLoaderRoute: typeof SharePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety-support': {
+      id: '/safety-support'
+      path: '/safety-support'
+      fullPath: '/safety-support'
+      preLoaderRoute: typeof SafetySupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reflect': {
+      id: '/reflect'
+      path: '/reflect'
+      fullPath: '/reflect'
+      preLoaderRoute: typeof ReflectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/postcard-preview': {
+      id: '/postcard-preview'
+      path: '/postcard-preview'
+      fullPath: '/postcard-preview'
+      preLoaderRoute: typeof PostcardPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay-forward': {
+      id: '/pay-forward'
+      path: '/pay-forward'
+      fullPath: '/pay-forward'
+      preLoaderRoute: typeof PayForwardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/note-frame-preview': {
+      id: '/note-frame-preview'
+      path: '/note-frame-preview'
+      fullPath: '/note-frame-preview'
+      preLoaderRoute: typeof NoteFramePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift': {
+      id: '/gift'
+      path: '/gift'
+      fullPath: '/gift'
+      preLoaderRoute: typeof GiftRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feelings': {
+      id: '/feelings'
+      path: '/feelings'
+      fullPath: '/feelings'
+      preLoaderRoute: typeof FeelingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections': {
+      id: '/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/volume-1/': {
@@ -458,12 +451,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Volume1IndexRouteImport
       parentRoute: typeof Volume1Route
     }
-    '/volume-1/preview': {
-      id: '/volume-1/preview'
-      path: '/preview'
-      fullPath: '/volume-1/preview'
-      preLoaderRoute: typeof Volume1PreviewRouteImport
-      parentRoute: typeof Volume1Route
+    '/write/$categorySlug': {
+      id: '/write/$categorySlug'
+      path: '/write/$categorySlug'
+      fullPath: '/write/$categorySlug'
+      preLoaderRoute: typeof WriteCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/volume-1/unlock': {
       id: '/volume-1/unlock'
@@ -472,11 +465,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Volume1UnlockRouteImport
       parentRoute: typeof Volume1Route
     }
-    '/write/$categorySlug': {
-      id: '/write/$categorySlug'
-      path: '/write/$categorySlug'
-      fullPath: '/write/$categorySlug'
-      preLoaderRoute: typeof WriteCategorySlugRouteImport
+    '/volume-1/preview': {
+      id: '/volume-1/preview'
+      path: '/preview'
+      fullPath: '/volume-1/preview'
+      preLoaderRoute: typeof Volume1PreviewRouteImport
+      parentRoute: typeof Volume1Route
+    }
+    '/note/$categorySlug': {
+      id: '/note/$categorySlug'
+      path: '/note/$categorySlug'
+      fullPath: '/note/$categorySlug'
+      preLoaderRoute: typeof NoteCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/volume-1/read/$chapter': {
