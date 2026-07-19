@@ -64,11 +64,14 @@ function Landing() {
       <CategoriesPreview />
       <HowItWorks />
       <TodaysNote />
+      <Volume1Transition />
+      <Volume1Commercial />
+      <Volume1Preview />
       <DailyLetterSignup />
-      <WelcomeManifesto />
       <PrivateByDesign />
-      <VolumeOne />
-      <Waitlist />
+      <ShortenedMission />
+      <PayANoteForward />
+      <FinalVolume1Invitation />
       <FeedbackBlock />
       <SiteFooter />
     </>
@@ -122,6 +125,13 @@ function Hero() {
               Read today&apos;s note
             </Link>
           </div>
+          <Link
+            to="/volume-1"
+            className="inline-block text-xs text-muted-foreground/70 underline-offset-4 hover:text-foreground hover:underline"
+            onClick={() => trackEvent("hero_explore_volume1_clicked")}
+          >
+            Explore Volume 1 &rarr;
+          </Link>
 
           <p className="text-xs leading-6 text-muted-foreground">
             No likes &middot; No comments &middot; No followers &middot; No performance &middot; Just private words.
@@ -448,6 +458,332 @@ function VolumeOne() {
             className="h-full w-full object-cover"
           />
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Volume 1 Transition -------------------------- */
+
+function Volume1Transition() {
+  const ref = useRef<HTMLElement>(null);
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked.current) {
+          tracked.current = true;
+          trackEvent("volume1_transition_viewed");
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={ref} className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--accent)_14%,transparent),transparent_60%)]" />
+      <div className="mx-auto max-w-2xl space-y-6 text-center">
+        <span className="eyebrow-copy">Now available</span>
+        <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
+          The free note is just the beginning.
+        </h2>
+        <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+          Volume 1 is a complete collection &mdash; 15 notes, 5 chapters, written for the weight you
+          carry quietly. Designed to be read slowly. Kept privately. Returned to.
+        </p>
+        <Link
+          to="/volume-1"
+          className="inline-block text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-70"
+        >
+          See what is inside &rarr;
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Volume 1 Commercial -------------------------- */
+
+function Volume1Commercial() {
+  const ref = useRef<HTMLElement>(null);
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked.current) {
+          tracked.current = true;
+          trackEvent("volume1_section_viewed");
+        }
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const contents = [
+    "15 designed notes",
+    "15 mobile wallpapers",
+    "15 quiet captions",
+    "15 journal prompts",
+    "5 private letters",
+    "Opening letter from MAD",
+    "Safety and care page",
+    "Closing receipt page",
+  ];
+
+  return (
+    <section ref={ref} className="paper-panel relative overflow-hidden p-6 sm:p-10">
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="stitched-label">Volume 1</div>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-foreground">
+              R149
+            </span>
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
+              Volume 1 is here.
+            </h2>
+            <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+              15 notes across 5 chapters. Written for the pain that stays quiet. Designed to be
+              kept, not scrolled past.
+            </p>
+          </div>
+
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {contents.map((item) => (
+              <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="size-1.5 shrink-0 rounded-full bg-primary/60" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <Button asChild variant="note" className="min-h-12">
+              <a
+                href={volumeOneSelarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent("volume1_purchase_clicked", { source: "homepage_commercial" })}
+              >
+                Get Volume 1 &mdash; R149 &rarr;
+              </a>
+            </Button>
+            <Button asChild variant="paper" className="min-h-12">
+              <Link
+                to="/volume-1/preview"
+                onClick={() => trackEvent("volume1_preview_opened", { source: "homepage" })}
+              >
+                Read a free note
+              </Link>
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Instant digital delivery &middot; Private PDF &middot; No subscription
+          </p>
+        </div>
+
+        <div className="relative overflow-hidden rounded-[24px] border border-border shadow-[0_30px_60px_-40px_color-mix(in_oklab,var(--paper-shadow)_70%,transparent)] rotate-[1deg]">
+          <img
+            src={volumeCollage}
+            alt="A stack of handwritten notes tied with twine and a navy stitched fabric tag with a pressed flower, beside a kraft envelope sealed with a red MAD wax stamp"
+            width={1536}
+            height={1024}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Volume 1 Chapter Preview -------------------------- */
+
+function Volume1Preview() {
+  const chapters = [
+    {
+      number: "01",
+      title: "Survival",
+      excerpt:
+        "I hope you heal from the shame of counting money that was never enough. From checking your balance before buying bread.",
+    },
+    {
+      number: "02",
+      title: "Unsaid Grief",
+      excerpt:
+        "I hope you heal from the love that left before your heart knew how to let go. Because some people do not only leave your life. They leave your mornings different. Your phone quieter.",
+    },
+    {
+      number: "03",
+      title: "Becoming Visible",
+      excerpt:
+        'They asked, “How are you?” and this time, they really meant it. They looked at you like they had space for the truth.',
+    },
+  ];
+
+  return (
+    <section className="space-y-10">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-xl space-y-3">
+          <span className="eyebrow-copy">Inside Volume 1</span>
+          <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
+            Five chapters. Each one written for a different kind of weight.
+          </h2>
+        </div>
+        <Button asChild variant="paper" className="min-h-11">
+          <Link to="/volume-1">
+            See all chapters
+            <ArrowRight aria-hidden />
+          </Link>
+        </Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {chapters.map((ch) => (
+          <div key={ch.number} className="stitched-edge space-y-4 p-6">
+            <div className="flex items-start justify-between gap-2">
+              <span className="font-label text-3xl text-muted-foreground">{ch.number}</span>
+              <Heart className="heart-mark size-4 mt-1" aria-hidden />
+            </div>
+            <h3 className="font-display text-2xl leading-tight text-foreground">{ch.title}</h3>
+            <p className="font-note text-base leading-relaxed text-muted-foreground">
+              &ldquo;{ch.excerpt}&rdquo;
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center">
+        <Button asChild variant="note" className="min-h-12">
+          <a
+            href={volumeOneSelarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent("volume1_purchase_clicked", { source: "homepage_preview" })}
+          >
+            Get Volume 1 &mdash; R149 &rarr;
+          </a>
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Shortened Mission -------------------------- */
+
+function ShortenedMission() {
+  return (
+    <section className="mx-auto max-w-2xl space-y-4 py-8 text-center">
+      <span className="eyebrow-copy">Why this exists</span>
+      <p className="text-balance font-display text-2xl leading-snug text-foreground sm:text-3xl">
+        Different wounds need different words. This is a place to find them.
+      </p>
+      <Link
+        to="/about"
+        className="inline-block text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+      >
+        Read the full story &rarr;
+      </Link>
+    </section>
+  );
+}
+
+/* -------------------------- Pay a Note Forward -------------------------- */
+
+function PayANoteForward() {
+  const ref = useRef<HTMLElement>(null);
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked.current) {
+          tracked.current = true;
+          trackEvent("pay_forward_viewed");
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={ref} className="paper-panel space-y-5 p-6 sm:p-10">
+      <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="space-y-4">
+          <span className="eyebrow-copy">Pay a Note Forward</span>
+          <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
+            Someone needs this note. They just do not know it yet.
+          </h2>
+          <p className="max-w-xl text-base leading-7 text-muted-foreground">
+            If this note found you at the right time, you can pass it to someone who is quietly
+            carrying something heavy. No explanation needed. Just a note, from you to them.
+          </p>
+          <Link
+            to="/pay-forward"
+            onClick={() => trackEvent("pay_forward_started")}
+            className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-70"
+          >
+            Pay a Note Forward &rarr;
+          </Link>
+        </div>
+        <div className="hidden lg:block">
+          <Heart className="heart-mark size-16 opacity-20" aria-hidden />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Final Volume 1 Invitation -------------------------- */
+
+function FinalVolume1Invitation() {
+  return (
+    <section className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_60%)]" />
+      <div className="mx-auto max-w-2xl space-y-6 text-center">
+        <span className="eyebrow-copy">Volume 1</span>
+        <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
+          Fifteen notes. One for every kind of quiet.
+        </h2>
+        <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground">
+          Survival. Grief. Becoming visible. Starting over. Quiet anger.
+          Five chapters written for the weight people carry without a name for it.
+        </p>
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Button asChild variant="note" size="lg" className="min-h-14 text-base">
+            <a
+              href={volumeOneSelarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("volume1_purchase_clicked", { source: "homepage_final" })}
+            >
+              Get Volume 1 &mdash; R149
+            </a>
+          </Button>
+          <Button asChild variant="paper" className="min-h-12">
+            <Link to="/volume-1">Preview first &rarr;</Link>
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Instant delivery &middot; Private PDF &middot; No subscription
+        </p>
       </div>
     </section>
   );

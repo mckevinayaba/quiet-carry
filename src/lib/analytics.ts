@@ -53,7 +53,13 @@ export type AnalyticsEventName =
   | "share_image_download_failed"
   | "note_share_clicked"
   | "gift_page_viewed"
-  | "gift_purchase_clicked";
+  | "gift_purchase_clicked"
+  | "hero_explore_volume1_clicked"
+  | "volume1_transition_viewed"
+  | "volume1_section_viewed"
+  | "volume1_preview_opened"
+  | "pay_forward_viewed"
+  | "pay_forward_started";
 
 // ---------------------------------------------------------------------------
 // Payload sanitisation

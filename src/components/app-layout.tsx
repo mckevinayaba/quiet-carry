@@ -1,7 +1,7 @@
 import {
   BookHeart,
+  BookOpen,
   House,
-  Layers2,
   MessageSquareHeart,
   NotebookPen,
   Sun,
@@ -20,7 +20,7 @@ const bottomNavItems = [
   { to: "/feelings", label: "Feelings", icon: BookHeart },
   { to: "/today", label: "Today", icon: Sun },
   { to: "/reflect", label: "Reflect", icon: NotebookPen },
-  { to: "/collections", label: "Collections", icon: Layers2 },
+  { to: "/volume-1", label: "Volume 1", icon: BookOpen },
 ] as const;
 
 // Desktop nav — shown at sm+ breakpoint, hidden on mobile.
@@ -28,6 +28,7 @@ const desktopNavLinks = [
   { to: "/", label: "Home" },
   { to: "/feelings", label: "Feelings" },
   { to: "/today", label: "Today" },
+  { to: "/volume-1", label: "Volume 1" },
   { to: "/about", label: "About" },
 ] as const;
 
