@@ -351,7 +351,7 @@ function TodaysNote() {
               <div className="stitched-label">The Note You Needed Today</div>
               <Heart className="heart-mark" aria-hidden />
             </div>
-            <div className="note-copy">{featuredNote.mainText}</div>
+            <div className="note-copy lg:columns-2 lg:gap-x-10">{featuredNote.mainText}</div>
           </div>
         </div>
       </article>
