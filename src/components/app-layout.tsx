@@ -55,18 +55,11 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
   return (
     <div className="min-h-screen pb-28">
       <header className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 pb-3 pt-4 sm:px-6">
-        {/* Top row: brand mark + Private Beta badge */}
-        <div className="flex items-center justify-between gap-3">
+        {/* Top row: brand mark */}
+        <div className="flex items-center gap-3">
           <Link to="/" className="stitched-label max-w-[14rem] text-center text-xs sm:text-sm">
             The Note You Needed Today
           </Link>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[0.7rem] font-medium uppercase tracking-[0.15em] text-muted-foreground"
-            aria-label="Private Beta"
-          >
-            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-            Private Beta
-          </span>
         </div>
 
         {/* Second row: tagline + utility links (mobile-visible) */}
