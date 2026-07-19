@@ -1255,7 +1255,7 @@ function SiteFooter() {
             href="mailto:hello@thenoteyouneeded.today"
             className="text-sm leading-7 text-muted-foreground hover:text-foreground"
           >
-            hello@thenoteyouneededtoday.com
+            hello@thenoteyouneeded.today
           </a>
         </FooterCol>
       </div>
