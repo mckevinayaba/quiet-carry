@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 
 import {
@@ -72,7 +73,7 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
         }}
         onJoin={() => {
           setAccountPromptOpen(false);
-          openWaitlist("account");
+          setAccountPromptDismissed(true);
         }}
       />
     </ModalContext.Provider>
@@ -93,11 +94,9 @@ function WaitlistDialog({ source, onClose }: { source: WaitlistSource | null; on
     }
   }, [open]);
 
-  const isVolume = source === "volume";
-  const title = isVolume ? "Volume 1 is almost ready" : "A private account is coming soon";
-  const description = isVolume
-    ? "The Things We Do Not Say Out Loud is the first digital collection from The Note You Needed Today. It will include designed notes, mobile wallpapers, captions, journal prompts, and private letters for the things people carry quietly. Leave your email and we will tell you when it is ready."
-    : "Private accounts will let you keep your notes and reflections safe across devices. Leave your email and we will tell you when it is ready.";
+  const title = "Volume 1 is almost ready";
+  const description =
+    "The Things We Do Not Say Out Loud is the first digital collection from The Note You Needed Today. It will include designed notes, mobile wallpapers, captions, journal prompts, and private letters for the things people carry quietly. Leave your email and we will tell you when it is ready.";
 
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
@@ -276,6 +275,7 @@ function AccountPromptDialog({
   onDismiss: () => void;
   onJoin: () => void;
 }) {
+  const router = useRouter();
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onDismiss(); }}>
       <DialogContent className="bg-card">
@@ -285,14 +285,21 @@ function AccountPromptDialog({
             Keep them safe across devices
           </DialogTitle>
           <DialogDescription className="text-base leading-7 text-muted-foreground">
-            Your notes are being kept on this device. Create a private account if you want them safe across devices.
+            Your notes are being kept on this device. Create a private account to keep them safe across devices.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="paper" onClick={onDismiss}>
             Not now
           </Button>
-          <Button type="button" variant="note" onClick={onJoin}>
+          <Button
+            type="button"
+            variant="note"
+            onClick={() => {
+              onJoin();
+              router.navigate({ to: "/account" });
+            }}
+          >
             Create private account
           </Button>
         </DialogFooter>

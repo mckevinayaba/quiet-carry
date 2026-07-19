@@ -9,9 +9,6 @@ import { Button } from "@/components/ui/button";
 const LOCAL_VALID_CODES = [
   "NOTE-2024-SURV",
   "NOTE-2024-HEAL",
-  "NOTE-2024-BETA",
-  "NOTE-TEST-0001",
-  "NOTE-TEST-0002",
 ];
 
 const GENERIC_ERROR = "That code doesn't seem right. Please check your email and try again.";

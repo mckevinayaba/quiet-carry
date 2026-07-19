@@ -94,7 +94,7 @@ function WritePage() {
           saveReflection(note, value.trim());
           trackEvent("reflection_saved", { noteId: note.id });
           setMessage(
-            "Saved privately on this device. A private account is coming soon so you can keep your reflections safe across devices.",
+            "Saved privately on this device. Create a private account to keep your reflections safe across devices.",
           );
           setSaved(true);
           registerMeaningfulGuestAction();
