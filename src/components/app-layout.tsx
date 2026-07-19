@@ -12,7 +12,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import { AppModalsProvider, useAppModals } from "@/components/app-modals";
-import { useAuth } from "@/lib/auth";
 
 // Bottom nav — 5 daily-use items. Account lives in the header.
 // Shelf access lives inside /reflect as a secondary link.
@@ -52,16 +51,22 @@ export function AppLayout({ children, className }: AppLayoutProps) {
 function AppLayoutShell({ children, className }: AppLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { openFeedback } = useAppModals();
-  const { user } = useAuth();
 
   return (
     <div className="min-h-screen pb-28">
       <header className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 pb-3 pt-4 sm:px-6">
-        {/* Top row: brand mark */}
+        {/* Top row: brand mark + Private Beta badge */}
         <div className="flex items-center justify-between gap-3">
           <Link to="/" className="stitched-label max-w-[14rem] text-center text-xs sm:text-sm">
             The Note You Needed Today
           </Link>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[0.7rem] font-medium uppercase tracking-[0.15em] text-muted-foreground"
+            aria-label="Private Beta"
+          >
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+            Private Beta
+          </span>
         </div>
 
         {/* Second row: tagline + utility links (mobile-visible) */}
@@ -90,15 +95,9 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
             <Link
               to="/account"
               aria-label="Account"
-              className="relative inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:hidden"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:hidden"
             >
               <UserRound className="size-3.5" aria-hidden="true" />
-              {user ? (
-                <span
-                  className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-primary"
-                  aria-hidden="true"
-                />
-              ) : null}
             </Link>
           </div>
         </div>
@@ -132,22 +131,14 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
           <Link
             to="/account"
             className={cn(
-              "relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
               pathname.startsWith("/account")
                 ? "bg-primary/10 text-foreground"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
             aria-current={pathname.startsWith("/account") ? "page" : undefined}
           >
-            <span className="relative inline-flex">
-              <UserRound className="size-3.5" aria-hidden="true" />
-              {user ? (
-                <span
-                  className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-primary"
-                  aria-hidden="true"
-                />
-              ) : null}
-            </span>
+            <UserRound className="size-3.5" aria-hidden="true" />
             Account
           </Link>
         </nav>

@@ -1,30 +1,73 @@
-// Kill-switch service worker for The Note You Needed Today.
-// The previous SW cached HTML/assets aggressively and left installed PWAs
-// hanging on stale chunks. This replacement wipes its own caches, takes
-// control of open clients, reloads them once, and unregisters itself.
-// Keep this file at /sw.js for at least one release cycle so returning
-// browsers actually pick it up and evict the old registration.
+// Service worker for The Note You Needed Today
+// Strategy:
+//   Navigation (HTML)         → network-first, fall back to /offline.html
+//   Hashed static assets      → cache-first (safe: fingerprinted filenames)
+//   Cross-origin (fonts, etc) → network-only (never cache)
+//   Supabase / analytics      → network-only
 
-self.addEventListener("install", () => self.skipWaiting());
+const CACHE = "tnynyt-v1";
+const OFFLINE_URL = "/offline.html";
 
-self.addEventListener("activate", (event) => {
+// Fingerprinted asset pattern: /assets/name-HASH.ext
+const ASSET_RE = /\/assets\/[^/]+-[A-Za-z0-9_-]{7,}\.(js|css|woff2?)(\?|$)/;
+
+// ── Install ──────────────────────────────────────────────────────────────────
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    (async () => {
-      try {
-        const names = await caches.keys();
-        // Only delete this app's own caches (origin-scoped). Leave any
-        // third-party messaging worker caches alone.
-        const ours = names.filter((n) => n.startsWith("tnynyt-"));
-        await Promise.allSettled(ours.map((n) => caches.delete(n)));
-        await self.clients.claim();
-        const clients = await self.clients.matchAll({ type: "window" });
-        await Promise.allSettled(clients.map((c) => c.navigate(c.url)));
-      } finally {
-        await self.registration.unregister();
-      }
-    })(),
+    caches.open(CACHE).then((cache) => cache.add(OFFLINE_URL))
   );
+  self.skipWaiting();
 });
 
-// Pass everything through to the network — never serve from cache.
-self.addEventListener("fetch", () => {});
+// ── Activate ─────────────────────────────────────────────────────────────────
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      )
+  );
+  self.clients.claim();
+});
+
+// ── Fetch ────────────────────────────────────────────────────────────────────
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Only handle GET; skip cross-origin (Supabase, Plausible, Google Fonts CDN)
+  if (request.method !== "GET") return;
+  if (url.origin !== self.location.origin) return;
+
+  // Navigation: network-first, offline fallback
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(() =>
+        caches.match(OFFLINE_URL).then(
+          (r) => r ?? new Response("Offline", { status: 503 })
+        )
+      )
+    );
+    return;
+  }
+
+  // Fingerprinted static assets: cache-first (safe, immutable)
+  if (ASSET_RE.test(url.pathname)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE).then((c) => c.put(request, clone));
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // Everything else (icons, manifest, sw.js itself): network-only
+});

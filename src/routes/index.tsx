@@ -71,11 +71,11 @@ function Landing() {
     <>
       <MomentBanner />
       <Hero />
-      <DailyLetterSignup />
       <NotSocialMedia />
       <HowItWorks />
       <CategoriesPreview />
       <TodaysNote />
+      <DailyLetterSignup />
       <PrivateByDesign />
       <VolumeOne />
       <FounderManifesto />
@@ -134,13 +134,6 @@ function Hero() {
           <p className="text-sm leading-6 text-muted-foreground">
             Find words for what you carry quietly.
           </p>
-
-          <a
-            href="#quiet-letter"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-          >
-            Or get today&apos;s note in your inbox, every morning →
-          </a>
         </div>
 
         <HeroVisual />

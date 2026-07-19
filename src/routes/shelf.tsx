@@ -5,9 +5,6 @@ import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { ShelfItem } from "@/components/shelf-item";
 import { Button } from "@/components/ui/button";
-import { getSavedNoteIds } from "@/lib/account-sync";
-import { useAuth } from "@/lib/auth";
-import { getFirstLine, getNoteById } from "@/lib/note-data";
 import type { SavedReflection, SavedShelfNote } from "@/lib/note-storage";
 import { getKeptNotes, getReflections, getSentNotes } from "@/lib/note-storage";
 
@@ -64,39 +61,16 @@ function EmptySent() {
 }
 
 function ShelfPage() {
-  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<"kept" | "reflections" | "sent">("kept");
   const [kept, setKept] = useState<SavedShelfNote[]>([]);
   const [sent, setSent] = useState<SavedShelfNote[]>([]);
   const [reflections, setReflections] = useState<SavedReflection[]>([]);
 
   useEffect(() => {
-    if (authLoading) return;
-
-    if (user) {
-      getSavedNoteIds(user.id).then((noteIds) => {
-        const resolved = noteIds
-          .map((noteId) => {
-            const note = getNoteById(noteId);
-            if (!note) return null;
-            return {
-              noteId: note.id,
-              categorySlug: note.categorySlug,
-              title: note.title,
-              firstLine: getFirstLine(note.mainText),
-              savedAt: new Date().toISOString(),
-            } satisfies SavedShelfNote;
-          })
-          .filter((n): n is SavedShelfNote => n !== null);
-        setKept(resolved);
-      });
-    } else {
-      setKept(getKeptNotes());
-    }
-
+    setKept(getKeptNotes());
     setSent(getSentNotes());
     setReflections(getReflections());
-  }, [user, authLoading]);
+  }, []);
 
   return (
     <AppLayout className="space-y-5 pb-8">
@@ -109,16 +83,7 @@ function ShelfPage() {
       </section>
 
       <div className="paper-panel space-y-1 text-sm leading-6 text-muted-foreground">
-        {user ? (
-          <p className="text-foreground">Synced to your private account.</p>
-        ) : (
-          <>
-            <p className="text-foreground">Your notes and reflections are private on this device.</p>
-            <Link to="/account" className="underline underline-offset-4">
-              Sign in to save across devices →
-            </Link>
-          </>
-        )}
+        <p className="text-foreground">Your notes and reflections are private on this device.</p>
         <p>No public profile. No comments. No followers.</p>
       </div>
 

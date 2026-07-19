@@ -1,32 +1,7 @@
-## Goal
+No changes needed. The redesigned Full Note Postcard Spread is already live at:
 
-Send magic-link and other auth emails from your own domain (e.g. `notify@thenoteyouneeded.today`) instead of the default Lovable sender. This also fixes the deliverability question from earlier — branded sender = far less likely to land in spam.
+**`/postcard-preview`**
 
-## What you do (one click)
+Open that path in the preview to see the design and use the **Download PNG** button to export `the-note-you-needed-today-do-it-anyway-full-postcard.png` (2160×1350). The route is hidden from the main navigation by design.
 
-No email domain is currently configured for this project. You'll click the button below; it opens a small dialog where you confirm the sending subdomain. Since the domain was bought through Lovable, the NS delegation gets wired up automatically — no DNS records to copy.
-
-<presentation-actions>
-<presentation-open-email-setup>Set up email domain</presentation-open-email-setup>
-</presentation-actions>
-
-## What I do after that (automatic, same turn)
-
-1. Provision email infrastructure (send queue, suppression list, unsubscribe tokens, processing job).
-2. Scaffold the six auth email templates (magic link, email change, signup, recovery, invite, reauthentication) as branded React Email components.
-3. Apply the site's warm parchment / dark-ink visual language so the emails feel like the app — not a generic system message.
-4. Deploy the auth email hook so Lovable Cloud starts routing auth emails through it.
-
-## After that
-
-- DNS verification runs in the background (up to ~72h, usually minutes). Until it completes, auth emails keep sending via the default Lovable sender — nothing breaks.
-- Once verified, every magic link arrives from your domain.
-- You can monitor status anytime in Cloud → Emails.
-
-## Not in scope (per your answer)
-
-Transactional emails (daily letter, Selar receipts, unsubscribe page sender) stay on their current path. We can branch those onto the same domain later if you want — say the word.
-
-## Build errors
-
-The TypeScript errors in `src/lib/account-sync.ts` you pasted earlier are still outstanding. I'll fix those in a separate turn so this email setup stays focused — flag if you want them bundled instead.
+If you'd like me to do something next (e.g. tweak the design, add it to navigation, or open the route automatically), tell me which and I'll plan it.

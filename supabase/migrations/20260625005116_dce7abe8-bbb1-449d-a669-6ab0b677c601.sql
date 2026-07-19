@@ -1,1 +1,0 @@
-SELECT cron.unschedule('selar-poll-every-5-min');

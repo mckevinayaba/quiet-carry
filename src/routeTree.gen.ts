@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Volume1RouteImport } from './routes/volume-1'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -32,18 +31,10 @@ import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
 import { Route as Volume1PreviewRouteImport } from './routes/volume-1.preview'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 
 const Volume1Route = Volume1RouteImport.update({
   id: '/volume-1',
   path: '/volume-1',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TodayRoute = TodayRouteImport.update({
@@ -151,22 +142,6 @@ const Volume1ReadChapterRoute = Volume1ReadChapterRouteImport.update({
   path: '/read/$chapter',
   getParentRoute: () => Volume1Route,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -184,7 +159,6 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -192,9 +166,6 @@ export interface FileRoutesByFullPath {
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -212,16 +183,12 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -240,7 +207,6 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
-  '/unsubscribe': typeof UnsubscribeRoute
   '/volume-1': typeof Volume1RouteWithChildren
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -248,9 +214,6 @@ export interface FileRoutesById {
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
-  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
-  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -270,7 +233,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
-    | '/unsubscribe'
     | '/volume-1'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -278,9 +240,6 @@ export interface FileRouteTypes {
     | '/write/$categorySlug'
     | '/volume-1/'
     | '/volume-1/read/$chapter'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -298,16 +257,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
-    | '/unsubscribe'
     | '/note/$categorySlug'
     | '/volume-1/preview'
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1'
     | '/volume-1/read/$chapter'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -325,7 +280,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
-    | '/unsubscribe'
     | '/volume-1'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -333,9 +287,6 @@ export interface FileRouteTypes {
     | '/write/$categorySlug'
     | '/volume-1/'
     | '/volume-1/read/$chapter'
-    | '/lovable/email/auth/preview'
-    | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -354,13 +305,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SupportRoute: typeof SupportRoute
   TodayRoute: typeof TodayRoute
-  UnsubscribeRoute: typeof UnsubscribeRoute
   Volume1Route: typeof Volume1RouteWithChildren
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
-  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
-  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -370,13 +317,6 @@ declare module '@tanstack/react-router' {
       path: '/volume-1'
       fullPath: '/volume-1'
       preLoaderRoute: typeof Volume1RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/today': {
@@ -526,27 +466,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Volume1ReadChapterRouteImport
       parentRoute: typeof Volume1Route
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -583,14 +502,20 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SupportRoute: SupportRoute,
   TodayRoute: TodayRoute,
-  UnsubscribeRoute: UnsubscribeRoute,
   Volume1Route: Volume1RouteWithChildren,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
-  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
-  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

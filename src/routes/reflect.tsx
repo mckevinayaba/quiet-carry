@@ -5,8 +5,6 @@ import { ArrowLeft, NotebookPen } from "lucide-react";
 import { AppLayout } from "@/components/app-layout";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
-import { deleteUserReflection, getUserReflections, saveUserReflection } from "@/lib/account-sync";
-import { useAuth } from "@/lib/auth";
 import { notes } from "@/lib/note-data";
 import {
   deleteReflectEntry,
@@ -39,58 +37,30 @@ function todaysPrompt(): string {
 type Mode = "home" | "writing" | "reading";
 
 function ReflectPage() {
-  const { user, loading: authLoading } = useAuth();
   const [entries, setEntries] = useState<ReflectEntry[]>([]);
   const [mode, setMode] = useState<Mode>("home");
   const [activeId, setActiveId] = useState<string | null>(null);
   const prompt = useMemo(() => todaysPrompt(), []);
 
-  const reload = () => {
-    if (user) {
-      getUserReflections(user.id).then((cloud) => {
-        setEntries(
-          cloud.map((entry) => ({
-            id: entry.id,
-            title: entry.prompt ?? "",
-            body: entry.response,
-            createdAt: entry.createdAt,
-          })),
-        );
-      });
-    } else {
-      setEntries(getReflectEntries());
-    }
-  };
-
   useEffect(() => {
-    if (authLoading) return;
-    reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]);
+    setEntries(getReflectEntries());
+  }, []);
 
   const activeEntry = entries.find((entry) => entry.id === activeId) ?? null;
 
-  const handleSave = async (title: string, body: string) => {
+  const handleSave = (title: string, body: string) => {
     if (!body.trim()) {
       setMode("home");
       return;
     }
-    if (user) {
-      await saveUserReflection(user.id, title, body);
-    } else {
-      saveReflectEntry(title, body);
-    }
-    reload();
+    saveReflectEntry(title, body);
+    setEntries(getReflectEntries());
     setMode("home");
   };
 
-  const handleDelete = async (id: string) => {
-    if (user) {
-      await deleteUserReflection(user.id, id);
-    } else {
-      deleteReflectEntry(id);
-    }
-    reload();
+  const handleDelete = (id: string) => {
+    deleteReflectEntry(id);
+    setEntries(getReflectEntries());
     setMode("home");
     setActiveId(null);
   };
@@ -117,11 +87,10 @@ function ReflectPage() {
           onDelete={() => handleDelete(activeEntry.id)}
         />
       ) : entries.length === 0 ? (
-        <EmptyState onBegin={() => setMode("writing")} isSignedIn={!!user} />
+        <EmptyState onBegin={() => setMode("writing")} />
       ) : (
         <EntriesList
           entries={entries}
-          isSignedIn={!!user}
           onWriteNew={() => setMode("writing")}
           onRead={(id) => {
             setActiveId(id);
@@ -137,7 +106,7 @@ function ReflectPage() {
 // State 1 — first visit, no entries
 // ---------------------------------------------------------------------------
 
-function EmptyState({ onBegin, isSignedIn }: { onBegin: () => void; isSignedIn: boolean }) {
+function EmptyState({ onBegin }: { onBegin: () => void }) {
   return (
     <section className="flex flex-col items-center gap-6 py-20 text-center">
       <NotebookPen className="size-8 text-muted-foreground/60" aria-hidden />
@@ -150,14 +119,6 @@ function EmptyState({ onBegin, isSignedIn }: { onBegin: () => void; isSignedIn: 
       <Button variant="note" className="min-h-12" onClick={onBegin}>
         Begin writing
       </Button>
-      {!isSignedIn ? (
-        <Link
-          to="/account"
-          className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-        >
-          Sign in to save across devices →
-        </Link>
-      ) : null}
     </section>
   );
 }
@@ -230,28 +191,19 @@ function WritingMode({
 
 function EntriesList({
   entries,
-  isSignedIn,
   onWriteNew,
   onRead,
 }: {
   entries: ReflectEntry[];
-  isSignedIn: boolean;
   onWriteNew: () => void;
   onRead: (id: string) => void;
 }) {
   return (
     <section className="space-y-6 py-2">
       <div className="flex items-center justify-between">
-        {isSignedIn ? (
-          <p className="text-sm text-muted-foreground">Synced to your private account.</p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Saved on this device.{" "}
-            <Link to="/account" className="underline underline-offset-4">
-              Sign in to save across devices →
-            </Link>
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground">
+          Your reflections are saved on this device. Account sync is coming soon.
+        </p>
         <Button variant="note" size="sm" className="min-h-9 shrink-0 text-sm" onClick={onWriteNew}>
           Write a new entry
         </Button>

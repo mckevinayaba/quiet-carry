@@ -18,7 +18,7 @@ export function DailyLetterSignup() {
   };
 
   return (
-    <section id="quiet-letter" className="paper-panel space-y-4 p-6 sm:p-8 scroll-mt-6">
+    <section className="paper-panel space-y-4 p-6 sm:p-8">
       <span className="eyebrow-copy">A quiet letter, once a day</span>
       <p className="max-w-md text-base leading-7 text-muted-foreground">
         One note. Delivered to your inbox each morning. No marketing. No tracking. Just the note
