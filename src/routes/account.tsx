@@ -132,6 +132,29 @@ function AccountInner() {
           How to install
         </Button>
       </section>
+
+      {signedIn && (
+        <section className="paper-panel space-y-3 border-destructive/30">
+          <div className="stitched-label">Your account</div>
+          <h2 className="font-display text-2xl leading-none">Delete your account</h2>
+          {email && (
+            <p className="text-sm leading-6 text-muted-foreground">Signed in as {email}.</p>
+          )}
+          <p className="text-sm leading-6 text-muted-foreground">
+            This permanently removes your account, your saved notes, and your reflections. It cannot be undone.
+          </p>
+          {deleteError && (
+            <p className="text-sm leading-6 text-destructive">{deleteError}</p>
+          )}
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Delete my account"}
+          </Button>
+        </section>
+      )}
     </>
   );
 }
