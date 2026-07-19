@@ -11,46 +11,66 @@ export function DailyLetterSignup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || status === "loading") return;
-
     setStatus("loading");
     const result = await subscribeToQuietLetter(email);
     setStatus(result.ok ? "done" : "error");
   };
 
   return (
-    <section className="paper-panel space-y-4 p-6 sm:p-8">
-      <span className="eyebrow-copy">A quiet letter, once a day</span>
-      <p className="max-w-md text-base leading-7 text-muted-foreground">
-        One note. Delivered to your inbox each morning. No marketing. No tracking. Just the note
-        you needed.
-      </p>
+    <section className="paper-panel space-y-6 p-6 sm:p-10">
+      <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="space-y-3">
+          <span className="eyebrow-copy">A morning ritual</span>
+          <h2 className="text-balance font-display text-3xl leading-tight text-foreground sm:text-4xl">
+            One note each morning, before the world starts asking things from you.
+          </h2>
+          <p className="max-w-md text-base leading-7 text-muted-foreground">
+            Come here before you text "I'm fine" again. One quiet note. No marketing. No tracking.
+            Just the words you needed.
+          </p>
+        </div>
 
-      {status === "done" ? (
-        <p className="text-sm leading-6 text-foreground">
-          You are on the quiet list. Check your inbox for a short confirmation.
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            autoComplete="email"
-            className="sm:max-w-xs"
-            required
-          />
-          <Button type="submit" variant="note" className="min-h-11 shrink-0" disabled={status === "loading"}>
-            {status === "loading" ? "Sending…" : "Send me the quiet letter"}
-          </Button>
-        </form>
-      )}
+        <div className="space-y-3 lg:min-w-[22rem]">
+          {status === "done" ? (
+            <p className="text-base leading-7 text-foreground">
+              You are on the quiet list.
+              <br />
+              <span className="text-sm text-muted-foreground">
+                Check your inbox for a short confirmation.
+              </span>
+            </p>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                autoComplete="email"
+                required
+              />
+              <Button
+                type="submit"
+                variant="note"
+                className="min-h-12 w-full"
+                disabled={status === "loading"}
+              >
+                {status === "loading" ? "Sending..." : "Send me the quiet letter"}
+              </Button>
+            </form>
+          )}
 
-      {status === "error" ? (
-        <p className="text-sm text-destructive">
-          Something went wrong. Please try again in a moment.
-        </p>
-      ) : null}
+          {status === "error" ? (
+            <p className="text-sm text-destructive">
+              Something went wrong. Please try again in a moment.
+            </p>
+          ) : null}
+
+          <p className="text-xs leading-5 text-muted-foreground">
+            One email each morning. No noise. No public profile. Unsubscribe any time.
+          </p>
+        </div>
+      </div>
     </section>
   );
 }

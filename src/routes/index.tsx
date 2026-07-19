@@ -71,12 +71,11 @@ function Landing() {
     <>
       <MomentBanner />
       <Hero />
-      <NotSocialMedia />
-      <HowItWorks />
-      <TodaysNote />
-      <WelcomeManifesto />
       <CategoriesPreview />
+      <TodaysNote />
+      <HowItWorks />
       <DailyLetterSignup />
+      <WelcomeManifesto />
       <PrivateByDesign />
       <VolumeOne />
       <Waitlist />
@@ -102,10 +101,12 @@ function Hero() {
               <span className="size-1.5 rounded-full bg-primary" aria-hidden />
               Now open quietly
             </span>
-            <span className="eyebrow-copy">A private-first emotional language platform</span>
           </div>
 
           <div className="space-y-5">
+            <p className="max-w-lg text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+              For the people who said "I'm fine" and meant "I don't know how to explain this."
+            </p>
             <h1 className="text-balance font-display text-[3.25rem] leading-[0.98] text-foreground sm:text-7xl lg:text-[5.25rem]">
               The Note You
               <br />
@@ -115,8 +116,7 @@ function Hero() {
               Find words for what you carry quietly.
             </p>
             <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-              For the things you survive in silence, the truths you keep swallowing, and the words
-              you needed before you knew how to ask.
+              Not advice. Not performance. Just the note you needed before you knew how to ask.
             </p>
           </div>
 
@@ -130,6 +130,10 @@ function Hero() {
               </Link>
             </Button>
           </div>
+
+          <p className="text-xs leading-6 text-muted-foreground">
+            No likes &middot; No comments &middot; No followers &middot; No performance &middot; Just private words.
+          </p>
         </div>
 
         <HeroVisual />
@@ -581,6 +585,7 @@ function VolumeOne() {
 /* -------------------------- Welcome + Why This Exists -------------------------- */
 
 function WelcomeManifesto() {
+  const [expanded, setExpanded] = useState(false);
   return (
     <div className="mx-auto max-w-3xl space-y-0">
       {/* ── Envelope flap ── */}
@@ -800,114 +805,141 @@ function WelcomeManifesto() {
             </p>
           </div>
 
-          <div className="border-l-2 border-border pl-5">
-            <p className="font-display text-xl text-foreground sm:text-2xl">
-              This is the uncomfortable truth.
-            </p>
-          </div>
+          {expanded ? (
+            <>
+              <div className="border-l-2 border-border pl-5">
+                <p className="font-display text-xl text-foreground sm:text-2xl">
+                  This is the uncomfortable truth.
+                </p>
+              </div>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p className="text-foreground">A lot of people are not healing.</p>
-            <p>They are functioning.</p>
-            <p>They are surviving inside routines.</p>
-            <p>They are laughing with wounds still open.</p>
-            <p>They are giving advice from places where they are still bleeding.</p>
-            <p>They are helping others breathe while they are quietly running out of air.</p>
-            <p>
-              They are making pain look normal because life does not pause long enough for them to
-              fall apart.
-            </p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p className="text-foreground">A lot of people are not healing.</p>
+                <p>They are functioning.</p>
+                <p>They are surviving inside routines.</p>
+                <p>They are laughing with wounds still open.</p>
+                <p>They are giving advice from places where they are still bleeding.</p>
+                <p>They are helping others breathe while they are quietly running out of air.</p>
+                <p>
+                  They are making pain look normal because life does not pause long enough for them
+                  to fall apart.
+                </p>
+              </div>
 
-          <p className="text-muted-foreground">
-            And when life becomes heavy, the world often gives them small sentences that sound good
-            but do not go deep enough.
-          </p>
+              <p className="text-muted-foreground">
+                And when life becomes heavy, the world often gives them small sentences that sound
+                good but do not go deep enough.
+              </p>
 
-          <div className="space-y-1 border-l-2 border-border pl-5 text-muted-foreground">
-            <p>Be strong.</p>
-            <p>Move on.</p>
-            <p>Let go.</p>
-            <p>Everything happens for a reason.</p>
-          </div>
+              <div className="space-y-1 border-l-2 border-border pl-5 text-muted-foreground">
+                <p>Be strong.</p>
+                <p>Move on.</p>
+                <p>Let go.</p>
+                <p>Everything happens for a reason.</p>
+              </div>
 
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            But pain is not generic.
-          </p>
+              <p className="font-display text-xl text-foreground sm:text-2xl">
+                But pain is not generic.
+              </p>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p>A betrayal does not feel like grief.</p>
-            <p>A divorce does not feel like job loss.</p>
-            <p>A family wound does not feel like loneliness.</p>
-            <p>Financial shame does not feel like heartbreak.</p>
-            <p>A delayed dream does not feel like the body finally saying, "I cannot keep carrying this."</p>
-            <p>
-              The silence after someone dies does not feel like the silence after someone abandons
-              you while still alive.
-            </p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p>A betrayal does not feel like grief.</p>
+                <p>A divorce does not feel like job loss.</p>
+                <p>A family wound does not feel like loneliness.</p>
+                <p>Financial shame does not feel like heartbreak.</p>
+                <p>
+                  A delayed dream does not feel like the body finally saying, "I cannot keep
+                  carrying this."
+                </p>
+                <p>
+                  The silence after someone dies does not feel like the silence after someone
+                  abandons you while still alive.
+                </p>
+              </div>
 
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            Different wounds need different words.
-          </p>
+              <p className="font-display text-xl text-foreground sm:text-2xl">
+                Different wounds need different words.
+              </p>
 
-          <p className="text-muted-foreground">
-            The Note You Needed Today exists because people need language for the things they carry
-            quietly.
-          </p>
+              <p className="text-muted-foreground">
+                The Note You Needed Today exists because people need language for the things they
+                carry quietly.
+              </p>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p>Not noise. Not performance. Not perfect healing.</p>
-            <p className="text-foreground">Language.</p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p>Not noise. Not performance. Not perfect healing.</p>
+                <p className="text-foreground">Language.</p>
+              </div>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p>Words that make someone stop and say, "This is what I have been trying to explain."</p>
-            <p>Words that can sit beside grief without rushing it.</p>
-            <p>Words that can name betrayal without decorating it.</p>
-            <p>Words that can hold heartbreak without begging someone to be okay too quickly.</p>
-            <p>Words that can tell a tired person, "You are not weak. You have been carrying too much for too long."</p>
-            <p>Words that can help someone understand that missing them is not the same as needing them back.</p>
-            <p>Words that can remind someone that family can explain the wound, but it does not excuse it.</p>
-            <p>Words that can tell someone who lost a job that the role ended, but they did not.</p>
-            <p>Words that can tell someone ashamed of money that they were not careless, they were carrying more than the money could hold.</p>
-            <p>Words that can be kept. Words that can be sent quietly. Words that can be shared when speaking feels impossible.</p>
-            <p>Words that make people feel seen, then leave them with enough hope to breathe again.</p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p>Words that make someone stop and say, "This is what I have been trying to explain."</p>
+                <p>Words that can sit beside grief without rushing it.</p>
+                <p>Words that can name betrayal without decorating it.</p>
+                <p>Words that can hold heartbreak without begging someone to be okay too quickly.</p>
+                <p>Words that can tell a tired person, "You are not weak. You have been carrying too much for too long."</p>
+                <p>Words that can help someone understand that missing them is not the same as needing them back.</p>
+                <p>Words that can remind someone that family can explain the wound, but it does not excuse it.</p>
+                <p>Words that can tell someone who lost a job that the role ended, but they did not.</p>
+                <p>Words that can tell someone ashamed of money that they were not careless, they were carrying more than the money could hold.</p>
+                <p>Words that can be kept. Words that can be sent quietly. Words that can be shared when speaking feels impossible.</p>
+                <p>Words that make people feel seen, then leave them with enough hope to breathe again.</p>
+              </div>
 
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            This is why The Note exists.
-          </p>
+              <p className="font-display text-xl text-foreground sm:text-2xl">
+                This is why The Note exists.
+              </p>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p>For the things people survive in silence.</p>
-            <p>For the truths they keep swallowing.</p>
-            <p>For the pain they make look normal.</p>
-            <p>For the wounds they do not always have the language to name.</p>
-            <p className="text-foreground">For the words they needed before they knew how to ask.</p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p>For the things people survive in silence.</p>
+                <p>For the truths they keep swallowing.</p>
+                <p>For the pain they make look normal.</p>
+                <p>For the wounds they do not always have the language to name.</p>
+                <p className="text-foreground">
+                  For the words they needed before they knew how to ask.
+                </p>
+              </div>
 
-          <p className="text-muted-foreground">And maybe today, one note will find you.</p>
+              <p className="text-muted-foreground">And maybe today, one note will find you.</p>
 
-          <div className="space-y-2 text-muted-foreground">
-            <p>Maybe it will not fix everything.</p>
-            <p>Maybe it will not change what happened.</p>
-            <p>
-              Maybe it will not take the grief away, bring the person back, pay the bill, heal the
-              family, return the job, restore the marriage, or make the loneliness disappear by
-              morning.
-            </p>
-          </div>
+              <div className="space-y-2 text-muted-foreground">
+                <p>Maybe it will not fix everything.</p>
+                <p>Maybe it will not change what happened.</p>
+                <p>
+                  Maybe it will not take the grief away, bring the person back, pay the bill, heal
+                  the family, return the job, restore the marriage, or make the loneliness disappear
+                  by morning.
+                </p>
+              </div>
 
-          <div className="space-y-2">
-            <p className="text-foreground">But maybe it will say the thing you have been carrying.</p>
-            <p className="text-foreground">Maybe it will help you feel less alone inside it.</p>
-            <p className="text-foreground">Maybe it will give you one honest sentence to hold.</p>
-          </div>
+              <div className="space-y-2">
+                <p className="text-foreground">
+                  But maybe it will say the thing you have been carrying.
+                </p>
+                <p className="text-foreground">Maybe it will help you feel less alone inside it.</p>
+                <p className="text-foreground">
+                  Maybe it will give you one honest sentence to hold.
+                </p>
+              </div>
 
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            And maybe, for today, that is enough to breathe.
-          </p>
+              <p className="font-display text-xl text-foreground sm:text-2xl">
+                And maybe, for today, that is enough to breathe.
+              </p>
+            </>
+          ) : (
+            <div className="space-y-4 rounded-lg border border-border bg-[color:var(--paper-deep)]/10 px-5 py-4">
+              <p className="text-sm leading-7 text-muted-foreground">
+                A lot of people are not healing. They are functioning. Different wounds need
+                different words. The Note exists to give language to what people carry quietly.
+              </p>
+              <button
+                type="button"
+                onClick={() => setExpanded(true)}
+                className="text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-70"
+              >
+                Read the full story
+              </button>
+            </div>
+          )}
 
           <div className="pt-4 text-center">
             <Button asChild size="lg" variant="note" className="min-h-14 text-base">
