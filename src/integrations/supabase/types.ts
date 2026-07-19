@@ -14,30 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      daily_subscribers: {
-        Row: {
-          active: boolean
-          created_at: string
-          email: string
-          id: string
-          time_preference: string | null
-        }
-        Insert: {
-          active?: boolean
-          created_at?: string
-          email: string
-          id?: string
-          time_preference?: string | null
-        }
-        Update: {
-          active?: boolean
-          created_at?: string
-          email?: string
-          id?: string
-          time_preference?: string | null
-        }
-        Relationships: []
-      }
       email_send_log: {
         Row: {
           created_at: string
@@ -179,51 +155,6 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
-        }
-        Relationships: []
-      }
-      user_reflections: {
-        Row: {
-          created_at: string
-          id: string
-          prompt: string | null
-          response: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          prompt?: string | null
-          response: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          prompt?: string | null
-          response?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_saved_notes: {
-        Row: {
-          id: string
-          note_id: string
-          saved_at: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          note_id: string
-          saved_at?: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          note_id?: string
-          saved_at?: string
-          user_id?: string
         }
         Relationships: []
       }
