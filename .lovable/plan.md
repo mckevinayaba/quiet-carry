@@ -1,40 +1,32 @@
-## Plan: fix the published-site freeze without changing the MVP experience
+## Goal
 
-I agree with your read: if the app works inside Lovable but the published custom domain cuts/freezes, this is a published-runtime problem, not the core React app failing everywhere. I also just confirmed the custom domain request times out while project publishing is public and the Lovable badge is already hidden.
+Send magic-link and other auth emails from your own domain (e.g. `notify@thenoteyouneeded.today`) instead of the default Lovable sender. This also fixes the deliverability question from earlier — branded sender = far less likely to land in spam.
 
-### 1. Verify the published-only failure path
-- Compare these targets separately:
-  - `thenoteyouneeded.today`
-  - `www.thenoteyouneeded.today`
-  - `quiet-words-today.lovable.app`
-  - Lovable preview
-- Capture whether the freeze starts before or after app hydration.
-- Confirm whether `/__l5e/events.js` is present on the published domain and whether it loads before the page cuts off.
+## What you do (one click)
 
-### 2. Add an emergency app-side blocker for the injected replay script
-If `/__l5e/events.js` is confirmed on the published domain, add a tiny early runtime guard in the root document head that:
-- Blocks script tags whose `src` includes `/__l5e/events.js`.
-- Removes any already-inserted matching script node as soon as possible.
-- Blocks related event transport calls to `/__l5e/*` through `fetch`, `XMLHttpRequest`, and `sendBeacon`.
-- Leaves the actual app routes, design, database, waitlist, auth, and MVP flows unchanged.
+No email domain is currently configured for this project. You'll click the button below; it opens a small dialog where you confirm the sending subdomain. Since the domain was bought through Lovable, the NS delegation gets wired up automatically — no DNS records to copy.
 
-This is a defensive workaround because the script is platform-injected and not part of the repo.
+<presentation-actions>
+<presentation-open-email-setup>Set up email domain</presentation-open-email-setup>
+</presentation-actions>
 
-### 3. Keep the support escalation open
-- The long-term fix is still for Lovable platform support to disable or fix that injected replay layer for the published domain.
-- The app-side blocker is a practical stopgap to get real users unstuck.
+## What I do after that (automatic, same turn)
 
-### 4. Republish and validate
-After the blocker is added:
-- Republish the frontend.
-- Test the published custom domain, not only the Lovable preview.
-- Confirm:
-  - Homepage renders past the previous cutoff.
-  - `/feelings` scrolls without freezing.
-  - CTAs still work.
-  - Waitlist still submits.
-  - Safety/support page still loads.
-  - Mobile readability is unchanged.
+1. Provision email infrastructure (send queue, suppression list, unsubscribe tokens, processing job).
+2. Scaffold the six auth email templates (magic link, email change, signup, recovery, invite, reauthentication) as branded React Email components.
+3. Apply the site's warm parchment / dark-ink visual language so the emails feel like the app — not a generic system message.
+4. Deploy the auth email hook so Lovable Cloud starts routing auth emails through it.
 
-### 5. Fallback if the platform script still executes first
-If Lovable injects `/__l5e/events.js` before any app code can block it, the only reliable bypass is deploying the same repo to Vercel and pointing the domain there, because the Vercel build will not include Lovable’s injected session-replay layer.
+## After that
+
+- DNS verification runs in the background (up to ~72h, usually minutes). Until it completes, auth emails keep sending via the default Lovable sender — nothing breaks.
+- Once verified, every magic link arrives from your domain.
+- You can monitor status anytime in Cloud → Emails.
+
+## Not in scope (per your answer)
+
+Transactional emails (daily letter, Selar receipts, unsubscribe page sender) stay on their current path. We can branch those onto the same domain later if you want — say the word.
+
+## Build errors
+
+The TypeScript errors in `src/lib/account-sync.ts` you pasted earlier are still outstanding. I'll fix those in a separate turn so this email setup stays focused — flag if you want them bundled instead.

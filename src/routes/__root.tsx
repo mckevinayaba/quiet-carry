@@ -16,136 +16,6 @@ const PLAUSIBLE_DOMAIN = import.meta.env.VITE_PLAUSIBLE_DOMAIN as string | undef
 const PLAUSIBLE_ENABLED =
   import.meta.env.VITE_ENABLE_PLAUSIBLE === "true" && Boolean(PLAUSIBLE_DOMAIN);
 
-const LOVABLE_REPLAY_BLOCKER = `
-(() => {
-  const noop = () => undefined;
-  window.__nightmare = true;
-
-  try {
-    Object.defineProperty(window, "Tinybird", {
-      value: { trackEvent: noop },
-      writable: false,
-      configurable: false,
-    });
-  } catch (_) {
-    window.Tinybird = window.Tinybird || { trackEvent: noop };
-  }
-
-  const lovableEventsStub = {
-    __userAppEventsSdkVersion: "tnynt-disabled-before-platform-load",
-    track: noop,
-    flush: noop,
-    identify: noop,
-    resetIdentity: noop,
-    captureException: noop,
-    getIdentity: () => ({ anonymous_id: "disabled", app_user_id_hash_available: false }),
-    getReplay: () => ({ replay_id: null, active: false, event_count: 0 }),
-  };
-
-  try {
-    Object.defineProperty(window, "__lovableEvents", {
-      value: lovableEventsStub,
-      writable: false,
-      configurable: false,
-    });
-  } catch (_) {
-    window.__lovableEvents = window.__lovableEvents || lovableEventsStub;
-    window.__lovableEvents.__userAppEventsSdkVersion =
-      window.__lovableEvents.__userAppEventsSdkVersion || "tnynt-disabled-before-platform-load";
-  }
-
-  const isBlocked = (value) => {
-    try {
-      const url = typeof value === "string" ? value : value && "url" in value ? value.url : String(value || "");
-      return (
-        url.includes("/__l5e/") ||
-        url.includes("/__l5e/events.js") ||
-        url.includes("/~flock.js") ||
-        url.includes("/~api/analytics") ||
-        url.includes("api.tinybird.co")
-      );
-    } catch (_) {
-      return false;
-    }
-  };
-
-  const removeBlockedScripts = () => {
-    document
-      .querySelectorAll('script[src*="/__l5e/"],script[src*="/~flock.js"]')
-      .forEach((node) => node.remove());
-  };
-
-  const guardDomInsert = (methodName) => {
-    const original = Node.prototype[methodName];
-    Node.prototype[methodName] = function(node) {
-      if (node && node.nodeType === 1 && node.tagName === "SCRIPT" && isBlocked(node.src)) {
-        return node;
-      }
-      return original.apply(this, arguments);
-    };
-  };
-
-  removeBlockedScripts();
-  guardDomInsert("appendChild");
-  guardDomInsert("insertBefore");
-  guardDomInsert("replaceChild");
-
-  const observer = new MutationObserver((records) => {
-    for (const record of records) {
-      for (const node of record.addedNodes) {
-        if (node && node.nodeType === 1) {
-          if (node.tagName === "SCRIPT" && isBlocked(node.src)) {
-            node.remove();
-          } else if (node.querySelectorAll) {
-            node
-              .querySelectorAll('script[src*="/__l5e/"],script[src*="/~flock.js"]')
-              .forEach((script) => script.remove());
-          }
-        }
-      }
-    }
-  });
-
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-
-  const originalFetch = window.fetch;
-  window.fetch = function(input, init) {
-    if (isBlocked(input)) {
-      return Promise.resolve(new Response(null, { status: 204 }));
-    }
-    return originalFetch.apply(this, arguments);
-  };
-
-  const originalOpen = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function(method, url) {
-    this.__tnyntBlockedReplay = isBlocked(url);
-    if (this.__tnyntBlockedReplay) {
-      return originalOpen.call(this, method, "about:blank");
-    }
-    return originalOpen.apply(this, arguments);
-  };
-
-  const originalSend = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function() {
-    if (this.__tnyntBlockedReplay) {
-      try { this.abort(); } catch (_) {}
-      return undefined;
-    }
-    return originalSend.apply(this, arguments);
-  };
-
-  if (navigator.sendBeacon) {
-    const originalBeacon = navigator.sendBeacon.bind(navigator);
-    navigator.sendBeacon = function(url, data) {
-      if (isBlocked(url)) return true;
-      return originalBeacon(url, data);
-    };
-  }
-
-  window.__tnyntReplayBlockerActive = true;
-})();
-`;
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -235,7 +105,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
     ],
-    scripts: [{ children: LOVABLE_REPLAY_BLOCKER }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -256,7 +125,7 @@ function RootShell({ children }: { children: ReactNode }) {
           />
         ) : null}
       </head>
-      <body data-lovable-block data-lovable-ignore data-private className="rr-block rrweb-ignore">
+      <body>
         {children}
         <Scripts />
       </body>

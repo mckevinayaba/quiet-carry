@@ -28,18 +28,5 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Network-only. Never serve from cache, never go stale. The only exception is
-// Lovable's same-origin replay/event capture endpoints on published domains;
-// if a returning browser already has this worker, short-circuit them before
-// their scripts or event batches can pin the main thread.
-self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
-  if (
-    url.pathname.startsWith("/__l5e/") ||
-    url.pathname === "/~flock.js" ||
-    url.pathname.startsWith("/~api/analytics") ||
-    url.hostname === "api.tinybird.co"
-  ) {
-    event.respondWith(new Response("", { status: 204 }));
-  }
-});
+// Network-only. Never serve from cache, never go stale.
+self.addEventListener("fetch", () => {});
