@@ -73,9 +73,9 @@ function Landing() {
       <Hero />
       <NotSocialMedia />
       <HowItWorks />
-      <CategoriesPreview />
       <TodaysNote />
       <WelcomeManifesto />
+      <CategoriesPreview />
       <DailyLetterSignup />
       <PrivateByDesign />
       <VolumeOne />
