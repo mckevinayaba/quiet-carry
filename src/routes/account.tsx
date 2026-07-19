@@ -37,11 +37,43 @@ function AccountInner() {
   const [savedCount, setSavedCount] = useState(0);
   const [reflectionCount, setReflectionCount] = useState(0);
   const [installOpen, setInstallOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteAccount = useServerFn(deleteMyAccount);
 
   useEffect(() => {
     setSavedCount(getKeptNotes().length);
     setReflectionCount(getReflections().length);
+    supabase.auth.getUser().then(({ data }) => {
+      setSignedIn(!!data.user);
+      setEmail(data.user?.email ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session?.user);
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      "Delete your account and everything on it? This cannot be undone. Your saved notes and reflections will be removed.",
+    );
+    if (!confirmed) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      setDeleteError("Something went wrong. Please try again in a moment.");
+      setDeleting(false);
+    }
+  }
 
   return (
     <>
