@@ -15,7 +15,6 @@ import {
 
 import { AppLayout } from "@/components/app-layout";
 import { DailyLetterSignup } from "@/components/daily-letter-signup";
-import { MomentBanner } from "@/components/moment-banner";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,7 +60,6 @@ function HomePage() {
 function Landing() {
   return (
     <>
-      <MomentBanner />
       <Hero />
       <CategoriesPreview />
       <HowItWorks />
@@ -112,15 +110,17 @@ function Hero() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button asChild size="lg" variant="note" className="min-h-14 text-base">
               <Link to="/feelings">Find the note you need today</Link>
             </Button>
-            <Button asChild size="lg" variant="paper" className="min-h-14 text-base">
-              <Link to="/note/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
-                Read today's note
-              </Link>
-            </Button>
+            <Link
+              to="/note/$categorySlug"
+              params={{ categorySlug: featuredNote.categorySlug }}
+              className="text-center text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground sm:text-left"
+            >
+              Read today&apos;s note
+            </Link>
           </div>
 
           <p className="text-xs leading-6 text-muted-foreground">
@@ -303,7 +303,7 @@ function CategoriesPreview() {
                 aria-hidden
               />
             </div>
-            <p className="text-sm leading-6 text-muted-foreground">{c.subtitle}</p>
+            <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{c.subtitle}</p>
           </Link>
         ))}
       </div>

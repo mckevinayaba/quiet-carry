@@ -28,11 +28,7 @@ const desktopNavLinks = [
   { to: "/", label: "Home" },
   { to: "/feelings", label: "Feelings" },
   { to: "/today", label: "Today" },
-  { to: "/shelf", label: "Shelf" },
-  { to: "/reflect", label: "Reflect" },
-  { to: "/collections", label: "Collections" },
   { to: "/about", label: "About" },
-  { to: "/support", label: "Safety & Support" },
 ] as const;
 
 interface AppLayoutProps {
@@ -76,14 +72,12 @@ function AppLayoutShell({ children, className }: AppLayoutProps) {
               <MessageSquareHeart className="size-3.5" aria-hidden="true" />
               <span className="sr-only sm:not-sr-only">Share feedback</span>
             </button>
-            <Link className="eyebrow-copy hidden sm:inline-flex" to="/support">
-              Safety &amp; Support
-            </Link>
             <Link
-              to="/about"
+              to="/support"
               className="text-xs text-muted-foreground hover:text-foreground sm:hidden"
+              aria-label="Safety and Support"
             >
-              About
+              Support
             </Link>
             <Link
               to="/account"
