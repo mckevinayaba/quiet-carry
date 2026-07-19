@@ -1252,7 +1252,7 @@ function SiteFooter() {
 
         <FooterCol title="Contact">
           <a
-            href="mailto:hello@thenoteyouneededtoday.com"
+            href="mailto:hello@thenoteyouneeded.today"
             className="text-sm leading-7 text-muted-foreground hover:text-foreground"
           >
             hello@thenoteyouneededtoday.com
