@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
@@ -6,6 +7,8 @@ import { InstallModal } from "@/components/install-modal";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { useAppModals } from "@/components/app-modals";
+import { supabase } from "@/integrations/supabase/client";
+import { deleteMyAccount } from "@/lib/account.functions";
 import { getKeptNotes, getReflections } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/account")({
