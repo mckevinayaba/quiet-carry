@@ -44,8 +44,9 @@
 | Check | Status | Notes |
 |---|---|---|
 | Collections page loads | ✅ Pass | Volume 1 + 2 coming-soon entries |
-| Volume 1 CTA button | ⚠️ Placeholder | "Get Volume 1" button renders; href is #volume-1-coming-soon — swap with real Selar URL before announcing |
-| Selar checkout | ❌ Not connected | Replace ctaHref in collections array in note-data.ts when Selar URL is ready |
+| Volume 1 CTA button | ✅ Live | All "Get Volume 1" buttons point to Selar URL via `volumeOneSelarUrl` in `src/lib/note-data.ts` |
+| Selar checkout | ✅ Connected | Fallback URL `https://selar.com/9114v4su35` is live; override with `VITE_SELAR_VOLUME1_URL` env var if URL changes |
+| Admin test coupon | ⬜ Required | Create 100% discount coupon inside Selar dashboard before founder test checkout — see section below |
 
 ---
 
@@ -114,9 +115,50 @@
 
 ---
 
-## Recommended Next Step
+---
 
-1. Get Selar URL → swap `ctaHref` in `src/lib/note-data.ts` for `volume-1` collection
-2. Email the waitlist with the Selar link
+## Selar Admin Test Checkout
+
+**Purpose:** Founder/admin only. Verify the full purchase and delivery flow before launch.
+Selar handles checkout, payment, coupon application, receipts, product delivery, and customer access.
+No payment or coupon logic lives in the app.
+
+### Before your test checkout
+
+- [ ] Log into Selar dashboard
+- [ ] Create the Volume 1 product if not already done
+- [ ] Upload the final digital files (PDF or download link)
+- [ ] Create a private 100% discount coupon (suggested code: see your private notes — do not record here)
+- [ ] Set coupon to single-use or admin-only; do not publish it
+
+### Test checkout steps
+
+- [ ] Open the Volume 1 CTA on the live site (mobile and desktop)
+- [ ] Confirm it reaches the correct Selar product page
+- [ ] Apply the admin coupon at checkout
+- [ ] Confirm the price becomes R0.00
+- [ ] Confirm the receipt email arrives at your address
+- [ ] Confirm the download or access link in the email works
+- [ ] Confirm the product file opens correctly
+
+### After a clean test
+
+- [ ] Mark this section complete in this file
+- [ ] Do not share or publish the admin coupon code
+- [ ] Do not hard-code any coupon into the app
+
+### App CTA status
+
+All "Get Volume 1" buttons use `volumeOneSelarUrl` from `src/lib/note-data.ts`.
+No coupon code appears anywhere in the app UI.
+To update the Selar URL: set `VITE_SELAR_VOLUME1_URL` in your deployment environment variables,
+or update `SELAR_VOLUME1_FALLBACK_URL` in `src/lib/note-data.ts`.
+
+---
+
+## Recommended Next Steps
+
+1. Complete Selar admin test checkout (see section above)
+2. Email the waitlist with the Selar link once test passes
 3. Write 10 more notes before any public distribution
 4. Add native `beforeinstallprompt` capture after note count is above 25
