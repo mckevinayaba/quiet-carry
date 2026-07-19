@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
@@ -6,6 +7,8 @@ import { InstallModal } from "@/components/install-modal";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { useAppModals } from "@/components/app-modals";
+import { supabase } from "@/integrations/supabase/client";
+import { deleteMyAccount } from "@/lib/account.functions";
 import { getKeptNotes, getReflections } from "@/lib/note-storage";
 
 export const Route = createFileRoute("/account")({
@@ -34,11 +37,43 @@ function AccountInner() {
   const [savedCount, setSavedCount] = useState(0);
   const [reflectionCount, setReflectionCount] = useState(0);
   const [installOpen, setInstallOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteAccount = useServerFn(deleteMyAccount);
 
   useEffect(() => {
     setSavedCount(getKeptNotes().length);
     setReflectionCount(getReflections().length);
+    supabase.auth.getUser().then(({ data }) => {
+      setSignedIn(!!data.user);
+      setEmail(data.user?.email ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session?.user);
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      "Delete your account and everything on it? This cannot be undone. Your saved notes and reflections will be removed.",
+    );
+    if (!confirmed) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      setDeleteError("Something went wrong. Please try again in a moment.");
+      setDeleting(false);
+    }
+  }
 
   return (
     <>
@@ -97,6 +132,29 @@ function AccountInner() {
           How to install
         </Button>
       </section>
+
+      {signedIn && (
+        <section className="paper-panel space-y-3 border-destructive/30">
+          <div className="stitched-label">Your account</div>
+          <h2 className="font-display text-2xl leading-none">Delete your account</h2>
+          {email && (
+            <p className="text-sm leading-6 text-muted-foreground">Signed in as {email}.</p>
+          )}
+          <p className="text-sm leading-6 text-muted-foreground">
+            This permanently removes your account, your saved notes, and your reflections. It cannot be undone.
+          </p>
+          {deleteError && (
+            <p className="text-sm leading-6 text-destructive">{deleteError}</p>
+          )}
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Delete my account"}
+          </Button>
+        </section>
+      )}
     </>
   );
 }
