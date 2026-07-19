@@ -22,11 +22,10 @@ export function DailyLetterSignup() {
         <div className="space-y-3">
           <span className="eyebrow-copy">A morning ritual</span>
           <h2 className="text-balance font-display text-3xl leading-tight text-foreground sm:text-4xl">
-            One note each morning, before the world starts asking things from you.
+            Come here before you text &ldquo;I&rsquo;m fine&rdquo; again.
           </h2>
           <p className="max-w-md text-base leading-7 text-muted-foreground">
-            Come here before you text "I'm fine" again. One quiet note. No marketing. No tracking.
-            Just the words you needed.
+            One quiet note each morning. No marketing. No tracking. Just the words you needed.
           </p>
         </div>
 

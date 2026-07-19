@@ -5,7 +5,6 @@ import {
   Feather,
   Heart,
   Layers2,
-  LockKeyhole,
   Mail,
   MessageSquareHeart,
   NotebookPen,
@@ -16,20 +15,12 @@ import {
 import { AppLayout } from "@/components/app-layout";
 import { DailyLetterSignup } from "@/components/daily-letter-signup";
 import { MomentBanner } from "@/components/moment-banner";
-import { ReceiptBlock } from "@/components/receipt-block";
 import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
 import { categories, featuredNote, volumeOneSelarUrl } from "@/lib/note-data";
-import {
-  getKeptNotes,
-  keepNote,
-  logSentNote,
-  registerMeaningfulGuestAction,
-} from "@/lib/note-storage";
-import { buildShareText } from "@/lib/share";
 import { isValidEmail, saveWaitlistEntry } from "@/lib/waitlist";
 
 import heroCollage from "@/assets/hero-note-collage.jpg";
@@ -72,8 +63,8 @@ function Landing() {
       <MomentBanner />
       <Hero />
       <CategoriesPreview />
-      <TodaysNote />
       <HowItWorks />
+      <TodaysNote />
       <DailyLetterSignup />
       <WelcomeManifesto />
       <PrivateByDesign />
@@ -295,7 +286,7 @@ function CategoriesPreview() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((c) => (
+        {categories.slice(0, 6).map((c) => (
           <Link
             key={c.slug}
             to="/note/$categorySlug"
@@ -321,89 +312,29 @@ function CategoriesPreview() {
 
 /* -------------------------- Today's Note -------------------------- */
 
-interface LandingActionResult {
-  text: string;
-  shelfLink?: boolean;
-}
-
 function TodaysNote() {
-  const [actionResult, setActionResult] = useState<LandingActionResult | null>(null);
-  const [isKept, setIsKept] = useState(false);
-
   useEffect(() => {
     trackEvent("note_opened", {
       noteId: featuredNote.id,
       category: featuredNote.categorySlug,
       source: "landing",
     });
-    setIsKept(getKeptNotes().some((n) => n.noteId === featuredNote.id));
   }, []);
-
-  const handleKeep = () => {
-    if (isKept) {
-      setActionResult({ text: "Already kept in your Shelf.", shelfLink: true });
-      return;
-    }
-    keepNote(featuredNote);
-    trackEvent("note_kept", { noteId: featuredNote.id, source: "landing" });
-    setIsKept(true);
-    setActionResult({
-      text: "Kept. You can come back to this when you need it.",
-      shelfLink: true,
-    });
-    registerMeaningfulGuestAction();
-  };
-
-  const handleSend = async () => {
-    const shareText = buildShareText(featuredNote.sendableText);
-    let shared = false;
-    try {
-      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share({ title: featuredNote.title, text: shareText });
-        shared = true;
-      } else if (
-        typeof navigator !== "undefined" &&
-        navigator.clipboard &&
-        typeof navigator.clipboard.writeText === "function"
-      ) {
-        await navigator.clipboard.writeText(shareText);
-        shared = true;
-      }
-    } catch {
-      try {
-        if (typeof navigator !== "undefined" && navigator.clipboard) {
-          await navigator.clipboard.writeText(shareText);
-          shared = true;
-        }
-      } catch {
-        // all sharing methods unavailable
-      }
-    }
-    logSentNote(featuredNote);
-    trackEvent("note_sent", { noteId: featuredNote.id, source: "landing" });
-    setActionResult({
-      text: shared
-        ? "Copied. Send it to someone who may need words today."
-        : "Copy the note manually.",
-    });
-    registerMeaningfulGuestAction();
-  };
 
   return (
     <section className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
       <div className="space-y-4">
-        <span className="eyebrow-copy">Today's Note</span>
+        <span className="eyebrow-copy">Today&apos;s Note</span>
         <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
           One note. Written for the part of you that has been quiet.
         </h2>
         <p className="text-base leading-7 text-muted-foreground">
-          Today, start with one note. Keep it for yourself. Send it softly to someone. Or write your
-          own reflection from it.
+          Read it. Keep it privately. Send it to someone who needs words today.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
           <Button asChild variant="note" className="min-h-11">
             <Link to="/note/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
-              Read today's note
+              Read today&apos;s note
             </Link>
           </Button>
           <Button asChild variant="paper" className="min-h-11">
@@ -412,18 +343,7 @@ function TodaysNote() {
         </div>
       </div>
 
-      <article className="space-y-4">
-        {actionResult ? (
-          <div className="paper-panel space-y-3 text-base leading-7 text-foreground" role="status">
-            <p>{actionResult.text}</p>
-            {actionResult.shelfLink ? (
-              <Button asChild variant="paper" size="sm" className="min-h-9 text-sm">
-                <Link to="/shelf">View in Shelf</Link>
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
-
+      <article>
         <div className="note-surface">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
@@ -432,56 +352,6 @@ function TodaysNote() {
             </div>
             <div className="note-copy">{featuredNote.mainText}</div>
           </div>
-        </div>
-
-        <ReceiptBlock
-          from={featuredNote.receiptFrom}
-          to={featuredNote.receiptTo}
-          date={featuredNote.receiptDate}
-          total={featuredNote.receiptTotal}
-        />
-
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Button
-            variant="paper"
-            className="min-h-14 items-start justify-start px-4 py-3 text-left"
-            onClick={handleKeep}
-          >
-            <LockKeyhole aria-hidden />
-            <span className="flex flex-col items-start gap-0.5">
-              <span>{isKept ? "Kept in Shelf" : "Keep this Note"}</span>
-              <span className="text-[0.7rem] text-muted-foreground">
-                {isKept ? "Already in your Shelf" : "Save it privately"}
-              </span>
-            </span>
-          </Button>
-          <Button
-            variant="paper"
-            className="min-h-14 items-start justify-start px-4 py-3 text-left"
-            onClick={handleSend}
-          >
-            <Mail aria-hidden />
-            <span className="flex flex-col items-start gap-0.5">
-              <span>Send this Quietly</span>
-              <span className="text-[0.7rem] text-muted-foreground">Share softly</span>
-            </span>
-          </Button>
-          <Button
-            asChild
-            variant="paper"
-            className="min-h-14 items-start justify-start px-4 py-3 text-left"
-            onClick={() =>
-              trackEvent("reflection_started", { noteId: featuredNote.id, source: "landing" })
-            }
-          >
-            <Link to="/write/$categorySlug" params={{ categorySlug: featuredNote.categorySlug }}>
-              <NotebookPen aria-hidden />
-              <span className="flex flex-col items-start gap-0.5">
-                <span>Write from This</span>
-                <span className="text-[0.7rem] text-muted-foreground">Begin a reflection</span>
-              </span>
-            </Link>
-          </Button>
         </div>
       </article>
     </section>
@@ -617,79 +487,22 @@ function WelcomeManifesto() {
         </div>
 
         <div className="mx-auto max-w-2xl space-y-5 text-[1.0625rem] leading-[1.85] text-foreground">
-          <p>Some days, you do not need advice.</p>
-
-          <p>You do not need someone to tell you to be strong.</p>
-
           <p>
-            You do not need another perfect quote from the internet pretending that pain is simple,
-            healing is quick, and moving on is just a decision.
+            Some days, you do not need advice. You do not need someone to tell you to be strong.
           </p>
-
-          <p className="font-display text-2xl text-foreground sm:text-3xl">
-            Some days, you need words.
-          </p>
-
-          <div className="space-y-2 text-muted-foreground">
-            <p>Words for the thing you have been swallowing.</p>
-            <p>Words for the grief that still follows you into normal days.</p>
-            <p>Words for the betrayal that changed how you trust people.</p>
-            <p>Words for the love that left but somehow stayed in your body.</p>
-          </div>
 
           <p className="text-muted-foreground">
-            Words for the money that never stretched, the job that ended, the family that hurt, the
-            apology that never came, the dream that delayed, the marriage that became a memory, the
-            body that is tired, and the loneliness nobody sees because you still know how to
+            Some days, you need words for the thing you have been swallowing &mdash; the grief that
+            still follows you into ordinary days, the love that left but stayed in your body, the
+            apology that never came, the loneliness nobody sees because you still know how to
             function.
           </p>
 
           <p>That is why this place exists.</p>
 
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            The Note You Needed Today was created for the moments people carry quietly.
-          </p>
-
-          <div className="space-y-2 text-muted-foreground">
-            <p>The moments when you are not ready to explain everything.</p>
-            <p>
-              The moments when someone asks, "How are you?" and the honest answer feels too heavy to
-              say out loud.
-            </p>
-            <p>
-              The moments when you are smiling in public, answering messages, raising children,
-              paying bills, attending meetings, helping others, showing up for everyone, and still
-              trying not to collapse somewhere nobody can see.
-            </p>
-          </div>
-
-          <p>Here, you can choose what you are carrying.</p>
-
-          <ul className="space-y-1.5 text-muted-foreground">
-            <li>You can read a note.</li>
-            <li>You can keep it for later.</li>
-            <li>You can send it quietly to someone who may need it.</li>
-            <li>You can download it as a card.</li>
-            <li>Or you can simply sit with it until the words feel less heavy.</li>
-          </ul>
-
-          <div className="space-y-2 border-l-2 border-border pl-5 text-muted-foreground">
-            <p>This is not a quote site.</p>
-            <p>This is not here to rush your healing.</p>
-            <p>This is not here to decorate your pain.</p>
-            <p>
-              This is not here to tell you to forgive before you have been heard, move on before you
-              have understood what happened, or be strong before anyone has asked what strength has
-              already cost you.
-            </p>
-          </div>
-
-          <p className="font-display text-xl text-foreground sm:text-2xl">
-            This is a language space.
-          </p>
-
           <p className="text-muted-foreground">
-            A quiet place for the things people survive without always having the words to explain.
+            Here, you can choose what you are carrying. Read a note. Keep it. Send it quietly. Or
+            simply sit with it until the words feel less heavy.
           </p>
         </div>
       </section>
