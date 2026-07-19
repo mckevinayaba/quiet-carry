@@ -5,6 +5,7 @@ import {
   Feather,
   Heart,
   Layers2,
+  LockKeyhole,
   Mail,
   MessageSquareHeart,
   NotebookPen,
