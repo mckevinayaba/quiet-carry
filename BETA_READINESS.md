@@ -46,22 +46,22 @@
 | Product name | ✅ Locked | The Note You Needed Today, Volume 1 |
 | Subtitle | ✅ Locked | The Things We Do Not Say Out Loud |
 | Chapter count | ✅ 5 chapters | Survival, Unsaid Pain, Loss, Betrayal, Staying |
-| Note count | ✅ 15 notes promised | 13 bodies written; 2 missing (see below) |
+| Note count | ✅ 15 notes complete | All 15 bodies written |
 | Quiet Anger exclusives | ✅ Excluded | Preserved in `quietAngerChapter` export for future use |
 | Opening MAD Letter | ✅ Written | Full letter in `src/data/volume1.ts` |
 | 5 chapter letters | ✅ Written | One per chapter in `introLetter` field |
 | Closing Receipt | ✅ Written | Updated per spec in `closingReceipt` export |
 | Price shown | ✅ R149 | On product page and all CTAs |
-| Journal prompts | ⚠️ TODO | All 15 marked `TODO:PROMPT` — author before shipping PDF |
-| Short captions | ⚠️ TODO | All 15 marked `TODO:CAPTION` — author before shipping PDF |
-| Wallpaper lines | ✅ Written | All 15 provided in spec, added to data |
+| Journal prompts | ✅ Complete | All 15 authored in `journalPrompt` fields |
+| Short captions | ✅ Complete | All 15 authored in `caption` fields |
+| Wallpaper lines | ✅ Reviewed | All 15 reviewed; 6 updated to final voice per spec |
 
-### Missing Note Bodies (must be authored before launch)
+### Note Bodies — Complete
 
 | Note | ID | Status |
 |---|---|---|
-| Shame Got There First | `shame-got-there-first` | `TODO:BODY` — body not yet written |
-| The Apology That Never Came | `apology-that-never-came` | `TODO:BODY` — non-exclusive version not yet written |
+| Shame Got There First | `shame-got-there-first` | ✅ Complete |
+| The Apology That Never Came | `apology-that-never-came` | ✅ Complete |
 
 ---
 

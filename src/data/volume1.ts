@@ -3,12 +3,6 @@
 // Subtitle: The Things We Do Not Say Out Loud
 // Launch structure: 5 chapters, 15 notes (Quiet Anger exclusives are NOT included at launch)
 //
-// TODO markers indicate fields not yet authored:
-//   TODO:BODY    — note body missing; do not ship without this
-//   TODO:PROMPT  — journal prompt not yet written
-//   TODO:CAPTION — short sharing caption not yet written
-//
-// Wallpaper lines are provided for all 15 notes (see spec).
 // Quiet Anger chapter is preserved below the launch export — for Volume 2 / future expansion.
 
 export interface Volume1Note {
@@ -118,7 +112,7 @@ And that carrying it was enough.`,
     {
       id: "money-that-never-stretched",
       title: "The Money That Never Stretched",
-      wallpaperLine: "You were not careless. You were carrying more than the money could hold.",
+      wallpaperLine: "You were carrying more than the money could hold.",
       body: `I hope you heal from the shame of counting money that was never enough.
 
 From checking your balance before buying bread.
@@ -160,8 +154,11 @@ I hope one day you have enough to breathe.`,
       to: "The part of you that felt ashamed for not having enough.",
       date: "The first day you stop calling survival a failure.",
       total: "You were not careless. You were carrying more than the money could hold.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `What would you tell the version of you who kept trying to survive on money that was never enough, especially in the months where your effort was real but your balance still made you feel ashamed?`,
+      caption: `"Counting money that never stretched does not mean you failed. Sometimes it means you were carrying more life than your balance could show."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "job-that-ended",
@@ -226,8 +223,11 @@ But before that, I hope you remember that your usefulness did not end when the r
       to: "The version of you learning how to stand without the title.",
       date: "The morning you realize your usefulness did not end with the job.",
       total: "The role ended. You did not.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `What part of your identity did you place inside that job, and what would it look like to slowly invite those parts back into your life without needing the same title to prove that you still matter?`,
+      caption: `"The job ended, but your worth did not. Titles can leave, salaries can stop, doors can close, and still the person who carried the work remains."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "body-is-tired",
@@ -290,8 +290,11 @@ I hope you listen before your body has to scream.`,
       to: "The part of you that thought exhaustion was a personal failure.",
       date: "The first time you listen before you collapse.",
       total: "Your body was not weak. It was honest.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `If your body could speak without being interrupted by guilt, bills, responsibilities, or the pressure to keep producing, what truth would it finally tell you about what it has carried quietly?`,
+      caption: `"Being tired is not always weakness. Sometimes it is the body finally telling the truth about what the mouth kept editing."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
   ],
   privateLetter: `There is a kind of survival that does not look like survival from the outside.
@@ -403,14 +406,17 @@ to hear you.`,
       date: "The first time someone asks and you do not flinch.",
       total:
         "The tears you saved for the dark. They are not shame. They are just waiting for permission.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `Think about one moment when you said "I'm fine" instead of the full truth, and ask yourself what you were protecting, what you were afraid would happen, and what you wish you could have said if the room had been safe enough.`,
+      caption: `"You have answered 'I'm fine' more times than you have actually been fine, and maybe the truth was not absent, maybe it was just too heavy to carry out loud."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
       safetyNote: true,
     },
     {
       id: "the-words-that-stayed",
       title: "The Words That Stayed",
-      wallpaperLine: "Some words stay because there was nowhere safe to put them.",
+      wallpaperLine: "Some words stayed because there was nowhere safe to put them.",
       body: `I hope you
 heal from
 the words
@@ -431,21 +437,94 @@ was never your name.`,
       to: "The day your own voice becomes louder than what they said.",
       date: "The first time you remember it without becoming small again.",
       total: "The wound was real, but it was never your name.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `Whose sentence is still living in you, and if you were allowed to write your own sentence over it now, what would you say about who you really are beyond what they made you feel?`,
+      caption: `"They may have forgotten what they said, but your body did not. Some sentences live longer than the people who spoke them."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "shame-got-there-first",
       title: "Shame Got There First",
-      wallpaperLine: "Shame arrived before anyone asked what happened.",
-      // TODO:BODY — note body not yet authored; do not ship without this
-      body: "TODO:BODY",
-      from: "TODO:RECEIPT",
-      to: "TODO:RECEIPT",
-      date: "TODO:RECEIPT",
-      total: "Shame arrived before anyone asked what happened.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      wallpaperLine: "Shame got there first, but it does not get the final word.",
+      body: `There are times in your life where nobody asked, "What happened?" They only looked at you and saw the mess, the reaction, the silence, the decision, the moment you could no longer carry yourself neatly, and they made a whole story out of the part they arrived in time to see.
+
+They did not see how long you had been holding things together before that moment. They did not see the night before. They did not see the years before. They did not see the fear behind the choice, the exhaustion behind the reaction, the heartbreak behind the silence, or the pressure that had been building quietly in your body while everyone still expected you to behave like someone who was not breaking.
+
+Shame got there first.
+
+It walked into the room before context.
+
+It spoke before truth had a chance to breathe.
+
+Maybe it was the moment money ran out and you had to say "No" to something that mattered, not because you did not care, but because your life had become a private negotiation between dignity and survival.
+
+Maybe it was the time you stayed in a situation that was hurting you because leaving safely was not as simple as people later made it sound.
+
+Maybe it was the day you raised your voice because your body was overwhelmed, and afterwards the story became "You overreacted," not "You had been carrying too much for too long."
+
+Maybe it was the mistake you made when you were lonely, afraid, unsupported, financially cornered, emotionally empty, or desperate for one moment of relief from a life that had been asking you to stay strong without ever asking whether strength was still available.
+
+Shame has a way of turning a single moment into a verdict.
+
+The mistake becomes a summary of who you are.
+
+The worst thing you did on a tired day becomes the only thing some people remember.
+
+Instead of asking, "How did you end up here?" they asked, "Why would you do that?" And before you could explain, shame had already written its sentence.
+
+So you started living as if you were permanently too much or permanently not enough.
+
+You began shrinking in rooms where you deserved to stand upright.
+
+You apologised for existing before anyone had accused you of anything.
+
+You hid parts of your story because you believed that if anyone saw the whole truth, they would only confirm what shame had already whispered, that you were the problem, that you were dirty, that you were foolish, that you should have known better, that you should have been stronger, that you should have carried what was breaking you with more grace.
+
+But here is the part shame never told you.
+
+Your reactions came from real weight.
+
+Your survival choices came from real fear.
+
+The ways you coped came from real exhaustion, real heartbreak, real confusion, real pressure, real being human.
+
+What happened around you would have been heavy for anyone, and the fact that you did not handle it perfectly does not mean you deserved humiliation, it means you were overwhelmed without enough support, language, safety, money, rest, softness, or witness.
+
+You are allowed to look at those moments with more compassion than shame ever offered.
+
+You are allowed to say, "I did something I am not proud of," without also saying, "So I must be permanently broken."
+
+You are allowed to tell the longer story, the one with context and history and pressure, without worrying that it makes you sound like you are making excuses.
+
+There is a difference between accountability and self-punishment.
+
+Shame only offered you the second.
+
+I hope you can begin to separate what you did from who you are.
+
+I hope you can name the weight that was on your shoulders before that moment, not only the moment itself.
+
+I hope you can stand in front of your own life and say, "I made choices from a place of fear and scarcity," without letting shame translate that into, "I am unworthy of understanding."
+
+You deserved someone to ask, "What happened?" before deciding who you were.
+
+You deserved to be seen in full, not only in the worst frame.
+
+And even if you never receive that from the people who watched you, you can begin to give that to yourself.
+
+Shame got there first.
+
+But it does not have to keep telling the story.`,
+      from: "Every moment shame arrived before anyone asked what happened.",
+      to: "The part of you that learned to hide before it learned to speak.",
+      date: "The day you stop letting shame tell the story first.",
+      total: "What happened to you deserved truth, not punishment disguised as silence.",
+      journalPrompt: `Choose one memory where shame arrived before compassion, then write the context shame refused to include, not to excuse everything, but to finally let the whole story breathe.`,
+      caption: `"Shame arrived before anyone asked what happened, and for too long it told a story that did not include your fear, your pressure, your exhaustion, or your humanity."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
   ],
   privateLetter: `You learned, somewhere along the way, that your full self was too much.
@@ -527,8 +606,11 @@ dials first.`,
       to: "A memory that no longer cuts.",
       date: "The first day love feels soft again.",
       total: "Missing them without losing yourself.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `What small habit, place, song, smell, routine, or ordinary moment still reminds you of what you lost, and how might you honour that memory without letting grief be the only way it returns to you?`,
+      caption: `"Sometimes grief does not arrive loudly. Sometimes it returns through a chair, a song, a street, a smell, or the way your hand still reaches for what is no longer there."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "love-that-left",
@@ -589,8 +671,11 @@ I hope one day their name no longer feels like a door reopening inside you.`,
       to: "The part of you still checking for what is no longer coming.",
       date: "The first day memory stops feeling like a wound reopening.",
       total: "Missing them is not the same as needing them back.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `How did the love that left change your mornings, evenings, phone, body, or sense of safety, and what gentle ritual could help your heart begin again without pretending that loss did not matter?`,
+      caption: `"Some people do not only leave your life. They leave your mornings different, your phone quieter, your body still reaching for something the relationship no longer gives."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "marriage-that-became-a-memory",
@@ -657,8 +742,11 @@ I hope you remember that a marriage becoming a memory does not mean your heart b
       to: "The heart learning how to release without erasing.",
       date: "The day you stop calling your grief an embarrassment.",
       total: "It ended, but it was not nothing.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `If you wrote a letter to the version of you who stayed in that marriage the longest, what would you thank them for enduring, what would you forgive them for not knowing, and what would you release them from now?`,
+      caption: `"The end of a marriage is not paperwork alone. It is the quiet death of routines, names, plans, rooms, and a future your heart had already rehearsed."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
   ],
   privateLetter: `Grief does not always arrive with a name.
@@ -730,15 +818,97 @@ This chapter was written for the part of you that is tired of performing peace f
     {
       id: "apology-that-never-came",
       title: "The Apology That Never Came",
-      wallpaperLine: "You can stop waiting for repair from someone committed to silence.",
-      // TODO:BODY — note body not yet authored; do not ship without this
-      body: "TODO:BODY",
-      from: "TODO:RECEIPT",
-      to: "TODO:RECEIPT",
-      date: "TODO:RECEIPT",
-      total: "You can stop waiting for repair from someone committed to silence.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      wallpaperLine: "You deserved the apology, but your healing is still yours.",
+      body: `There is a particular kind of ache that does not come from the original wound alone.
+
+It comes from waiting.
+
+Waiting for someone to say, "I know what I did."
+
+Waiting for a message that begins with, "I am sorry."
+
+Waiting for them to notice how deeply it cut, not because you want to beg for sympathy, but because acknowledgement would have made the wound feel less abandoned.
+
+You replayed what happened more times than you want to admit.
+
+You wondered if you were being dramatic.
+
+You rehearsed what you would say if they ever opened the door to that conversation.
+
+You drafted texts you never sent because you wanted them to want to repair the damage, not feel forced into it.
+
+You kept hoping they would look at you and see the hurt, not the inconvenience of being reminded that they caused it.
+
+Instead, they carried on.
+
+They joked with you as if nothing had changed.
+
+They posted pictures like nothing was broken.
+
+They showed up in rooms where you were still bleeding internally and acted as if you were both fine.
+
+They let the silence become its own cruelty, because not only did they hurt you, they kept living as if your hurt was invisible.
+
+The apology you deserved would not have fixed everything, but it would have told you that you were not crazy for feeling the way you do.
+
+It would have said, "I see the damage. I see my part in it. I see the version of you that had to carry what I refused to name."
+
+It would have offered you the dignity of being acknowledged.
+
+Instead, you were left holding the story alone, wondering if your pain was valid because nobody else wanted to name it.
+
+There is a grief in realizing that some people will never give you that sentence.
+
+Not because it is impossible.
+
+But because it would require them to face themselves.
+
+It would require them to admit that the version of themselves they show the world is not the full one.
+
+It would require them to say, out loud, "I harmed someone I cared about," and some people would rather protect their image than repair the person their image helped them wound.
+
+You cannot keep your life on pause until they decide to grow brave enough to say those words.
+
+Your healing is not a hostage waiting for their courage.
+
+Your worth is not a verdict waiting at the end of their sentence.
+
+You are allowed to heal in the absence of their apology.
+
+You are allowed to grieve the apology itself, to grieve the fantasy of accountability, to grieve the version of them you kept hoping would arrive with honesty in their mouth and repair in their hands.
+
+And then, slowly, you are allowed to move beyond its absence.
+
+I hope you can let yourself name what happened without needing their agreement for it to be real.
+
+I hope you can say, "This was wrong," even if they never respond with, "You're right."
+
+I hope you can build a life that does not revolve around proving to them that the wound was serious.
+
+You deserved the apology.
+
+That is a truth, not a negotiable detail.
+
+But your healing cannot remain trapped inside someone else's refusal to take responsibility.
+
+There are other places where accountability lives.
+
+There are people who will not minimize your pain.
+
+There are spaces where you are not asked to pretend you are fine so everyone else can remain comfortable.
+
+The words you needed may never come from their mouth.
+
+But they do not have to be the only mouth that speaks to your healing.`,
+      from: "The wound someone opened and left you to close alone.",
+      to: "The part of you still waiting for accountability before it feels allowed to heal.",
+      date: "The day you stop letting their silence decide how long you stay wounded.",
+      total: "You deserved the apology. But your healing cannot remain trapped inside someone else's refusal to take responsibility.",
+      journalPrompt: `If you never receive the apology you deserved, what boundary, truth, or decision would help your life stop waiting at the door of someone else's accountability?`,
+      caption: `"You deserved the apology. But your healing cannot remain trapped inside someone else's refusal to take responsibility for the wound they left behind."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "family-that-hurt",
@@ -789,13 +959,16 @@ I hope you stop abandoning yourself just to keep peace with people who never ask
       to: "The child in you who still wonders why love felt unsafe.",
       date: "The day you stop calling self protection disrespect.",
       total: "Family can explain the wound, but it does not excuse it.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `What story about family kept you silent for too long, and how might you rewrite that story in a way that protects you without pretending the wound was smaller than it was?`,
+      caption: `"Sometimes blood is where the wound began, and that truth does not make you disrespectful, it makes you honest about the place where you first learned to bleed quietly."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "people-who-watched-you-bleed",
       title: "The People Who Watched You Bleed",
-      wallpaperLine: "Your proof was never their permission. Keep going.",
+      wallpaperLine: "Your proof was never their permission.",
       body: `I hope you heal from
 the people who knew your story
 but still waited for strangers to clap
@@ -836,8 +1009,11 @@ It was given to you.`,
       to: "The day you stop needing witnesses before you believe yourself.",
       date: "The moment you choose the dream without waiting for applause.",
       total: "Your proof was never their permission. Keep going.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `Remember a time when people saw you hurting and still did nothing, then write to the part of you that quietly believed their inaction meant you were not worth saving, supporting, or standing beside.`,
+      caption: `"The people who watched you bleed in silence taught you something painful, that not everyone who sees you hurting will move, and not everyone close to your story is close to your healing."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
   ],
   privateLetter: `The in-between does not have good lighting.
@@ -932,8 +1108,11 @@ your own strength.`,
       to: "The person you are still becoming.",
       date: "The day you remember you did not come this far by accident.",
       total: "Your story is not over. You are still here.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `When you strip away titles, roles, usefulness, survival mode, other people's opinions, and the pressure to be everything for everyone, which truths about you still feel real enough to return to?`,
+      caption: `"You were someone before you were useful, before you were needed, before you were praised, before you were reduced to what you could carry for other people."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "dream-that-delayed",
@@ -996,13 +1175,16 @@ But I also hope you stop pretending the waiting has not hurt.`,
       to: "The part of you still believing without enough evidence.",
       date: "The day you stop measuring purpose only by speed.",
       total: "Late is not always lost.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `What did you tell yourself about your worth when your dream had to wait, and what kinder sentence could replace that while you move at the pace life currently allows?`,
+      caption: `"A delayed dream is not always a cancelled future. Sometimes life is asking you to keep the heart of the dream alive while the shape of it changes."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
     },
     {
       id: "when-staying-feels-hard",
       title: "When Staying Feels Hard",
-      wallpaperLine: "You do not have to do this alone.",
+      wallpaperLine: "You do not have to carry this hour alone.",
       body: `I hope you stay close to help tonight.
 
 Not because you have to explain everything.
@@ -1066,8 +1248,11 @@ But because this moment is not the whole story.`,
       to: "The part of you that needs support, not shame.",
       date: "The moment you choose one more breath and one safe person.",
       total: "You do not have to do this alone.",
-      journalPrompt: "TODO:PROMPT",
-      caption: "TODO:CAPTION",
+      journalPrompt: `On days when staying feels heavy, what small reason, person, place, promise, memory, or unfinished hope still anchors you here, and what gentle action could help you stay close to support today?`,
+      caption: `"On the nights when staying feels heavy, stay close to help. You do not have to carry this hour alone, and this moment is not the whole story."
+
+From The Note You Needed Today, Volume 1.
+The Things We Do Not Say Out Loud.`,
       safetyNote: true,
     },
   ],
