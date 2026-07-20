@@ -106,6 +106,15 @@ function UnlockPage() {
           <p className="text-sm leading-6 text-muted-foreground">
             Your code was included in your Selar delivery email.
           </p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            If you cannot find it, check your spam folder. Still missing?{" "}
+            <a
+              href="mailto:hello@thenoteyouneeded.today"
+              className="underline underline-offset-4"
+            >
+              hello@thenoteyouneeded.today
+            </a>
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

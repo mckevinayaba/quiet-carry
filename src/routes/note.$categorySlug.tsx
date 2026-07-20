@@ -218,11 +218,11 @@ function NotePage() {
             </ActionButton>
             <ActionButton
               asChild
-              hint="See the full Volume 1 collection"
+              hint="Get the full Volume 1 collection"
               icon={Layers2}
               onClick={() => trackEvent("collection_clicked", { from: "note", noteId: note.id })}
             >
-              <Link to="/collections">Unlock Full Collection</Link>
+              <Link to="/volume-1">Get Volume 1</Link>
             </ActionButton>
           </>
         }

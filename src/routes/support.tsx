@@ -43,11 +43,19 @@ function SupportPage() {
         <ul className="space-y-2 text-base leading-7 text-foreground">
           <li className="flex items-start gap-3">
             <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
-            Contact emergency services in your country.
+            Contact emergency services in your country. In South Africa, call 112 from a mobile phone or 10111 for police.
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
-            Call a local crisis line.
+            Call a crisis line. In South Africa: SADAG 0800 21 22 23 (free, 24 hours). Outside South Africa:{" "}
+            <a
+              href="https://findahelpline.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4"
+            >
+              findahelpline.com
+            </a>
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />

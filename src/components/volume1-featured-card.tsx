@@ -4,14 +4,14 @@ import { volumeOneSelarUrl } from "@/lib/note-data";
 import { trackEvent } from "@/lib/analytics";
 
 const LINE_ITEMS = [
-  ["15 designed notes", "included"],
-  ["15 mobile wallpapers", "included"],
-  ["15 quiet captions", "included"],
+  ["15 complete emotional notes", "included"],
+  ["5 carefully structured chapters", "included"],
+  ["Opening MAD Letter", "included"],
+  ["5 private chapter letters", "included"],
   ["15 journal prompts", "included"],
-  ["5 private letters", "included"],
-  ["Opening letter from MAD", "included"],
-  ["Safety & care page", "included"],
-  ["Closing receipt page", "included"],
+  ["15 quiet sharing captions", "included"],
+  ["15 wallpaper or lockscreen lines", "included"],
+  ["Closing Receipt", "included"],
 ] as const;
 
 export function Volume1FeaturedCard() {

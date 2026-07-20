@@ -37,7 +37,8 @@ function GiftPage() {
           Give someone the words they have been waiting to hear.
         </h1>
         <p className="text-base leading-7 text-muted-foreground">
-          Volume 1. One-time purchase. Their access code arrives by email.
+          Volume 1. One-time purchase. Your access code arrives to your email — forward it directly
+          to the person you are gifting.
         </p>
         <Button asChild variant="note" size="lg" className="min-h-12 w-full sm:w-auto">
           <a

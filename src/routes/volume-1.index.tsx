@@ -50,12 +50,12 @@ const HOW_IT_WORKS = [
   {
     step: "2",
     title: "Receive",
-    copy: "Your unique access code arrives in your email within minutes of purchase.",
+    copy: "Your unique access code arrives in your email within minutes of purchase. If it does not arrive, check your spam folder or email hello@thenoteyouneeded.today.",
   },
   {
     step: "3",
     title: "Read",
-    copy: "Enter your code at /volume-1/unlock. Volume 1 opens immediately. It's yours to return to, forever.",
+    copy: "Come back to this page and click \"I already have a code.\" Volume 1 opens immediately. It is yours to return to, forever.",
   },
 ];
 
