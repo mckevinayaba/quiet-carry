@@ -7,52 +7,38 @@ import { RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { volumeOneSelarUrl } from "@/lib/note-data";
-import type { VolumeChapter } from "@/lib/note-data";
+import { VOLUME1_CONTENTS } from "@/data/volume1";
 
 const CHAPTERS: {
   number: number;
-  name: VolumeChapter;
-  description: string;
-  exclusiveNote?: string;
+  name: string;
+  chapterLine: string;
 }[] = [
   {
     number: 1,
     name: "Survival",
-    description: "Money, body, exhaustion, staying.",
+    chapterLine: "You got through things nobody clapped for.",
   },
   {
     number: 2,
-    name: "Unsaid Grief",
-    description: "The losses that never received a funeral.",
+    name: "Unsaid Pain",
+    chapterLine: "The truths you swallowed until they started living in your body.",
   },
   {
     number: 3,
-    name: "Becoming Visible",
-    description: "The parts of yourself you buried to survive.",
+    name: "Loss",
+    chapterLine: "The grief that kept arriving without asking permission.",
   },
   {
     number: 4,
-    name: "Starting Over",
-    description: "The life that ended before the next one began.",
+    name: "Betrayal",
+    chapterLine: "The hurt people wanted you to forgive before they were willing to name.",
   },
   {
     number: 5,
-    name: "Quiet Anger",
-    description: "The chapter nobody wants to admit they need.",
-    exclusiveNote:
-      "Five exclusive notes — written only for Volume 1. Not available anywhere on the free platform.",
+    name: "Staying",
+    chapterLine: "For the days when staying takes everything you have left.",
   },
-];
-
-const CONTENTS = [
-  "15 designed notes",
-  "15 mobile wallpapers",
-  "15 quiet captions",
-  "15 journal prompts",
-  "5 private letters",
-  "Opening letter from MAD",
-  "Safety and care page",
-  "Closing receipt page",
 ];
 
 const HOW_IT_WORKS = [
@@ -78,17 +64,23 @@ export const Route = createFileRoute("/volume-1/")({
   head: () => ({
     links: [{ rel: "canonical", href: "https://thenoteyouneeded.today/volume-1" }],
     meta: [
-      { title: "Volume 1 | The Note You Needed Today" },
+      {
+        title:
+          "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today",
+      },
       {
         name: "description",
         content:
-          "A private collection of notes, wallpapers, captions, prompts, and letters for the things people carry quietly.",
+          "15 notes. 5 chapters. Written for the weight you carry quietly. A private digital collection for the grief, the apology that never came, the truth you kept swallowing.",
       },
-      { property: "og:title", content: "Volume 1 | The Note You Needed Today" },
+      {
+        property: "og:title",
+        content: "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today",
+      },
       {
         property: "og:description",
         content:
-          "When life is too heavy to explain, Volume 1 gives you words you can keep, return to, and quietly share.",
+          "Fifteen deeply written notes across five emotional chapters. The free note is for today. Volume 1 is for the weight that keeps returning.",
       },
     ],
   }),
@@ -139,28 +131,29 @@ function VolumeOneContent() {
           The Things We Do Not Say Out Loud
         </p>
         <p className="max-w-xl text-base leading-7 text-muted-foreground">
-          When life is too heavy to explain, Volume 1 gives you words you can keep, return to, and
-          quietly share.
+          15 notes. 5 chapters. Written for the weight you carry quietly.
         </p>
       </section>
 
-      {/* Who it is for */}
+      {/* Product description */}
       <section className="paper-panel space-y-5 p-6 sm:p-8">
-        <span className="eyebrow-copy">Who this is for</span>
-        <ul className="space-y-4">
-          {[
-            "For the person who has carried too much quietly.",
-            "For the person who does not need another motivational quote.",
-            "For the person who needs language that feels honest before it feels comforting.",
-          ].map((line) => (
-            <li key={line} className="flex items-start gap-3 text-base leading-7 text-foreground">
-              <span className="heart-mark mt-0.5 shrink-0" aria-hidden>
-                ♥
-              </span>
-              {line}
-            </li>
-          ))}
-        </ul>
+        <div className="mx-auto max-w-2xl space-y-4 text-base leading-7 text-foreground">
+          <p>
+            Fifteen deeply written notes across five emotional chapters, created for the days when
+            you need more than advice but cannot find the words yourself.
+          </p>
+          <p className="text-muted-foreground">
+            This collection is for the grief that followed you into ordinary days, the apology that
+            never came, the truth you kept swallowing, the relationship you survived, the money that
+            never stretched, the body that got tired, and the parts of yourself that became
+            exhausted from pretending.
+          </p>
+          <p className="font-display text-xl leading-snug text-foreground sm:text-2xl">
+            The free note is for today.
+            <br />
+            Volume 1 is for the weight that keeps returning.
+          </p>
+        </div>
       </section>
 
       {/* What's inside */}
@@ -168,15 +161,11 @@ function VolumeOneContent() {
         <div className="space-y-2">
           <span className="eyebrow-copy">What is inside</span>
           <h2 className="text-balance font-display text-3xl leading-tight text-foreground sm:text-4xl">
-            A handmade emotional artifact.
+            A private digital collection you can return to.
           </h2>
-          <p className="max-w-lg text-base leading-7 text-muted-foreground">
-            Not a generic ebook. A private keepsake — built with warm parchment, soft paper, receipt
-            motifs, and a hand-drawn heart from MAD.
-          </p>
         </div>
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {CONTENTS.map((item) => (
+        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {VOLUME1_CONTENTS.map((item) => (
             <li
               key={item}
               className="stitched-edge flex items-center gap-3 p-4 text-sm text-foreground"
@@ -193,7 +182,8 @@ function VolumeOneContent() {
         <div className="space-y-2">
           <span className="eyebrow-copy">The five chapters</span>
           <h2 className="text-balance font-display text-3xl leading-tight text-foreground sm:text-4xl">
-            One emotional arc. Five places to land.
+            Five emotional chapters. Fifteen notes. Words for the things people often carry without
+            knowing how to explain them.
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -274,8 +264,8 @@ function VolumeOneContent() {
               </a>
             </Button>
             <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-              You&apos;ll receive your unique access code by email. Enter it at /volume-1/unlock to
-              begin reading immediately.
+              Your purchase gives you access to Volume 1 and helps keep the daily note freely
+              available to people who need words today.
             </p>
             <Button asChild variant="paper" className="min-h-12">
               <Link to="/volume-1/unlock">
@@ -334,7 +324,7 @@ function VolumeOneContent() {
 function ChapterCardBody({
   chapter,
 }: {
-  chapter: { number: number; name: VolumeChapter; description: string; exclusiveNote?: string };
+  chapter: { number: number; name: string; chapterLine: string };
 }) {
   return (
     <>
@@ -343,10 +333,7 @@ function ChapterCardBody({
         <Heart className="heart-mark size-4" aria-hidden />
       </div>
       <h3 className="font-display text-2xl leading-tight text-foreground">{chapter.name}</h3>
-      <p className="text-sm leading-6 text-muted-foreground">{chapter.description}</p>
-      {chapter.exclusiveNote ? (
-        <p className="text-xs leading-5 text-muted-foreground/70 italic">{chapter.exclusiveNote}</p>
-      ) : null}
+      <p className="text-sm leading-6 text-muted-foreground">{chapter.chapterLine}</p>
     </>
   );
 }

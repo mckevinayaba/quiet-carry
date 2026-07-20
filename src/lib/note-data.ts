@@ -1,8 +1,13 @@
 export type EmotionalIntensity = "low" | "medium" | "heavy" | "crisisAdjacent";
 export type VolumeChapter =
+  | "Survival"
+  | "Unsaid Pain"
+  | "Loss"
+  | "Betrayal"
+  | "Staying"
+  // Legacy values — kept for backward compatibility with existing note records
   | "Unsaid Grief"
   | "Quiet Anger"
-  | "Survival"
   | "Starting Over"
   | "Becoming Visible";
 

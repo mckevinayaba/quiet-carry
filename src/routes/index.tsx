@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
 import { categories, featuredNote, volumeOneSelarUrl } from "@/lib/note-data";
+import { VOLUME1_CONTENTS } from "@/data/volume1";
 import { isValidEmail, saveWaitlistEntry } from "@/lib/waitlist";
 
 import heroCollage from "@/assets/hero-note-collage.jpg";
@@ -489,20 +490,23 @@ function Volume1Transition() {
     <section ref={ref} className="relative -mx-4 overflow-hidden px-4 py-16 sm:-mx-6 sm:px-6 sm:py-20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--accent)_14%,transparent),transparent_60%)]" />
       <div className="mx-auto max-w-2xl space-y-6 text-center">
-        <span className="eyebrow-copy">Now available</span>
+        <span className="eyebrow-copy">This was one note</span>
         <h2 className="text-balance font-display text-4xl leading-[1.02] sm:text-5xl">
-          The free note is just the beginning.
+          Volume 1 goes deeper.
         </h2>
         <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-          Volume 1 is a complete collection &mdash; 15 notes, 5 chapters, written for the weight you
-          carry quietly. Designed to be read slowly. Kept privately. Returned to.
+          There are things one note cannot hold. The grief that returns without warning. The apology
+          that never came. The truth you keep swallowing. The relationship you survived but still
+          carry. The days when you are functioning, but not healing.
         </p>
-        <Link
-          to="/volume-1"
-          className="inline-block text-sm font-medium text-foreground underline underline-offset-4 hover:opacity-70"
-        >
-          See what is inside &rarr;
-        </Link>
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Button asChild variant="note" className="min-h-12">
+            <Link to="/volume-1">Explore Volume 1</Link>
+          </Button>
+          <Button asChild variant="paper" className="min-h-12">
+            <Link to="/feelings">Choose another feeling</Link>
+          </Button>
+        </div>
       </div>
     </section>
   );
@@ -530,16 +534,7 @@ function Volume1Commercial() {
     return () => observer.disconnect();
   }, []);
 
-  const contents = [
-    "15 designed notes",
-    "15 mobile wallpapers",
-    "15 quiet captions",
-    "15 journal prompts",
-    "5 private letters",
-    "Opening letter from MAD",
-    "Safety and care page",
-    "Closing receipt page",
-  ];
+  const contents = VOLUME1_CONTENTS;
 
   return (
     <section ref={ref} className="paper-panel relative overflow-hidden p-6 sm:p-10">
@@ -617,20 +612,37 @@ function Volume1Preview() {
     {
       number: "01",
       title: "Survival",
+      chapterLine: "You got through things nobody clapped for.",
       excerpt:
         "I hope you heal from the shame of counting money that was never enough. From checking your balance before buying bread.",
     },
     {
       number: "02",
-      title: "Unsaid Grief",
+      title: "Unsaid Pain",
+      chapterLine: "The truths you swallowed until they started living in your body.",
       excerpt:
-        "I hope you heal from the love that left before your heart knew how to let go. Because some people do not only leave your life. They leave your mornings different. Your phone quieter.",
+        "They looked at you like they had space for the truth. But you still smiled. You still said, \"I'm fine.\" Because the truth was too heavy to carry out loud.",
     },
     {
       number: "03",
-      title: "Becoming Visible",
+      title: "Loss",
+      chapterLine: "The grief that kept arriving without asking permission.",
       excerpt:
-        'They asked, “How are you?” and this time, they really meant it. They looked at you like they had space for the truth.',
+        "I hope you heal from the love that left before your heart knew how to let go. Some people do not only leave your life. They leave your mornings different. Your phone quieter.",
+    },
+    {
+      number: "04",
+      title: "Betrayal",
+      chapterLine: "The hurt people wanted you to forgive before they were willing to name.",
+      excerpt:
+        "When family hurts you, the world often asks you to understand. To forgive. To remember they are still your blood. But sometimes blood is where the wound began.",
+    },
+    {
+      number: "05",
+      title: "Staying",
+      chapterLine: "For the days when staying takes everything you have left.",
+      excerpt:
+        "I hope you stay close to help tonight. Not because you have to explain everything. Just because this moment is too heavy to carry alone.",
     },
   ];
 
@@ -640,7 +652,8 @@ function Volume1Preview() {
         <div className="max-w-xl space-y-3">
           <span className="eyebrow-copy">Inside Volume 1</span>
           <h2 className="text-balance font-display text-4xl leading-[1.05] sm:text-5xl">
-            Five chapters. Each one written for a different kind of weight.
+            Five emotional chapters. Fifteen notes. Words for the things people often carry without
+            knowing how to explain them.
           </h2>
         </div>
         <Button asChild variant="paper" className="min-h-11">
@@ -653,12 +666,15 @@ function Volume1Preview() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {chapters.map((ch) => (
-          <div key={ch.number} className="stitched-edge space-y-4 p-6">
+          <div key={ch.number} className="stitched-edge space-y-3 p-6">
             <div className="flex items-start justify-between gap-2">
               <span className="font-label text-3xl text-muted-foreground">{ch.number}</span>
               <Heart className="heart-mark size-4 mt-1" aria-hidden />
             </div>
             <h3 className="font-display text-2xl leading-tight text-foreground">{ch.title}</h3>
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground/70">
+              {ch.chapterLine}
+            </p>
             <p className="font-note text-base leading-relaxed text-muted-foreground">
               &ldquo;{ch.excerpt}&rdquo;
             </p>
@@ -763,7 +779,7 @@ function FinalVolume1Invitation() {
           Fifteen notes. One for every kind of quiet.
         </h2>
         <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground">
-          Survival. Grief. Becoming visible. Starting over. Quiet anger.
+          Survival. Unsaid pain. Loss. Betrayal. Staying.
           Five chapters written for the weight people carry without a name for it.
         </p>
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

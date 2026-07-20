@@ -49,7 +49,7 @@ const courier = "'Courier New', Courier, monospace";
 export function VolumeReader({ chapter, chapterNumber }: VolumeReaderProps) {
   const isLastChapter = chapterNumber === CHAPTER_COUNT;
   const isFirstChapter = chapterNumber === 1;
-  const isQuietAnger = !!chapter.isExclusive;
+  const isQuietAnger = false;
 
   // Scroll to an in-page anchor (e.g. the closing receipt) when arriving via hash.
   useEffect(() => {
