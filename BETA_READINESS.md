@@ -71,7 +71,7 @@
 |---|---|---|
 | Collections page loads | ✅ Pass | Volume 1 + 2 coming-soon entries |
 | Volume 1 CTA button | ✅ Live | All "Get Volume 1" buttons point to Selar URL via `volumeOneSelarUrl` in `src/lib/note-data.ts` |
-| Selar checkout | ✅ Connected | Fallback URL `https://selar.com/9114v4su35` is live; override with `VITE_SELAR_VOLUME1_URL` env var if URL changes |
+| Selar checkout | ✅ Connected | Live URL `https://selar.com/cwx4wm8v18`; override with `VITE_SELAR_VOLUME1_URL` env var if URL changes |
 | Admin test coupon | ⬜ Required | Create 100% discount coupon inside Selar dashboard before founder test checkout — see section below |
 
 ---

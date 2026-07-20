@@ -76,7 +76,7 @@ export interface CollectionEntry {
 
 // Hardcoded fallback so every purchase button works even when
 // VITE_SELAR_VOLUME1_URL is not configured in the deployment environment.
-const SELAR_VOLUME1_FALLBACK_URL = "https://selar.com/9114v4su35";
+const SELAR_VOLUME1_FALLBACK_URL = "https://selar.com/cwx4wm8v18";
 
 const selarVolume1Url = import.meta.env.VITE_SELAR_VOLUME1_URL as string | undefined;
 
