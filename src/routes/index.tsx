@@ -1,6 +1,7 @@
 ﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ShareNote } from "@/components/share-note";
+import { Smartphone } from "lucide-react";
 import {
   ArrowRight,
   Feather,
@@ -21,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppModals } from "@/components/app-modals";
 import { trackEvent } from "@/lib/analytics";
+import { requestInstallPrompt, shouldShowInstallPrompt, isStandalone } from "@/lib/pwa-install";
 import { categories, featuredNote, volumeOneSelarUrl } from "@/lib/note-data";
 import { VOLUME1_CONTENTS } from "@/data/volume1";
 import { isValidEmail, saveWaitlistEntry } from "@/lib/waitlist";
@@ -51,6 +53,12 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  // 8-second timer trigger — fires once per page load, respects eligibility checks
+  useEffect(() => {
+    const id = setTimeout(() => requestInstallPrompt(), 8000);
+    return () => clearTimeout(id);
+  }, []);
+
   return (
     <AppLayout className="space-y-24 pb-12 sm:space-y-32">
       <Landing />
@@ -70,6 +78,7 @@ function Landing() {
       <Volume1Commercial />
       <Volume1Preview />
       <DailyLetterSignup />
+      <AddToPhone />
       <PrivateByDesign />
       <ShortenedMission />
       <PayANoteForward />
@@ -534,6 +543,37 @@ function PassItOn() {
           context="homepage"
         />
       </div>
+    </section>
+  );
+}
+
+/* -------------------------- Add to Phone invite -------------------------- */
+
+function AddToPhone() {
+  const { openInstallPrompt } = useAppModals();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(shouldShowInstallPrompt() && !isStandalone());
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <section className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
+      <div className="flex items-start gap-3">
+        <Smartphone className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+        <p className="text-sm leading-6 text-muted-foreground">
+          Add The Note to your phone, so the words are close when the day gets heavy.
+        </p>
+      </div>
+      <Button
+        variant="paper"
+        className="min-h-10 shrink-0 text-sm"
+        onClick={openInstallPrompt}
+      >
+        Add to phone
+      </Button>
     </section>
   );
 }

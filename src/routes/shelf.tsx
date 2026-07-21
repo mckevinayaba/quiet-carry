@@ -7,6 +7,7 @@ import { ShelfItem } from "@/components/shelf-item";
 import { Button } from "@/components/ui/button";
 import type { SavedReflection, SavedShelfNote } from "@/lib/note-storage";
 import { getKeptNotes, getReflections, getSentNotes } from "@/lib/note-storage";
+import { requestInstallPrompt } from "@/lib/pwa-install";
 
 export const Route = createFileRoute("/shelf")({
   errorComponent: RouteErrorBoundary,
@@ -70,6 +71,8 @@ function ShelfPage() {
     setKept(getKeptNotes());
     setSent(getSentNotes());
     setReflections(getReflections());
+    const id = setTimeout(() => requestInstallPrompt(), 3000);
+    return () => clearTimeout(id);
   }, []);
 
   return (

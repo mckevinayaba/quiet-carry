@@ -11,6 +11,7 @@ import { NoteNotFound, RouteErrorBoundary } from "@/components/route-error";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib/note-data";
+import { requestInstallPrompt } from "@/lib/pwa-install";
 import {
   getKeptNotes,
   keepNote,
@@ -74,6 +75,9 @@ function NotePage() {
     trackEvent("note_opened", { noteId: note.id, category: category.slug });
     setActionResult(null);
     setIsKept(getKeptNotes().some((n) => n.noteId === note.id));
+    // Gently invite install after reading a note (fires after 4s to let them read first)
+    const id = setTimeout(() => requestInstallPrompt(), 4000);
+    return () => clearTimeout(id);
   }, [category.slug, note.id]);
 
   const handleKeep = () => {

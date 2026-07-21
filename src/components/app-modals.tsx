@@ -2,8 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useRouter } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 
-import { InstallModal } from "@/components/install-modal";
-
 import {
   Dialog,
   DialogContent,
@@ -15,13 +13,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { InstallModal, type DeferredInstallPrompt } from "@/components/install-modal";
 import { trackEvent } from "@/lib/analytics";
 import { isValidEmail, saveFeedbackEntry, saveWaitlistEntry, type WaitlistSource } from "@/lib/waitlist";
 import { onMeaningfulGuestAction, shouldShowAccountPrompt } from "@/lib/note-storage";
+import {
+  isIOS,
+  isStandalone,
+  markInstallSeen,
+  onInstallPromptRequested,
+  shouldShowInstallPrompt,
+} from "@/lib/pwa-install";
 
 interface ModalCtx {
   openWaitlist: (source: WaitlistSource) => void;
   openFeedback: () => void;
+  openInstallPrompt: () => void;
 }
 
 const ModalContext = createContext<ModalCtx | null>(null);
@@ -38,12 +45,9 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
   const [accountPromptOpen, setAccountPromptOpen] = useState(false);
   const [accountPromptDismissed, setAccountPromptDismissed] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
-  const [installDismissed, setInstallDismissed] = useState(() =>
-    typeof localStorage !== "undefined"
-      ? localStorage.getItem("tnynyt-install-dismissed") === "1"
-      : false,
-  );
-  const deferredInstallPrompt = useRef<Event & { prompt: () => Promise<void> } | null>(null);
+  const [afterKeptNote, setAfterKeptNote] = useState(false);
+  const deferredPrompt = useRef<DeferredInstallPrompt | null>(null);
+  const isIOSDevice = useRef(typeof window !== "undefined" ? isIOS() : false);
 
   const openWaitlist = useCallback((source: WaitlistSource) => {
     setWaitlistSource(source);
@@ -57,28 +61,57 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
     trackEvent("feedback_opened");
   }, []);
 
+  const openInstallPrompt = useCallback(() => {
+    if (!shouldShowInstallPrompt()) return;
+    if (isStandalone()) return;
+    setAfterKeptNote(false);
+    setInstallOpen(true);
+    markInstallSeen();
+  }, []);
+
+  // Capture Android Chrome native install prompt
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
-      deferredInstallPrompt.current = e as Event & { prompt: () => Promise<void> };
+      deferredPrompt.current = e as DeferredInstallPrompt;
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
+  // Show install prompt when any page requests it
+  useEffect(() => {
+    const unsub = onInstallPromptRequested(() => {
+      if (!shouldShowInstallPrompt()) return;
+      if (isStandalone()) return;
+      setAfterKeptNote(false);
+      setInstallOpen(true);
+      markInstallSeen();
+    });
+    return unsub;
+  }, []);
+
+  // Account prompt + install prompt after meaningful guest actions
   useEffect(() => {
     return onMeaningfulGuestAction((count) => {
       if (!accountPromptDismissed && shouldShowAccountPrompt(count)) {
         setAccountPromptOpen(true);
         trackEvent("account_prompt_shown", { actionCount: count });
+        return;
       }
-      if (!installDismissed && count === 3) {
+      // Show install prompt after first meaningful action (note kept / reflection saved)
+      if (count === 1 && shouldShowInstallPrompt() && !isStandalone()) {
+        setAfterKeptNote(true);
         setInstallOpen(true);
+        markInstallSeen();
       }
     });
-  }, [accountPromptDismissed, installDismissed]);
+  }, [accountPromptDismissed]);
 
-  const value = useMemo<ModalCtx>(() => ({ openWaitlist, openFeedback }), [openWaitlist, openFeedback]);
+  const value = useMemo<ModalCtx>(
+    () => ({ openWaitlist, openFeedback, openInstallPrompt }),
+    [openWaitlist, openFeedback, openInstallPrompt],
+  );
 
   return (
     <ModalContext.Provider value={value}>
@@ -88,12 +121,10 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
       <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <InstallModal
         open={installOpen}
-        deferredPrompt={deferredInstallPrompt.current}
-        onClose={() => {
-          setInstallOpen(false);
-          setInstallDismissed(true);
-          localStorage.setItem("tnynyt-install-dismissed", "1");
-        }}
+        afterKeptNote={afterKeptNote}
+        isIOS={isIOSDevice.current}
+        deferredPrompt={deferredPrompt.current}
+        onClose={() => setInstallOpen(false)}
       />
       <AccountPromptDialog
         open={accountPromptOpen}
