@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 
@@ -13,14 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { InstallModal, type DeferredInstallPrompt } from "@/components/install-modal";
+import { InstallModal } from "@/components/install-modal";
+import type { DeferredInstallPrompt } from "@/lib/pwa-install";
 import { trackEvent } from "@/lib/analytics";
 import { isValidEmail, saveFeedbackEntry, saveWaitlistEntry, type WaitlistSource } from "@/lib/waitlist";
 import { onMeaningfulGuestAction, shouldShowAccountPrompt } from "@/lib/note-storage";
 import {
-  isIOS,
+  clearDeferredPrompt,
   isStandalone,
   markInstallSeen,
+  onDeferredPromptCaptured,
   onInstallPromptRequested,
   shouldShowInstallPrompt,
 } from "@/lib/pwa-install";
@@ -46,10 +48,8 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
   const [accountPromptDismissed, setAccountPromptDismissed] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
   const [afterKeptNote, setAfterKeptNote] = useState(false);
-  // Keep deferred prompt in both ref (for capture) and state (so modal prop is never stale)
-  const deferredPromptRef = useRef<DeferredInstallPrompt | null>(null);
-  const [deferredPromptReady, setDeferredPromptReady] = useState<DeferredInstallPrompt | null>(null);
-  const isIOSDevice = useRef(typeof window !== "undefined" ? isIOS() : false);
+  // Deferred prompt tracked in state so modal prop is never a stale ref snapshot
+  const [deferredPrompt, setDeferredPrompt] = useState<DeferredInstallPrompt | null>(null);
 
   const openWaitlist = useCallback((source: WaitlistSource) => {
     setWaitlistSource(source);
@@ -63,31 +63,35 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
     trackEvent("feedback_opened");
   }, []);
 
+  // openInstallPrompt — called by explicit user action (button/link).
+  // Always opens the modal regardless of dismissal cooldown, because the user
+  // is actively asking for help. Standalone check still applies.
   const openInstallPrompt = useCallback(() => {
-    if (!shouldShowInstallPrompt()) return;
-    if (isStandalone()) return;
+    if (isStandalone()) {
+      console.log("[PWA] already standalone — hiding prompt");
+      return;
+    }
+    console.log("[PWA] install prompt opened by user action");
     setAfterKeptNote(false);
     setInstallOpen(true);
     markInstallSeen();
   }, []);
 
-  // Capture Android Chrome native install prompt — store in both ref and state
+  // Subscribe to the module-level beforeinstallprompt capture.
+  // If the event already fired before this component mounted, onDeferredPromptCaptured
+  // calls our callback immediately with the stored event.
   useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault();
-      const evt = e as DeferredInstallPrompt;
-      deferredPromptRef.current = evt;
-      setDeferredPromptReady(evt);
-    };
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return onDeferredPromptCaptured((evt) => {
+      setDeferredPrompt(evt);
+    });
   }, []);
 
-  // Show install prompt when any page requests it
+  // Show install prompt when any page triggers it via requestInstallPrompt()
   useEffect(() => {
     const unsub = onInstallPromptRequested(() => {
-      if (!shouldShowInstallPrompt()) return;
       if (isStandalone()) return;
+      if (!shouldShowInstallPrompt()) return;
+      console.log("[PWA] install prompt triggered by page");
       setAfterKeptNote(false);
       setInstallOpen(true);
       markInstallSeen();
@@ -103,8 +107,8 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
         trackEvent("account_prompt_shown", { actionCount: count });
         return;
       }
-      // Show install prompt after first meaningful action (note kept / reflection saved)
       if (count === 1 && shouldShowInstallPrompt() && !isStandalone()) {
+        console.log("[PWA] install prompt triggered after first meaningful action");
         setAfterKeptNote(true);
         setInstallOpen(true);
         markInstallSeen();
@@ -126,9 +130,12 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
       <InstallModal
         open={installOpen}
         afterKeptNote={afterKeptNote}
-        isIOS={isIOSDevice.current}
-        deferredPrompt={deferredPromptReady}
+        deferredPrompt={deferredPrompt}
         onClose={() => setInstallOpen(false)}
+        onPromptUsed={() => {
+          clearDeferredPrompt();
+          setDeferredPrompt(null);
+        }}
       />
       <AccountPromptDialog
         open={accountPromptOpen}

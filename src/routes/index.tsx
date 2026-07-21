@@ -551,13 +551,14 @@ function PassItOn() {
 
 function AddToPhone() {
   const { openInstallPrompt } = useAppModals();
-  const [visible, setVisible] = useState(false);
+  const [standalone, setStandalone] = useState(false);
 
+  // Only hide if already running as installed PWA; show even if previously dismissed
   useEffect(() => {
-    setVisible(shouldShowInstallPrompt() && !isStandalone());
+    setStandalone(isStandalone());
   }, []);
 
-  if (!visible) return null;
+  if (standalone) return null;
 
   return (
     <section className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
@@ -1296,7 +1297,7 @@ function FeedbackBlock() {
 /* -------------------------- Footer -------------------------- */
 
 function SiteFooter() {
-  const { openFeedback } = useAppModals();
+  const { openFeedback, openInstallPrompt } = useAppModals();
   return (
     <footer className="-mx-4 border-t border-border bg-[color:var(--paper-deep)]/40 px-4 py-12 sm:-mx-6 sm:px-6">
       <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -1322,6 +1323,13 @@ function SiteFooter() {
         <FooterCol title="Care">
           <FooterLink to="/volume-1">Volume 1</FooterLink>
           <FooterLink to="/gift">Gift Volume 1</FooterLink>
+          <button
+            type="button"
+            onClick={openInstallPrompt}
+            className="text-left text-sm leading-7 text-muted-foreground hover:text-foreground"
+          >
+            Add to phone
+          </button>
           <FooterLink to="/support">Safety &amp; Support</FooterLink>
           <button
             type="button"
