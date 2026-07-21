@@ -87,8 +87,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "The Note You Needed Today" },
       { name: "twitter:description", content: "Find words for what you carry quietly." },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/73cc5279-72d3-43bf-be83-9679a52eff4a/id-preview-4ccdad64--42b096e9-c48d-46ed-a2cd-c1468652d462.lovable.app-1781647574924.png" },
-      // PWA / home-screen meta
-      { name: "theme-color", content: "#f7f1e8" },
+      // PWA / home-screen meta — color-scheme: light prevents browser forced dark mode
+      { name: "color-scheme", content: "light" },
+      { name: "theme-color", content: "#3B2A24" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },

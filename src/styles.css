@@ -101,10 +101,14 @@
 
   html {
     scroll-behavior: smooth;
+    /* Force light color scheme — prevents Samsung Internet / Chrome from
+       applying browser-level forced dark mode to this page. */
+    color-scheme: light;
   }
 
   body {
     min-height: 100vh;
+    background-color: oklch(0.97 0.018 80); /* --background fallback for forced-dark bypass */
     background: var(--bg-texture);
     color: var(--color-foreground);
     font-family: Arial, sans-serif;
