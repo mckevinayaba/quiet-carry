@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Heart } from "lucide-react";
+import { ShareNote } from "@/components/share-note";
 import { useEffect, useState } from "react";
 
 import { AppLayout } from "@/components/app-layout";
@@ -64,24 +65,17 @@ export const Route = createFileRoute("/volume-1/")({
   head: () => ({
     links: [{ rel: "canonical", href: "https://thenoteyouneeded.today/volume-1" }],
     meta: [
-      {
-        title:
-          "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today",
-      },
-      {
-        name: "description",
-        content:
-          "15 notes. 5 chapters. Written for the weight you carry quietly. A private digital collection for the grief, the apology that never came, the truth you kept swallowing.",
-      },
-      {
-        property: "og:title",
-        content: "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today",
-      },
-      {
-        property: "og:description",
-        content:
-          "Fifteen deeply written notes across five emotional chapters. The free note is for today. Volume 1 is for the weight that keeps returning.",
-      },
+      { title: "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today" },
+      { name: "description", content: "15 notes across 5 chapters. Written for the weight you carry quietly." },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "The Note You Needed Today" },
+      { property: "og:title", content: "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today" },
+      { property: "og:description", content: "15 notes across 5 chapters. Written for the weight you carry quietly." },
+      { property: "og:image", content: "https://thenoteyouneeded.today/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Volume 1: The Things We Do Not Say Out Loud | The Note You Needed Today" },
+      { name: "twitter:description", content: "15 notes across 5 chapters. Written for the weight you carry quietly." },
+      { name: "twitter:image", content: "https://thenoteyouneeded.today/og-image.png" },
     ],
   }),
   component: VolumeOneIndexPage,
@@ -273,7 +267,31 @@ function VolumeOneContent() {
                 <ArrowRight aria-hidden />
               </Link>
             </Button>
+            <Link
+              to="/gift"
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+              onClick={() => trackEvent("gift_link_clicked", { source: "volume1_cta" })}
+            >
+              Gift this instead →
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Share invitation */}
+      <section className="mx-auto max-w-2xl space-y-4 text-center">
+        <p className="eyebrow-copy">Know someone who needs this?</p>
+        <p className="text-base leading-7 text-muted-foreground">
+          Give someone the words they have been waiting to hear.
+        </p>
+        <div className="flex justify-center">
+          <ShareNote
+            noteTitle="The Note You Needed Today, Volume 1"
+            wallpaperLine="15 notes for the things one sentence could not hold."
+            caption={`I found this and thought of you.\n\nVolume 1 — words for things we do not say out loud.\nR149 · thenoteyouneeded.today/volume-1`}
+            url="https://thenoteyouneeded.today/volume-1"
+            context="volume1"
+          />
         </div>
       </section>
 

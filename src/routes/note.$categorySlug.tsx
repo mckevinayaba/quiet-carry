@@ -1,8 +1,9 @@
-import { ArrowLeft, BookOpenText, ImageDown, Layers2, LockKeyhole, Mail, NotebookPen, Share2 } from "lucide-react";
+import { ArrowLeft, BookOpenText, ImageDown, Layers2, LockKeyhole, NotebookPen, Share2 } from "lucide-react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
 import { ActionButton } from "@/components/action-button";
+import { ShareNote } from "@/components/share-note";
 import { ShareNoteModal } from "@/components/share-note-modal";
 import { AppLayout } from "@/components/app-layout";
 import { NoteCard } from "@/components/note-card";
@@ -13,10 +14,8 @@ import { getCategoryBySlug, getNoteByCategorySlug, getSimilarNotes } from "@/lib
 import {
   getKeptNotes,
   keepNote,
-  logSentNote,
   registerMeaningfulGuestAction,
 } from "@/lib/note-storage";
-import { buildShareText } from "@/lib/share";
 
 export const Route = createFileRoute("/note/$categorySlug")({
   loader: ({ params }) => {
@@ -27,30 +26,33 @@ export const Route = createFileRoute("/note/$categorySlug")({
   },
   errorComponent: RouteErrorBoundary,
   notFoundComponent: NoteNotFound,
-  head: ({ loaderData }) => ({
-    links: [
-      {
-        rel: "canonical",
-        href: `https://thenoteyouneeded.today/note/${loaderData?.note.categorySlug ?? ""}`,
-      },
-    ],
-    meta: [
-      { title: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
-      {
-        name: "description",
-        content: loaderData?.category.subtitle ?? "A private note for what you carry quietly.",
-      },
-      { property: "og:title", content: `${loaderData?.note.title ?? "Note"} | The Note You Needed Today` },
-      {
-        property: "og:description",
-        content: loaderData?.category.subtitle ?? "A private note for what you carry quietly.",
-      },
-      {
-        property: "og:url",
-        content: `https://thenoteyouneeded.today/note/${loaderData?.note.categorySlug ?? ""}`,
-      },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const noteTitle = loaderData?.note.title ?? "Note";
+    const ogDescription =
+      loaderData?.note.hookLine ||
+      loaderData?.note.shareExcerpt ||
+      loaderData?.category.subtitle ||
+      "Find words for what you carry quietly.";
+    const canonicalUrl = `https://thenoteyouneeded.today/note/${loaderData?.note.categorySlug ?? ""}`;
+    const ogImage = "https://thenoteyouneeded.today/og-image.png";
+    return {
+      links: [{ rel: "canonical", href: canonicalUrl }],
+      meta: [
+        { title: `${noteTitle} | The Note You Needed Today` },
+        { name: "description", content: ogDescription },
+        { property: "og:type", content: "article" },
+        { property: "og:site_name", content: "The Note You Needed Today" },
+        { property: "og:title", content: `${noteTitle} | The Note You Needed Today` },
+        { property: "og:description", content: ogDescription },
+        { property: "og:url", content: canonicalUrl },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: `${noteTitle} | The Note You Needed Today` },
+        { name: "twitter:description", content: ogDescription },
+        { name: "twitter:image", content: ogImage },
+      ],
+    };
+  },
   component: NotePage,
 });
 
@@ -65,6 +67,7 @@ function NotePage() {
   const [isKept, setIsKept] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareInitialPreset, setShareInitialPreset] = useState<"A" | "D" | "P">("A");
+  const [captionLabel, setCaptionLabel] = useState("Copy caption for sharing");
   const similar = useMemo(() => getSimilarNotes(category.slug), [category.slug]);
 
   useEffect(() => {
@@ -90,40 +93,19 @@ function NotePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSend = async () => {
-    const shareText = buildShareText(note.sendableText);
-    let shared = false;
+  const handleCopyCaption = async () => {
+    const caption =
+      note.longCaption ||
+      note.shortCaption ||
+      `From The Note You Needed Today.\nFind words for what you carry quietly.\nhttps://thenoteyouneeded.today/note/${note.categorySlug}`;
     try {
-      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share({ title: note.title, text: shareText });
-        shared = true;
-      } else if (
-        typeof navigator !== "undefined" &&
-        navigator.clipboard &&
-        typeof navigator.clipboard.writeText === "function"
-      ) {
-        await navigator.clipboard.writeText(shareText);
-        shared = true;
-      }
+      await navigator.clipboard.writeText(caption);
+      setCaptionLabel("Caption copied");
+      trackEvent("note_caption_copied", { noteId: note.id });
+      setTimeout(() => setCaptionLabel("Copy caption for sharing"), 2000);
     } catch {
-      try {
-        if (typeof navigator !== "undefined" && navigator.clipboard) {
-          await navigator.clipboard.writeText(shareText);
-          shared = true;
-        }
-      } catch {
-        // all sharing methods unavailable
-      }
+      // clipboard unavailable
     }
-
-    logSentNote(note);
-    trackEvent("note_sent", { noteId: note.id });
-    setActionResult({
-      text: shared
-        ? "Copied. Send it to someone who may need words today."
-        : "Copy the note manually.",
-    });
-    registerMeaningfulGuestAction();
   };
 
   return (
@@ -165,9 +147,6 @@ function NotePage() {
               onClick={handleKeep}
             >
               {isKept ? "Kept in Shelf" : "Keep this Note"}
-            </ActionButton>
-            <ActionButton hint="Share softly, without noise" icon={Mail} onClick={handleSend}>
-              Send this Quietly
             </ActionButton>
             <ActionButton
               asChild
@@ -227,6 +206,24 @@ function NotePage() {
           </>
         }
       />
+
+      <div className="space-y-3">
+        <ShareNote
+          noteTitle={note.title}
+          wallpaperLine={note.hookLine || note.shareExcerpt || ""}
+          caption={note.longCaption || note.shortCaption || ""}
+          context="note"
+          url={`https://thenoteyouneeded.today/note/${note.categorySlug}`}
+          asActionButton
+        />
+        <button
+          type="button"
+          onClick={handleCopyCaption}
+          className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+        >
+          {captionLabel}
+        </button>
+      </div>
 
       {note.safetyNote ? (
         <div className="paper-panel space-y-3 border-l-4 border-l-destructive/50">

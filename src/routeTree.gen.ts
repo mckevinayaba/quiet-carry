@@ -32,6 +32,7 @@ import { Route as Volume1UnlockRouteImport } from './routes/volume-1.unlock'
 import { Route as Volume1PreviewRouteImport } from './routes/volume-1.preview'
 import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as AdminEmailsRouteImport } from './routes/admin.emails'
 import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicQuietLetterSubscribeRouteImport } from './routes/api/public/quiet-letter-subscribe'
@@ -154,6 +155,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEmailsRoute = AdminEmailsRouteImport.update({
+  id: '/admin/emails',
+  path: '/admin/emails',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Volume1ReadChapterRoute = Volume1ReadChapterRouteImport.update({
   id: '/read/$chapter',
   path: '/read/$chapter',
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
   '/volume-1': typeof Volume1RouteWithChildren
+  '/admin/emails': typeof AdminEmailsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/today': typeof TodayRoute
   '/volume-1': typeof Volume1RouteWithChildren
+  '/admin/emails': typeof AdminEmailsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/note/$categorySlug': typeof NoteCategorySlugRoute
   '/volume-1/preview': typeof Volume1PreviewRoute
@@ -302,6 +311,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/today'
     | '/volume-1'
+    | '/admin/emails'
     | '/email/unsubscribe'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/support'
     | '/today'
+    | '/admin/emails'
     | '/email/unsubscribe'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/today'
     | '/volume-1'
+    | '/admin/emails'
     | '/email/unsubscribe'
     | '/note/$categorySlug'
     | '/volume-1/preview'
@@ -395,6 +407,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TodayRoute: typeof TodayRoute
   Volume1Route: typeof Volume1RouteWithChildren
+  AdminEmailsRoute: typeof AdminEmailsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
@@ -568,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/emails': {
+      id: '/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AdminEmailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/volume-1/read/$chapter': {
       id: '/volume-1/read/$chapter'
       path: '/read/$chapter'
@@ -648,6 +668,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TodayRoute: TodayRoute,
   Volume1Route: Volume1RouteWithChildren,
+  AdminEmailsRoute: AdminEmailsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
@@ -660,3 +681,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

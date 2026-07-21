@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppLayout } from "@/components/app-layout";
 import { CategoryCard } from "@/components/category-card";
 import { RouteErrorBoundary } from "@/components/route-error";
+import { ShareNote } from "@/components/share-note";
 import { trackEvent } from "@/lib/analytics";
 import { categories } from "@/lib/note-data";
 
@@ -10,16 +11,17 @@ export const Route = createFileRoute("/feelings")({
   errorComponent: RouteErrorBoundary,
   head: () => ({
     meta: [
-      { title: "What are you carrying today?" },
-      {
-        name: "description",
-        content: "Choose the feeling closest to what you are carrying quietly.",
-      },
-      { property: "og:title", content: "What are you carrying today?" },
-      {
-        property: "og:description",
-        content: "Choose the feeling closest to what you are carrying quietly.",
-      },
+      { title: "What are you carrying today? | The Note You Needed Today" },
+      { name: "description", content: "Choose the closest feeling. You do not have to explain it yet." },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "The Note You Needed Today" },
+      { property: "og:title", content: "What are you carrying today? | The Note You Needed Today" },
+      { property: "og:description", content: "Choose the closest feeling. You do not have to explain it yet." },
+      { property: "og:image", content: "https://thenoteyouneeded.today/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "What are you carrying today? | The Note You Needed Today" },
+      { name: "twitter:description", content: "Choose the closest feeling. You do not have to explain it yet." },
+      { name: "twitter:image", content: "https://thenoteyouneeded.today/og-image.png" },
     ],
   }),
   component: FeelingsPage,
@@ -116,6 +118,23 @@ function FeelingsPage() {
           );
         })}
       </div>
+
+      <section className="space-y-3 pt-4">
+        <p className="eyebrow-copy">Know someone who needs this?</p>
+        <h2 className="font-display text-2xl leading-tight text-foreground">
+          Send them here. No explanation needed.
+        </h2>
+        <p className="max-w-md text-sm leading-6 text-muted-foreground">
+          Sometimes the best thing you can do is quietly pass someone the door.
+        </p>
+        <ShareNote
+          noteTitle="The Note You Needed Today — Feelings"
+          wallpaperLine="Every feeling has a room. Choose the one that knows your name today."
+          caption={`Sometimes you just need words for what you are carrying.\n\nFind the note you need today.\nthenoteyouneeded.today/feelings`}
+          url="https://thenoteyouneeded.today/feelings"
+          context="feelings"
+        />
+      </section>
     </AppLayout>
   );
 }

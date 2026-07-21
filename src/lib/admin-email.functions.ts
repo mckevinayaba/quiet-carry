@@ -47,7 +47,7 @@ export const getEmailStats = createServerFn({ method: "GET" }).handler(
 );
 
 export const getEmailLog = createServerFn({ method: "GET" })
-  .inputValidator(
+  .validator(
     z.object({
       page: z.number().int().min(0).default(0),
       status: z.string().optional(),

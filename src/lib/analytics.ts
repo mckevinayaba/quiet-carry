@@ -59,7 +59,12 @@ export type AnalyticsEventName =
   | "volume1_section_viewed"
   | "volume1_preview_opened"
   | "pay_forward_viewed"
-  | "pay_forward_started";
+  | "pay_forward_started"
+  | "share_panel_opened"
+  | "share_option_clicked"
+  | "share_link_copied"
+  | "note_caption_copied"
+  | "gift_link_clicked";
 
 // ---------------------------------------------------------------------------
 // Payload sanitisation
@@ -82,6 +87,7 @@ const SAFE_PAYLOAD_KEYS = new Set([
   "from",
   "preset",
   "contentMode",
+  "option",
 ]);
 
 function sanitizePayload(

@@ -1,5 +1,6 @@
 ﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { ShareNote } from "@/components/share-note";
 import {
   ArrowRight,
   Feather,
@@ -34,17 +35,16 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "https://thenoteyouneeded.today/" }],
     meta: [
       { title: "The Note You Needed Today — Find words for what you carry quietly" },
-      {
-        name: "description",
-        content:
-          "Find words for what you carry quietly. A private-first emotional language platform for the feelings you cannot always explain.",
-      },
-      { property: "og:title", content: "The Note You Needed Today" },
-      {
-        property: "og:description",
-        content:
-          "Find words for what you carry quietly. A private-first emotional language platform.",
-      },
+      { name: "description", content: "Not advice. Not performance. Just the note you needed before you knew how to ask." },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "The Note You Needed Today" },
+      { property: "og:title", content: "The Note You Needed Today — Find words for what you carry quietly" },
+      { property: "og:description", content: "Not advice. Not performance. Just the note you needed before you knew how to ask." },
+      { property: "og:image", content: "https://thenoteyouneeded.today/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "The Note You Needed Today — Find words for what you carry quietly" },
+      { name: "twitter:description", content: "Not advice. Not performance. Just the note you needed before you knew how to ask." },
+      { name: "twitter:image", content: "https://thenoteyouneeded.today/og-image.png" },
     ],
   }),
   component: HomePage,
@@ -66,6 +66,7 @@ function Landing() {
       <HowItWorks />
       <TodaysNote />
       <Volume1Transition />
+      <PassItOn />
       <Volume1Commercial />
       <Volume1Preview />
       <DailyLetterSignup />
@@ -507,6 +508,31 @@ function Volume1Transition() {
             <Link to="/feelings">Choose another feeling</Link>
           </Button>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Pass It On -------------------------- */
+
+function PassItOn() {
+  return (
+    <section className="mx-auto max-w-2xl space-y-4 text-center">
+      <span className="eyebrow-copy">Pass it on</span>
+      <h2 className="text-balance font-display text-3xl leading-tight text-foreground sm:text-4xl">
+        If this found you at the right time, someone else needs it too.
+      </h2>
+      <p className="mx-auto max-w-md text-sm leading-6 text-muted-foreground">
+        No explanation needed. Just send the note.
+      </p>
+      <div className="flex justify-center">
+        <ShareNote
+          noteTitle="The Note You Needed Today"
+          wallpaperLine="Find words for what you carry quietly."
+          caption={`For the people who said 'I'm fine' and meant something heavier.\n\nFind words for what you carry quietly.\nthenoteyouneeded.today`}
+          url="https://thenoteyouneeded.today"
+          context="homepage"
+        />
       </div>
     </section>
   );

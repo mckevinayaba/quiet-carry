@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/app-layout";
 import { MoodSelector } from "@/components/mood-selector";
 import { NoteCard } from "@/components/note-card";
 import { RouteErrorBoundary } from "@/components/route-error";
+import { ShareNote } from "@/components/share-note";
 import { Button } from "@/components/ui/button";
 import { getCategoryBySlug, featuredNote } from "@/lib/note-data";
 
@@ -13,7 +14,16 @@ export const Route = createFileRoute("/today")({
   head: () => ({
     meta: [
       { title: "Today's Note | The Note You Needed Today" },
-      { name: "description", content: "One quiet note for today, chosen for this moment." },
+      { name: "description", content: "One note. Written for the part of you that has been quiet." },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "The Note You Needed Today" },
+      { property: "og:title", content: "Today's Note | The Note You Needed Today" },
+      { property: "og:description", content: "One note. Written for the part of you that has been quiet." },
+      { property: "og:image", content: "https://thenoteyouneeded.today/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Today's Note | The Note You Needed Today" },
+      { name: "twitter:description", content: "One note. Written for the part of you that has been quiet." },
+      { name: "twitter:image", content: "https://thenoteyouneeded.today/og-image.png" },
     ],
   }),
   component: TodayPage,
@@ -68,6 +78,20 @@ function TodayPage() {
             Open this note
           </Link>
         </Button>
+      </div>
+
+      <div className="space-y-3 pt-2">
+        <p className="eyebrow-copy">Send today's note</p>
+        <p className="text-sm leading-6 text-muted-foreground">
+          If this note found you at the right time, pass it to someone who may need it today.
+        </p>
+        <ShareNote
+          noteTitle={note.title}
+          wallpaperLine={note.hookLine || note.shareExcerpt || ""}
+          caption={note.longCaption || note.shortCaption || ""}
+          context="today"
+          url={`https://thenoteyouneeded.today/note/${note.categorySlug}`}
+        />
       </div>
     </AppLayout>
   );
