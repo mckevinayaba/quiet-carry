@@ -46,7 +46,9 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
   const [accountPromptDismissed, setAccountPromptDismissed] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
   const [afterKeptNote, setAfterKeptNote] = useState(false);
-  const deferredPrompt = useRef<DeferredInstallPrompt | null>(null);
+  // Keep deferred prompt in both ref (for capture) and state (so modal prop is never stale)
+  const deferredPromptRef = useRef<DeferredInstallPrompt | null>(null);
+  const [deferredPromptReady, setDeferredPromptReady] = useState<DeferredInstallPrompt | null>(null);
   const isIOSDevice = useRef(typeof window !== "undefined" ? isIOS() : false);
 
   const openWaitlist = useCallback((source: WaitlistSource) => {
@@ -69,11 +71,13 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
     markInstallSeen();
   }, []);
 
-  // Capture Android Chrome native install prompt
+  // Capture Android Chrome native install prompt — store in both ref and state
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
-      deferredPrompt.current = e as DeferredInstallPrompt;
+      const evt = e as DeferredInstallPrompt;
+      deferredPromptRef.current = evt;
+      setDeferredPromptReady(evt);
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
@@ -123,7 +127,7 @@ export function AppModalsProvider({ children }: { children: ReactNode }) {
         open={installOpen}
         afterKeptNote={afterKeptNote}
         isIOS={isIOSDevice.current}
-        deferredPrompt={deferredPrompt.current}
+        deferredPrompt={deferredPromptReady}
         onClose={() => setInstallOpen(false)}
       />
       <AccountPromptDialog
