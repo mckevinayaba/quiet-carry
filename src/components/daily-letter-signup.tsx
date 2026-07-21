@@ -61,7 +61,7 @@ export function DailyLetterSignup() {
 
           {status === "error" ? (
             <p className="text-sm text-destructive">
-              Something went wrong. Please try again in a moment.
+              Something did not go through. Please try again, or email thenoteyouneededtoday@gmail.com.
             </p>
           ) : null}
 

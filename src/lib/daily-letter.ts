@@ -11,22 +11,30 @@ export interface SubscribeResult {
   error?: string;
 }
 
+const TIMEOUT_MS = 8_000;
+
 export async function subscribeToQuietLetter(email: string): Promise<SubscribeResult> {
   const trimmed = email.trim();
   if (!isValidEmail(trimmed)) return { ok: false, error: "invalid_email" };
 
-  const { data, error } = await supabase.functions.invoke("subscribe-daily-letter", {
-    body: { email: trimmed },
-  });
+  const timeout = new Promise<SubscribeResult>((resolve) =>
+    setTimeout(() => resolve({ ok: false, error: "timeout" }), TIMEOUT_MS),
+  );
 
-  if (error) {
-    if (import.meta.env.DEV) console.error("[daily-letter] subscribe failed", error);
-    return { ok: false, error: error.message };
-  }
+  const request = supabase.functions
+    .invoke("subscribe-daily-letter", { body: { email: trimmed } })
+    .then(({ data, error }) => {
+      if (error) {
+        if (import.meta.env.DEV) console.error("[daily-letter] subscribe failed", error);
+        return { ok: false, error: error.message } as SubscribeResult;
+      }
+      if (data && data.ok === false) return { ok: false, error: data.error } as SubscribeResult;
+      return { ok: true } as SubscribeResult;
+    })
+    .catch((err: unknown) => {
+      if (import.meta.env.DEV) console.error("[daily-letter] unexpected error", err);
+      return { ok: false, error: "unknown" } as SubscribeResult;
+    });
 
-  if (data && data.ok === false) {
-    return { ok: false, error: data.error };
-  }
-
-  return { ok: true };
+  return Promise.race([request, timeout]);
 }
