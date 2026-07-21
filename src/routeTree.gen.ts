@@ -34,6 +34,7 @@ import { Route as NoteCategorySlugRouteImport } from './routes/note.$categorySlu
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as Volume1ReadChapterRouteImport } from './routes/volume-1.read.$chapter'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicQuietLetterSubscribeRouteImport } from './routes/api/public/quiet-letter-subscribe'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -163,6 +164,12 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQuietLetterSubscribeRoute =
+  ApiPublicQuietLetterSubscribeRouteImport.update({
+    id: '/api/public/quiet-letter-subscribe',
+    path: '/api/public/quiet-letter-subscribe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
+  '/api/public/quiet-letter-subscribe': typeof ApiPublicQuietLetterSubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -235,6 +243,7 @@ export interface FileRoutesByTo {
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1': typeof Volume1IndexRoute
+  '/api/public/quiet-letter-subscribe': typeof ApiPublicQuietLetterSubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -266,6 +275,7 @@ export interface FileRoutesById {
   '/volume-1/unlock': typeof Volume1UnlockRoute
   '/write/$categorySlug': typeof WriteCategorySlugRoute
   '/volume-1/': typeof Volume1IndexRoute
+  '/api/public/quiet-letter-subscribe': typeof ApiPublicQuietLetterSubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/volume-1/read/$chapter': typeof Volume1ReadChapterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1/'
+    | '/api/public/quiet-letter-subscribe'
     | '/lovable/email/suppression'
     | '/volume-1/read/$chapter'
     | '/lovable/email/queue/process'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1'
+    | '/api/public/quiet-letter-subscribe'
     | '/lovable/email/suppression'
     | '/volume-1/read/$chapter'
     | '/lovable/email/queue/process'
@@ -357,6 +369,7 @@ export interface FileRouteTypes {
     | '/volume-1/unlock'
     | '/write/$categorySlug'
     | '/volume-1/'
+    | '/api/public/quiet-letter-subscribe'
     | '/lovable/email/suppression'
     | '/volume-1/read/$chapter'
     | '/lovable/email/queue/process'
@@ -385,6 +398,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   NoteCategorySlugRoute: typeof NoteCategorySlugRoute
   WriteCategorySlugRoute: typeof WriteCategorySlugRoute
+  ApiPublicQuietLetterSubscribeRoute: typeof ApiPublicQuietLetterSubscribeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -568,6 +582,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/quiet-letter-subscribe': {
+      id: '/api/public/quiet-letter-subscribe'
+      path: '/api/public/quiet-letter-subscribe'
+      fullPath: '/api/public/quiet-letter-subscribe'
+      preLoaderRoute: typeof ApiPublicQuietLetterSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -630,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   NoteCategorySlugRoute: NoteCategorySlugRoute,
   WriteCategorySlugRoute: WriteCategorySlugRoute,
+  ApiPublicQuietLetterSubscribeRoute: ApiPublicQuietLetterSubscribeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
