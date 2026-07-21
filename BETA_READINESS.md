@@ -182,6 +182,14 @@ or update `SELAR_VOLUME1_FALLBACK_URL` in `src/lib/note-data.ts`.
 
 ---
 
+## Support Email
+
+**Temporary:** `thenoteyouneededtoday@gmail.com` — active and used in all public-facing copy (footer, unlock page, How It Works step, morning email error).
+
+**Future:** `hello@thenoteyouneeded.today` — replace all instances once the branded email has been externally configured, tested, and confirmed working. Search for `thenoteyouneededtoday@gmail.com` in `src/routes/` to find every location to update.
+
+---
+
 ## Recommended Next Steps
 
 1. Complete Selar admin test checkout (see section above)

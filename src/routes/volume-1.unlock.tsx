@@ -109,10 +109,10 @@ function UnlockPage() {
           <p className="text-sm leading-6 text-muted-foreground">
             If you cannot find it, check your spam folder. Still missing?{" "}
             <a
-              href="mailto:hello@thenoteyouneeded.today"
+              href="mailto:thenoteyouneededtoday@gmail.com"
               className="underline underline-offset-4"
             >
-              hello@thenoteyouneeded.today
+              thenoteyouneededtoday@gmail.com
             </a>
           </p>
         </div>

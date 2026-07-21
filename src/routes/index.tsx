@@ -1137,7 +1137,7 @@ function Waitlist() {
       setError(
         res.error === "throttled"
           ? "You have already joined recently. Please wait a moment before trying again."
-          : "Something went wrong. Please try again.",
+          : "Something did not go through. Please try again, or email thenoteyouneededtoday@gmail.com.",
       );
       return;
     }
@@ -1268,10 +1268,10 @@ function SiteFooter() {
 
         <FooterCol title="Contact">
           <a
-            href="mailto:hello@thenoteyouneeded.today"
+            href="mailto:thenoteyouneededtoday@gmail.com"
             className="text-sm leading-7 text-muted-foreground hover:text-foreground"
           >
-            hello@thenoteyouneeded.today
+            thenoteyouneededtoday@gmail.com
           </a>
         </FooterCol>
       </div>

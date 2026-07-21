@@ -50,7 +50,7 @@ const HOW_IT_WORKS = [
   {
     step: "2",
     title: "Receive",
-    copy: "Your unique access code arrives in your email within minutes of purchase. If it does not arrive, check your spam folder or email hello@thenoteyouneeded.today.",
+    copy: "Your unique access code arrives in your email within minutes of purchase. If it does not arrive, check your spam folder or email thenoteyouneededtoday@gmail.com.",
   },
   {
     step: "3",
